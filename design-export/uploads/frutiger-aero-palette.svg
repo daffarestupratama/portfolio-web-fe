@@ -1,0 +1,62 @@
+<svg viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, -apple-system, &#39;Segoe UI&#39;, Roboto, sans-serif">
+  <rect width="860" height="560" rx="20" fill="#FFFFFF"></rect>
+
+  <text x="40" y="48" font-size="24" font-weight="700" fill="#1B2E33">Frutiger Aero — soft green × sky blue</text>
+  <text x="40" y="72" font-size="13" fill="#4E6569">Analogous hues bridged by a teal/aqua midtone · light-default + dark mode</text>
+
+  
+  <text x="40" y="110" font-size="13" font-weight="700" letter-spacing="1.5" fill="#1B2E33">LIGHT MODE</text>
+
+  <g>
+    <rect x="40" y="124" width="96" height="96" rx="14" fill="#EFF5F1" stroke="#D8E6E0"></rect>
+    <rect x="152" y="124" width="96" height="96" rx="14" fill="#FFFFFF" stroke="#D8E6E0"></rect>
+    <rect x="264" y="124" width="96" height="96" rx="14" fill="#5AA9D6"></rect>
+    <rect x="376" y="124" width="96" height="96" rx="14" fill="#5FB98A"></rect>
+    <rect x="488" y="124" width="96" height="96" rx="14" fill="#46B3AE"></rect>
+    <rect x="600" y="124" width="96" height="96" rx="14" fill="#1B2E33"></rect>
+    <rect x="712" y="124" width="96" height="96" rx="14" fill="#D8E6E0" stroke="#C7DAD3"></rect>
+  </g>
+  <g font-size="11" text-anchor="middle">
+    <text x="88" y="238" fill="#1B2E33">Base bg</text>      <text x="88" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#EFF5F1</text>
+    <text x="200" y="238" fill="#1B2E33">Surface</text>      <text x="200" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#FFFFFF</text>
+    <text x="312" y="238" fill="#1B2E33">Sky · primary</text><text x="312" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#5AA9D6</text>
+    <text x="424" y="238" fill="#1B2E33">Green · 2nd</text>  <text x="424" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#5FB98A</text>
+    <text x="536" y="238" fill="#1B2E33">Teal · bridge</text><text x="536" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#46B3AE</text>
+    <text x="648" y="238" fill="#1B2E33">Ink · text</text>   <text x="648" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#1B2E33</text>
+    <text x="760" y="238" fill="#1B2E33">Border</text>       <text x="760" y="253" font-family="ui-monospace, monospace" fill="#4E6569">#D8E6E0</text>
+  </g>
+
+  
+  <text x="40" y="300" font-size="13" font-weight="700" letter-spacing="1.5" fill="#1B2E33">DARK MODE</text>
+  <rect x="24" y="312" width="812" height="152" rx="16" fill="#0B1517"></rect>
+
+  <g stroke="rgba(255,255,255,0.14)">
+    <rect x="40" y="326" width="96" height="96" rx="14" fill="#0F1E20"></rect>
+    <rect x="152" y="326" width="96" height="96" rx="14" fill="#15282A"></rect>
+    <rect x="264" y="326" width="96" height="96" rx="14" fill="#74C2EA" stroke="none"></rect>
+    <rect x="376" y="326" width="96" height="96" rx="14" fill="#72D3A0" stroke="none"></rect>
+    <rect x="488" y="326" width="96" height="96" rx="14" fill="#4FCFC6" stroke="none"></rect>
+    <rect x="600" y="326" width="96" height="96" rx="14" fill="#E7F1ED" stroke="none"></rect>
+    <rect x="712" y="326" width="96" height="96" rx="14" fill="#2B3F40"></rect>
+  </g>
+  <g font-size="11" text-anchor="middle">
+    <text x="88" y="440" fill="#E7F1ED">Base bg</text>       <text x="88" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#0F1E20</text>
+    <text x="200" y="440" fill="#E7F1ED">Surface</text>       <text x="200" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#15282A</text>
+    <text x="312" y="440" fill="#E7F1ED">Sky · primary</text> <text x="312" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#74C2EA</text>
+    <text x="424" y="440" fill="#E7F1ED">Green · 2nd</text>   <text x="424" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#72D3A0</text>
+    <text x="536" y="440" fill="#E7F1ED">Teal · bridge</text> <text x="536" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#4FCFC6</text>
+    <text x="648" y="440" fill="#E7F1ED">Text</text>          <text x="648" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#E7F1ED</text>
+    <text x="760" y="440" fill="#E7F1ED">Border 12%</text>    <text x="760" y="455" font-family="ui-monospace, monospace" fill="#9DB4B0">#FFFFFF1F</text>
+  </g>
+
+  
+  <defs>
+    <linearGradient id="harmony" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5FB98A"></stop>
+      <stop offset="0.5" stop-color="#46B3AE"></stop>
+      <stop offset="1" stop-color="#5AA9D6"></stop>
+    </linearGradient>
+  </defs>
+  <rect x="40" y="492" width="768" height="20" rx="10" fill="url(#harmony)"></rect>
+  <text x="40" y="534" font-size="11" fill="#4E6569">Green → teal → sky: the bridge keeps the two anchors in harmony. Glass surfaces sit on top of these as translucent white (light) / white-on-dark (dark).</text>
+</svg>

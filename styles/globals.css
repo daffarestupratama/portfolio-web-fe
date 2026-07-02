@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------- */
+/* Design tokens — copied verbatim from design-export/Daffa Portfolio.dc.html */
+/* Only change from the export: body font-family swapped from Space Grotesk */
+/* to var(--font-sans) (Inter), per kickoff-brief.md §3.                    */
+/* ---------------------------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.012em;
+}
+
+:root {
+  --bg: #EFF5F1; --surface: #FFFFFF;
+  --ink: #1B2E33; --ink-dim: #4E6569; --ink-faint: #86A09B;
+  --border: #D8E6E0;
+  /* hue anchors (light) */
+  --sky: #5AA9D6; --green: #5FB98A; --teal: #46B3AE;
+  --set-sky-a: #5AA9D6; --set-sky-2: #7FC0E2; --set-sky-ink: #2E7CA8;
+  --set-teal-a: #46B3AE; --set-teal-2: #79CDC8; --set-teal-ink: #2E8783;
+  --set-green-a: #5FB98A; --set-green-2: #86CFA6; --set-green-ink: #3C8E63;
+  /* default accent = sky */
+  --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink);
+  --chip: color-mix(in srgb, var(--accent) 12%, transparent);
+  --chip-brd: color-mix(in srgb, var(--accent) 26%, transparent);
+  /* liquid-glass material — base (light) */
+  --g-op-base: 0.55; --g-blur-base: 18px; --g-spec-base: 0.85; --g-hi-base: 0.92; --g-brd-base: 0.66;
+  --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1;
+  --glass-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult)));
+  --glass-bg-2: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.55));
+  --glass-brd: rgba(255,255,255, var(--g-brd-base));
+  --glass-hi: rgba(255,255,255, calc(var(--g-hi-base) * var(--g-spec-mult)));
+  --glass-spec: calc(var(--g-spec-base) * var(--g-spec-mult));
+  --glass-blur: calc(var(--g-blur-base) * var(--g-blur-mult));
+  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 60%);
+  /* cards — cleaner, more restrained glass (nav keeps the fuller --glass-* recipe) */
+  --card-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.48));
+  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.12), rgba(255,255,255,0.015) 55%);
+  --card-hi: rgba(255,255,255,0.4);
+  --glass-sh: 0 18px 40px -22px rgba(27,46,51,0.30);
+  --glass-sh-lg: 0 40px 80px -30px rgba(27,46,51,0.42);
+  /* ambient blobs — subtle, recessive */
+  --blob-green: rgba(191,227,207,0.55); --blob-sky: rgba(195,228,241,0.55); --blob-lum: rgba(255,255,255,0.75);
+  --blob-op: 0.22;
+  /* motion */
+  --drift: 64s; --float: 9s; --float-play: running; --lift: -8px;
+}
+[data-theme="dark"] {
+  --bg: #0F1E20; --surface: #15282A;
+  --ink: #E7F1ED; --ink-dim: #9DB4B0; --ink-faint: #6E8783;
+  --border: rgba(255,255,255,0.12);
+  --sky: #74C2EA; --green: #72D3A0; --teal: #4FCFC6;
+  --set-sky-a: #74C2EA; --set-sky-2: #A5DAF2; --set-sky-ink: #B7E4FA;
+  --set-teal-a: #4FCFC6; --set-teal-2: #8AE0DA; --set-teal-ink: #B4EEEA;
+  --set-green-a: #72D3A0; --set-green-2: #9BE1BE; --set-green-ink: #C0EED5;
+  --g-op-base: 0.075; --g-spec-base: 0.5; --g-hi-base: 0.4; --g-brd-base: 0.14;
+  --glass-bg: rgba(255,255,255,0.07);
+  --glass-bg-2: rgba(255,255,255,0.04);
+  --glass-brd: rgba(255,255,255,0.12);
+  --glass-hi: rgba(255,255,255,0.10);
+  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.05), rgba(255,255,255,0.008) 60%);
+  --card-bg: rgba(255,255,255,0.045);
+  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 55%);
+  --card-hi: rgba(255,255,255,0.10);
+  --glass-sh: 0 22px 48px -22px rgba(0,0,0,0.72);
+  --glass-sh-lg: 0 46px 92px -30px rgba(0,0,0,0.82);
+  --blob-green: rgba(114,211,160,0.9); --blob-sky: rgba(116,194,234,0.9); --blob-lum: rgba(0,0,0,0.55);
+  --blob-op: 0.09;
+}
+/* accent mood (independent of theme; hues follow theme via --set-*) */
+[data-accent="sky"] { --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink); }
+[data-accent="teal"] { --accent: var(--set-teal-a); --accent-2: var(--set-teal-2); --accent-ink: var(--set-teal-ink); }
+[data-accent="green"] { --accent: var(--set-green-a); --accent-2: var(--set-green-2); --accent-ink: var(--set-green-ink); }
+/* glass intensity */
+[data-glass="subtle"] { --g-op-mult: 0.72; --g-blur-mult: 0.62; --g-spec-mult: 0.58; }
+[data-glass="balanced"] { --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1; }
+[data-glass="vivid"] { --g-op-mult: 1.22; --g-blur-mult: 1.55; --g-spec-mult: 1.28; }
+/* motion */
+[data-motion="calm"] { --drift: 130s; --float-play: paused; --lift: -3px; }
+
+@keyframes driftA { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(3vw,2vh) scale(1.08); } 100% { transform: translate(0,0) scale(1); } }
+@keyframes driftB { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-2.5vw,3vh) scale(1.06); } 100% { transform: translate(0,0) scale(1); } }
+@keyframes driftC { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(2vw,-2.5vh) scale(1.1); } 100% { transform: translate(0,0) scale(1); } }
+@keyframes floaty { 0% { transform: translateY(0); } 50% { transform: translateY(-9px); } 100% { transform: translateY(0); } }
+@keyframes blink { 0%, 45% { opacity: 0.9; } 50%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

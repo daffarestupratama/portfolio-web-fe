@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  .frm{font-family:Sora,system-ui,sans-serif;color:#16203a;letter-spacing:-0.01em}
+  .lbl{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#54607c;margin-bottom:10px}
+  .card{background:#fff;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  /* tinted stage so glass refracts */
+  .stage{position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(150deg,#f3f7fe,#e3ecfb 60%,#e8e1fb)}
+  .stage::before{content:"";position:absolute;width:60%;height:70%;left:-8%;top:-10%;border-radius:50%;background:radial-gradient(circle,rgba(99,150,255,0.6),transparent 68%);filter:blur(34px)}
+  .stage::after{content:"";position:absolute;width:60%;height:70%;right:-10%;bottom:-14%;border-radius:50%;background:radial-gradient(circle,rgba(150,120,255,0.5),transparent 68%);filter:blur(36px)}
+  .stage-d{background:linear-gradient(150deg,#0d1530,#0a1124 60%,#10122e)}
+  .stage-d::before{background:radial-gradient(circle,rgba(60,110,255,0.5),transparent 68%)}
+  .stage-d::after{background:radial-gradient(circle,rgba(120,90,255,0.45),transparent 68%)}
+  .glass{position:relative;z-index:2;background:rgba(255,255,255,0.52);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,0.85);box-shadow:0 12px 34px -14px rgba(31,54,112,0.3),inset 0 1px 0 rgba(255,255,255,0.95)}
+  .glass-d{background:rgba(255,255,255,0.065);border:1px solid rgba(255,255,255,0.16);box-shadow:0 14px 38px -14px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.3)}
+  .demo-card{border-radius:18px;padding:18px;transition:transform .2s cubic-bezier(.2,.7,.2,1),box-shadow .2s ease;cursor:pointer}
+  .demo-card:hover{transform:perspective(900px) translateY(-6px) rotateX(2deg);box-shadow:0 30px 60px -22px rgba(31,54,112,0.42),inset 0 1px 0 rgba(255,255,255,0.95),0 0 0 1px rgba(63,109,255,0.2)}
+  .demo-card:active{transform:translateY(-1px) scale(.985)}
+  .sw{height:54px;border-radius:11px;border:1px solid rgba(0,0,0,0.06);display:flex;align-items:flex-end;padding:7px;color:#fff;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+  @keyframes liftLoop{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</helmet>
+
+<div style="position:absolute;left:0;top:0;width:600px" class="frm">
+  <div class="lbl" data-drags-parent="1">Style direction · 01</div>
+  <div class="card" style="padding:30px">
+    <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:#3f6dff;letter-spacing:0.08em">DAFFA RESTUPRATAMA — PORTFOLIO</div>
+    <h1 style="margin:10px 0 0;font-size:38px;font-weight:700;letter-spacing:-0.035em;line-height:1.05">Liquid-glass on a calm azure field</h1>
+    <p style="margin:14px 0 0;font-size:15px;line-height:1.6;color:#54607c;max-width:42ch">Pronounced frosted surfaces float over a soft, light, blue-tinted backdrop. Glass is used as accent — nav, hero panel, cards — never the whole page. Formal yet warm; modern, not flashy.</p>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+      <span style="padding:7px 13px;border-radius:999px;background:rgba(63,109,255,0.1);border:1px solid rgba(63,109,255,0.2);color:#2a4fd6;font-size:12.5px;font-weight:600">Sora · geometric sans</span>
+      <span style="padding:7px 13px;border-radius:999px;background:rgba(63,109,255,0.1);border:1px solid rgba(63,109,255,0.2);color:#2a4fd6;font-size:12.5px;font-weight:600">Soft azure accent #3f6dff</span>
+      <span style="padding:7px 13px;border-radius:999px;background:rgba(63,109,255,0.1);border:1px solid rgba(63,109,255,0.2);color:#2a4fd6;font-size:12.5px;font-weight:600">Radius 18–20px · pill buttons</span>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:700px;top:0;width:430px" class="frm">
+  <div class="lbl" data-drags-parent="1">Glass recipe</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="stage" style="padding:26px">
+      <div class="glass" style="border-radius:18px;padding:18px">
+        <div style="font-weight:650;font-size:15px">Frosted surface</div>
+        <div style="margin-top:6px;font-size:12.5px;color:#54607c">Luminous border + inner highlight catch the light blobs behind.</div>
+      </div>
+    </div>
+    <div style="padding:20px 22px">
+      <div class="mono" style="font-size:12px;line-height:2;color:#16203a">
+        <div><span style="color:#8a96ad">background</span> &nbsp;rgba(255,255,255,<b>.52</b>)</div>
+        <div><span style="color:#8a96ad">backdrop</span> &nbsp;&nbsp;&nbsp;blur(<b>22px</b>) saturate(180%)</div>
+        <div><span style="color:#8a96ad">border</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1px rgba(255,255,255,<b>.85</b>)</div>
+        <div><span style="color:#8a96ad">inset hi</span> &nbsp;&nbsp;0 1px 0 rgba(255,255,255,<b>.95</b>)</div>
+        <div><span style="color:#8a96ad">shadow</span> &nbsp;&nbsp;&nbsp;&nbsp;0 12px 34px -14px ink/30</div>
+      </div>
+      <div style="margin-top:14px;font-size:11.5px;color:#8a96ad;line-height:1.5">Dark mode: surface drops to .065 white, border to .16 — same highlight logic, deeper shadow.</div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:1180px;top:0;width:440px" class="frm">
+  <div class="lbl" data-drags-parent="1">Palettes — light & dark</div>
+  <div class="card" style="padding:22px">
+    <div style="font-size:12px;font-weight:600;color:#54607c;margin-bottom:10px">Light (default)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="sw" style="background:#3f6dff">accent</div>
+      <div class="sw" style="background:#2a4fd6">accent-ink</div>
+      <div class="sw" style="background:#73a6ff">accent-2</div>
+      <div class="sw" style="background:linear-gradient(150deg,#f3f7fe,#e3ecfb);color:#54607c;border:1px solid #dbe4f5">bg</div>
+      <div class="sw" style="background:#16203a">ink</div>
+      <div class="sw" style="background:#54607c">ink-soft</div>
+      <div class="sw" style="background:#8a96ad">ink-faint</div>
+      <div class="sw" style="background:#fff;color:#8a96ad;border:1px solid #e3ecfb">glass</div>
+    </div>
+    <div style="font-size:12px;font-weight:600;color:#54607c;margin:18px 0 10px">Dark</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="sw" style="background:#6f9bff">accent</div>
+      <div class="sw" style="background:#9cc4ff;color:#0a1124">accent-2</div>
+      <div class="sw" style="background:#c5d8ff;color:#0a1124">accent-ink</div>
+      <div class="sw" style="background:linear-gradient(150deg,#0d1530,#0a1124)">bg</div>
+      <div class="sw" style="background:#e9eefb;color:#0a1124">ink</div>
+      <div class="sw" style="background:#a9b4cf;color:#0a1124">ink-soft</div>
+      <div class="sw" style="background:#6b779a">ink-faint</div>
+      <div class="sw" style="background:#1a2440;border:1px solid #2a3553">glass</div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:0;top:440px;width:600px" class="frm">
+  <div class="lbl" data-drags-parent="1">Type scale & spacing</div>
+  <div class="card" style="padding:26px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #eef2fb;padding-bottom:12px"><span class="mono" style="font-size:11px;color:#8a96ad;width:64px">58 / 700</span><span style="font-size:34px;font-weight:700;letter-spacing:-0.035em">Display</span></div>
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #eef2fb;padding:12px 0"><span class="mono" style="font-size:11px;color:#8a96ad;width:64px">38 / 700</span><span style="font-size:26px;font-weight:700;letter-spacing:-0.03em">Section heading</span></div>
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #eef2fb;padding:12px 0"><span class="mono" style="font-size:11px;color:#8a96ad;width:64px">19 / 650</span><span style="font-size:19px;font-weight:650;letter-spacing:-0.02em">Card title</span></div>
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid #eef2fb;padding:12px 0"><span class="mono" style="font-size:11px;color:#8a96ad;width:64px">15 / 400</span><span style="font-size:15px;color:#54607c">Body copy — comfortable line-height 1.6 for readability on glass.</span></div>
+    <div style="display:flex;align-items:baseline;gap:14px;padding-top:12px"><span class="mono" style="font-size:11px;color:#8a96ad;width:64px">12 / mono</span><span class="mono" style="font-size:12px;color:#3f6dff;letter-spacing:0.08em">LABEL · JETBRAINS MONO</span></div>
+    <div style="margin-top:20px;display:flex;gap:8px;align-items:flex-end">
+      <div style="text-align:center"><div style="width:8px;height:8px;background:#3f6dff;border-radius:2px;margin:0 auto"></div><div class="mono" style="font-size:9px;color:#8a96ad;margin-top:4px">8</div></div>
+      <div style="text-align:center"><div style="width:12px;height:12px;background:#3f6dff;border-radius:2px;margin:0 auto"></div><div class="mono" style="font-size:9px;color:#8a96ad;margin-top:4px">12</div></div>
+      <div style="text-align:center"><div style="width:18px;height:18px;background:#3f6dff;border-radius:3px;margin:0 auto"></div><div class="mono" style="font-size:9px;color:#8a96ad;margin-top:4px">18</div></div>
+      <div style="text-align:center"><div style="width:22px;height:22px;background:#3f6dff;border-radius:4px;margin:0 auto"></div><div class="mono" style="font-size:9px;color:#8a96ad;margin-top:4px">22</div></div>
+      <div style="text-align:center"><div style="width:40px;height:40px;background:#3f6dff;border-radius:6px;margin:0 auto"></div><div class="mono" style="font-size:9px;color:#8a96ad;margin-top:4px">40</div></div>
+      <div style="margin-left:8px;font-size:12px;color:#8a96ad;align-self:center">4px base · radius 18–20 cards · 999 pills</div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:700px;top:440px;width:920px" class="frm">
+  <div class="lbl" data-drags-parent="1">Card micro-interactions — hover the middle card</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="stage" style="padding:30px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px">
+      <div>
+        <div class="mono" style="position:relative;z-index:2;font-size:10.5px;color:#54607c;margin-bottom:8px;text-align:center">DEFAULT</div>
+        <div class="glass demo-card">
+          <span style="display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;color:#2a4fd6;background:rgba(63,109,255,0.1);border:1px solid rgba(63,109,255,0.2)">Data science</span>
+          <div style="font-weight:700;font-size:16px;margin-top:10px">At rest</div>
+          <div style="font-size:12.5px;color:#54607c;margin-top:5px">Soft shadow, luminous edge.</div>
+        </div>
+      </div>
+      <div>
+        <div class="mono" style="position:relative;z-index:2;font-size:10.5px;color:#3f6dff;margin-bottom:8px;text-align:center">HOVER ↑ LIFT + TILT + SHINE</div>
+        <div class="glass demo-card" style="transform:perspective(900px) translateY(-6px) rotateX(2deg);box-shadow:0 30px 60px -22px rgba(31,54,112,0.42),inset 0 1px 0 rgba(255,255,255,0.95),0 0 0 1px rgba(63,109,255,0.25);animation:liftLoop 3s ease-in-out infinite">
+          <span style="display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;color:#2a4fd6;background:rgba(63,109,255,0.14);border:1px solid rgba(63,109,255,0.3)">Dashboard</span>
+          <div style="font-weight:700;font-size:16px;margin-top:10px">Lifted</div>
+          <div style="font-size:12.5px;color:#54607c;margin-top:5px">−6px, 2° tilt, blue rim glow.</div>
+        </div>
+      </div>
+      <div>
+        <div class="mono" style="position:relative;z-index:2;font-size:10.5px;color:#54607c;margin-bottom:8px;text-align:center">ACTIVE ↓ PRESS</div>
+        <div class="glass demo-card" style="transform:translateY(-1px) scale(.965);box-shadow:0 8px 20px -12px rgba(31,54,112,0.4),inset 0 1px 0 rgba(255,255,255,0.9)">
+          <span style="display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;color:#2a4fd6;background:rgba(90,200,255,0.16);border:1px solid rgba(90,200,255,0.3)">GIS</span>
+          <div style="font-weight:700;font-size:16px;margin-top:10px">Pressed</div>
+          <div style="font-size:12.5px;color:#54607c;margin-top:5px">Scales to .965, shadow tucks.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px 24px;display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:#54607c">
+      <span><b style="color:#16203a">Transition</b> 150–250ms · cubic-bezier(.2,.7,.2,1)</span>
+      <span><b style="color:#16203a">Hover</b> lift −6px + 2–6° pointer tilt + rim glow</span>
+      <span><b style="color:#16203a">Active</b> scale .965</span>
+      <span><b style="color:#16203a">Reduced-motion</b> → opacity/colour only</span>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:0;top:980px;width:600px" class="frm">
+  <div class="lbl" data-drags-parent="1">Motion principles</div>
+  <div class="card" style="padding:26px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="padding:16px;border-radius:14px;background:#f6f8fe;border:1px solid #eef2fb"><div style="font-weight:650;font-size:14px">Ambient, not busy</div><div style="font-size:12.5px;color:#54607c;margin-top:5px">Backdrop blobs drift over 26–32s. Hero graph repels the cursor gently.</div></div>
+      <div style="padding:16px;border-radius:14px;background:#f6f8fe;border:1px solid #eef2fb"><div style="font-weight:650;font-size:14px">Tactile feedback</div><div style="font-size:12.5px;color:#54607c;margin-top:5px">Every interactive surface answers a pointer within 250ms — lift, tilt, glow, press.</div></div>
+      <div style="padding:16px;border-radius:14px;background:#f6f8fe;border:1px solid #eef2fb"><div style="font-weight:650;font-size:14px">Depth through light</div><div style="font-size:12.5px;color:#54607c;margin-top:5px">Inner highlight + outer shadow shift together so glass feels lit, not flat.</div></div>
+      <div style="padding:16px;border-radius:14px;background:#f6f8fe;border:1px solid #eef2fb"><div style="font-weight:650;font-size:14px">Graceful degradation</div><div style="font-size:12.5px;color:#54607c;margin-top:5px">prefers-reduced-motion stills all loops; graph paints one static frame.</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:700px;top:1190px;width:440px" class="frm">
+  <div class="lbl" data-drags-parent="1">Glass treatments — light</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="stage" style="padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;background:rgba(255,255,255,0.52);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,0.85);box-shadow:0 12px 34px -14px rgba(31,54,112,0.3),inset 0 1px 0 rgba(255,255,255,0.95)"><b style="font-size:13.5px">Primary</b> <span style="font-size:12px;color:#54607c">— .52 / blur 22 · nav, cards, hero</span></div>
+      <div style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;background:rgba(255,255,255,0.34);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.9)"><b style="font-size:13.5px">Inset</b> <span style="font-size:12px;color:#54607c">— .34 / blur 14 · chips, stat tiles</span></div>
+      <div style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;background:rgba(63,109,255,0.1);border:1px solid rgba(63,109,255,0.2)"><b style="font-size:13.5px;color:#2a4fd6">Accent tint</b> <span style="font-size:12px;color:#54607c">— badges, price chips</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute;left:1180px;top:1190px;width:440px" class="frm">
+  <div class="lbl" data-drags-parent="1">Glass treatments — dark</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="stage stage-d" style="padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div class="glass-d" style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);color:#e9eefb"><b style="font-size:13.5px">Primary</b> <span style="font-size:12px;color:#a9b4cf">— .065 white / blur 22</span></div>
+      <div style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#e9eefb"><b style="font-size:13.5px">Inset</b> <span style="font-size:12px;color:#a9b4cf">— .04 white</span></div>
+      <div style="position:relative;z-index:2;border-radius:16px;padding:14px 16px;background:rgba(111,155,255,0.16);border:1px solid rgba(111,155,255,0.3);color:#c5d8ff"><b style="font-size:13.5px">Accent tint</b> <span style="font-size:12px;color:#9cc4ff">— badges, chips</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
