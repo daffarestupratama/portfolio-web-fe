@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npx --yes create-next-app@latest --help)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(node debug-navshell.mjs)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__0z90-ly._.css\")"
     ]
   }
 }
