@@ -4,7 +4,16 @@
       "Bash(npx --yes create-next-app@latest --help)",
       "Bash(npm run *)",
       "Bash(node debug-navshell.mjs)",
-      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__0z90-ly._.css\")"
+      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__0z90-ly._.css\")",
+      "Bash(npm view *)",
+      "Bash(npm install *)",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\" \"https://cms.daffa.me/api/tour-packages?filters%5BisFeatured%5D%5B%24eq%5D=true&populate%5BcoverImage%5D=true&populate%5Broute%5D=true&populate%5BpriceOption%5D=*\")",
+      "Bash(curl -s -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\" \"https://cms.daffa.me/api/articles?filters%5BisFeatured%5D%5B%24eq%5D=true&pagination%5Blimit%5D=1\")",
+      "Bash(npx tsc *)",
+      "Bash(curl -s http://localhost:3000/ -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(node verify-step3.mjs)",
+      "Bash(taskkill //F //IM node.exe)"
     ]
   }
 }

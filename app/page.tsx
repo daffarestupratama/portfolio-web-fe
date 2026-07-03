@@ -14,6 +14,8 @@ import {
   getHomePage,
 } from "@/content/home";
 
+export const revalidate = 60;
+
 export default async function Home() {
   const [home, experiences, projects, tours, articles] = await Promise.all([
     getHomePage(),

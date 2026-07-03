@@ -54,9 +54,11 @@ export function TourCard({ tour }: TourCardProps) {
         </div>
 
         <div className="mt-auto flex items-center gap-2.5 pt-3.5">
-          <span className="text-xs" style={{ color: "var(--ink-faint)" }}>
-            {tour.groupSize}
-          </span>
+          {tour.groupSize && (
+            <span className="text-xs" style={{ color: "var(--ink-faint)" }}>
+              {tour.groupSize}
+            </span>
+          )}
           <a href={`/tours/${tour.slug}`} className="btn-gradient ml-auto gap-[7px] px-[18px] py-[9px] text-[13.5px]">
             Book
             <ArrowRightIcon />

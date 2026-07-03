@@ -1,15 +1,22 @@
 "use client";
 
 import { useTilt } from "@/hooks/use-tilt";
-import type { Project, ProjectType } from "@/content/home";
+import type { Project } from "@/content/home";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
 import { DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
+import { titleCase } from "@/lib/mappers";
 
-const PROJECT_TYPE_META: Record<ProjectType, { label: string; hue: string }> = {
+const PROJECT_TYPE_META: Record<string, { label: string; hue: string }> = {
   "data-science": { label: "Data science", hue: "var(--sky)" },
   dashboard: { label: "Dashboard", hue: "var(--teal)" },
   gis: { label: "GIS", hue: "var(--green)" },
 };
+
+/** projectType is a free-form Strapi enum — fall back to a title-cased label
+ *  with a default sky badge for any value outside our known 3. */
+function projectTypeMeta(type: string): { label: string; hue: string } {
+  return PROJECT_TYPE_META[type] ?? { label: titleCase(type), hue: "var(--sky)" };
+}
 
 interface ProjectCardProps {
   project: Project;
@@ -17,7 +24,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   const ref = useTilt<HTMLDivElement>();
-  const meta = PROJECT_TYPE_META[project.projectType];
+  const meta = projectTypeMeta(project.projectType);
 
   return (
     <div ref={ref} data-tilt className="glass-card p-[15px]">

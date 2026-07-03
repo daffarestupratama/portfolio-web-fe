@@ -1,5 +1,12 @@
 import Link from "next/link";
 
+// Single source of truth for the logo's rendered height, in px — shared by the
+// SVG wordmark and the cursor beside it so the cursor always spans the glyphs'
+// full cap-height-to-baseline extent (the paths fill their entire viewBox with
+// no internal padding, so this value *is* that extent) instead of two
+// independently-guessed magic numbers that could drift apart.
+const LOGO_HEIGHT = 18;
+
 export function Logo() {
   return (
     <Link
@@ -7,7 +14,13 @@ export function Logo() {
       aria-label="dir home"
       className="inline-flex shrink-0 items-center gap-1.5 no-underline transition-transform duration-200 ease-out hover:-translate-y-px"
     >
-      <svg height="18" viewBox="0 0 1066 393" fill="none" xmlns="http://www.w3.org/2000/svg" className="block w-auto">
+      <svg
+        height={LOGO_HEIGHT}
+        viewBox="0 0 1066 393"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="block w-auto"
+      >
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -21,8 +34,8 @@ export function Logo() {
       </svg>
       <span
         aria-hidden="true"
-        className="h-[18px] w-2 rounded-sm"
-        style={{ background: "var(--accent)", animation: "blink 1.15s steps(1) infinite" }}
+        className="w-2 rounded-xs"
+        style={{ height: LOGO_HEIGHT, background: "var(--accent)", animation: "blink 1.15s steps(1) infinite" }}
       />
     </Link>
   );
