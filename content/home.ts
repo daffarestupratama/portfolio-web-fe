@@ -119,7 +119,7 @@ const getHomePageRaw = cache(() => strapiFindOne<StrapiHomePage>("home-page", HO
 export async function getHomePage(): Promise<HomePage> {
   const raw = await getHomePageRaw();
   return {
-    eyebrow: "Information systems · data & GIS · tour guide",
+    eyebrow: "Data · Business · Finance · Maps · Walking Tours",
     fullName: raw.fullName,
     headline: raw.headline,
     subheadline: raw.subheadline,

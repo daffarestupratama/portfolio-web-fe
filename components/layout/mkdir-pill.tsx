@@ -14,7 +14,7 @@ export function MkdirPill() {
     >
       <TerminalIcon style={{ color: "var(--accent-ink)" }} />
       <span className="hidden sm:inline">
-        <span style={{ color: "var(--accent-ink)" }}>&gt;</span>mkdir
+        <span style={{ color: "var(--accent-ink)" }}></span>mkdir
       </span>
     </Link>
   );
