@@ -5,19 +5,7 @@ import { useTilt } from "@/hooks/use-tilt";
 import type { Project } from "@/content/home";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
 import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
-import { titleCase } from "@/lib/mappers";
-
-const PROJECT_TYPE_META: Record<string, { label: string; hue: string }> = {
-  "data-science": { label: "Data science", hue: "var(--sky)" },
-  dashboard: { label: "Dashboard", hue: "var(--teal)" },
-  gis: { label: "GIS", hue: "var(--green)" },
-};
-
-/** projectType is a free-form Strapi enum — fall back to a title-cased label
- *  with a default sky badge for any value outside our known 3. */
-function projectTypeMeta(type: string): { label: string; hue: string } {
-  return PROJECT_TYPE_META[type] ?? { label: titleCase(type), hue: "var(--sky)" };
-}
+import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
 
 interface ProjectCardProps {
   project: Project;
@@ -33,14 +21,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <div className="relative z-[2] px-2 pt-4 pb-1.5">
         <div className="flex items-center justify-between gap-2.5">
-          <span
-            className="badge"
-            style={{
-              color: `color-mix(in srgb, ${meta.hue} 52%, var(--ink))`,
-              background: `color-mix(in srgb, ${meta.hue} 15%, transparent)`,
-              borderColor: `color-mix(in srgb, ${meta.hue} 32%, transparent)`,
-            }}
-          >
+          <span className="badge" style={badgeStyle(meta.hue)}>
             {meta.label}
           </span>
           <span className="mono shrink-0 text-[11px]" style={{ color: "var(--ink-faint)" }}>

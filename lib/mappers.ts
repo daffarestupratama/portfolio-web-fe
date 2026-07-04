@@ -10,9 +10,12 @@ import type {
   StrapiContactLink,
   StrapiCta,
   StrapiExperience,
+  StrapiGalleryImage,
+  StrapiMedia,
   StrapiProject,
   StrapiTourPackage,
 } from "./types";
+import { strapiImageUrl } from "./image";
 import type {
   Article,
   ArticleLanguage,
@@ -21,6 +24,8 @@ import type {
   Cta,
   Experience,
   ExperienceCategory,
+  GalleryImage,
+  MappedImage,
   Project,
   TourPackage,
 } from "@/content/home";
@@ -28,6 +33,28 @@ import type {
 /** Title-cases a slug/enum-ish string ("machine_learning" -> "Machine Learning"). */
 export function titleCase(value: string): string {
   return value.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Resolve a Strapi media object into an absolute-URL image with intrinsic size. */
+export function mapImage(media: StrapiMedia | null | undefined, alt = ""): MappedImage | null {
+  if (!media?.url) return null;
+  return {
+    url: strapiImageUrl(media.url),
+    alt: media.alternativeText || alt,
+    width: media.width ?? 1200,
+    height: media.height ?? 675,
+  };
+}
+
+/** Map a repeatable gallery-image component (sorted by `order`, null images dropped). */
+export function mapGallery(items: StrapiGalleryImage[] | null | undefined): GalleryImage[] {
+  return (items ?? [])
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .flatMap((item) => {
+      const img = mapImage(item.image, item.alt ?? "");
+      return img ? [{ ...img, alt: item.alt || img.alt, caption: item.caption }] : [];
+    });
 }
 
 export function mapCta(cta: StrapiCta | null, fallback: Cta): Cta {
@@ -97,6 +124,7 @@ export function mapExperience(e: StrapiExperience): Experience {
     startDate: e.startDate,
     endDate: e.endDate,
     isCurrent: e.isCurrent ?? false,
+    gallery: mapGallery(e.gallery),
   };
 }
 
@@ -112,7 +140,7 @@ export function byNewestExperience(a: Experience, b: Experience): number {
   return 0;
 }
 
-function toStringArray(value: unknown): string[] {
+export function toStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
 

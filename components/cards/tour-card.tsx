@@ -24,7 +24,9 @@ export function TourCard({ tour }: TourCardProps) {
       <div className="relative z-[2] flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-2.5">
           <h3 className="m-0 text-lg font-bold" style={{ letterSpacing: "-0.025em" }}>
-            {tour.title}
+            <Link href={`/tours/${tour.slug}`} className="transition-colors hover:text-(--accent-ink)">
+              {tour.title}
+            </Link>
           </h3>
           <span
             className="flex shrink-0 flex-col items-end px-3 py-2"

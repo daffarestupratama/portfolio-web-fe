@@ -15,6 +15,17 @@ interface BuildMetadataOptions {
   absoluteTitle?: boolean;
 }
 
+/** Per-field merge of an entry's SEO over the site default (empty fields fall back). */
+export function mergeSeo(primary: Seo, fallback: Seo): Seo {
+  return {
+    metaTitle: primary.metaTitle || fallback.metaTitle,
+    metaDescription: primary.metaDescription || fallback.metaDescription,
+    canonicalUrl: primary.canonicalUrl || fallback.canonicalUrl,
+    noIndex: primary.noIndex,
+    ogImageUrl: primary.ogImageUrl || fallback.ogImageUrl,
+  };
+}
+
 /** Maps a Strapi `seo` component (+ fallbacks) into a Next.js Metadata object.
  *  Shared by the root layout default and each page's generateMetadata. */
 export function buildMetadata(seo: Seo | null, options: BuildMetadataOptions = {}): Metadata {

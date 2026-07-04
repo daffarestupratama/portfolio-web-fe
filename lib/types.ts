@@ -73,6 +73,25 @@ export interface StrapiRouteStop {
   order: number | null;
 }
 
+export interface StrapiGalleryImage {
+  id: number;
+  alt: string | null;
+  caption: string | null;
+  order: number | null;
+  image: StrapiMedia | null;
+}
+
+export interface StrapiNotebookResource {
+  id: number;
+  title: string;
+  kind: string;
+  url: string | null;
+  embedUrl: string | null;
+  description: string | null;
+  order: number | null;
+  file: StrapiMedia | null;
+}
+
 export interface StrapiExperience {
   id: number;
   documentId: string;
@@ -86,6 +105,7 @@ export interface StrapiExperience {
   description: string;
   sortOrder: number | null;
   isFeatured: boolean;
+  gallery: StrapiGalleryImage[];
 }
 
 export interface StrapiProject {
@@ -104,6 +124,18 @@ export interface StrapiProject {
   isFeatured: boolean;
 }
 
+/** Extra fields only present when the detail query populates them. */
+export interface StrapiProjectDetail extends StrapiProject {
+  problem: string | null;
+  approach: unknown;
+  result: unknown;
+  projectStatus: string;
+  gallery: StrapiGalleryImage[];
+  notebookResources: StrapiNotebookResource[];
+  relatedArticles: StrapiArticle[];
+  seo: StrapiSeo | null;
+}
+
 export interface StrapiArticle {
   id: number;
   documentId: string;
@@ -117,6 +149,11 @@ export interface StrapiArticle {
   isFeatured: boolean;
   publishedDate: string;
   body: unknown;
+}
+
+export interface StrapiArticleDetail extends StrapiArticle {
+  relatedProjects: StrapiProject[];
+  seo: StrapiSeo | null;
 }
 
 export interface StrapiTourPackage {

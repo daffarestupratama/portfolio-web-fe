@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Experience } from "@/content/home";
 import { ChevronDownIcon } from "@/components/ui/icons";
+import { Gallery } from "@/components/ui/gallery";
 
 const LOGO_GRADIENTS = [
   "linear-gradient(145deg, var(--sky), var(--teal))",
@@ -87,6 +88,7 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
             <p className="mt-2.5 text-[13.5px]" style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}>
               {experience.description}
             </p>
+            <Gallery images={experience.gallery} />
           </div>
         )}
       </div>

@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import { AmbientBackground } from "@/components/layout/ambient-background";
-import { Nav } from "@/components/layout/nav";
-import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/hero/hero";
 import { Experiences } from "@/components/sections/experiences";
 import { Projects } from "@/components/sections/projects";
@@ -48,17 +45,14 @@ export default async function Home() {
   const sameAs = site.contactLinks.map((l) => l.url).filter((url) => /^https?:\/\//.test(url));
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden" style={{ background: "var(--bg)", color: "var(--ink)" }}>
+    <>
       <HomeJsonLd fullName={home.fullName} siteName={site.siteName || home.fullName} sameAs={sameAs} />
-      <AmbientBackground />
-      <Nav />
       <Hero home={home} />
       <Experiences experiences={experiences} />
       <Projects projects={projects} />
       <Tours tours={tours} />
       <Writing articles={articles} />
       <ContactCTA email={site.email} whatsappUrl={site.whatsappUrl} />
-      <Footer />
-    </div>
+    </>
   );
 }

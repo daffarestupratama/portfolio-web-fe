@@ -51,6 +51,18 @@ export interface HomePage {
   heroStats: HeroStat[];
 }
 
+/** A resolved image (absolute URL + intrinsic size) for next/image. */
+export interface MappedImage {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+export interface GalleryImage extends MappedImage {
+  caption: string | null;
+}
+
 export type ExperienceCategory = "education" | "organization" | "others";
 
 export interface Experience {
@@ -66,6 +78,7 @@ export interface Experience {
   startDate: string;
   endDate: string | null;
   isCurrent: boolean;
+  gallery: GalleryImage[];
 }
 
 /**

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { AmbientBackground } from "@/components/layout/ambient-background";
+import { Nav } from "@/components/layout/nav";
+import { Footer } from "@/components/layout/footer";
 import { getSiteSettings } from "@/content/site";
 import { buildMetadata, FALLBACK_TITLE, SITE_URL } from "@/lib/seo";
 import "../styles/globals.css";
@@ -43,7 +46,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <div
+            className="relative min-h-screen overflow-x-hidden"
+            style={{ background: "var(--bg)", color: "var(--ink)" }}
+          >
+            <AmbientBackground />
+            <Nav />
+            {children}
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
