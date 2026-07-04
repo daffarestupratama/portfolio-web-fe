@@ -38,6 +38,15 @@ export interface StrapiCta {
   description?: string | null;
 }
 
+export interface StrapiSeo {
+  id: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  canonicalUrl: string | null;
+  noIndex: boolean | null;
+  ogImage: StrapiMedia | null;
+}
+
 export interface StrapiContactLink {
   id: number;
   label: string;
@@ -137,4 +146,17 @@ export interface StrapiHomePage {
   featuredExperiences: StrapiExperience[];
   featuredProjects: StrapiProject[];
   featuredArticles: StrapiArticle[];
+  seo: StrapiSeo | null;
+}
+
+export interface StrapiSiteSetting {
+  id: number;
+  documentId: string;
+  siteName: string | null;
+  footerText: string | null;
+  copyrightText: string | null;
+  email: string | null;
+  whatsappUrl: string | null;
+  contactLinks: StrapiContactLink[];
+  defaultSeo: StrapiSeo | null;
 }

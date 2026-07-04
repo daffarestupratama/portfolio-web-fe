@@ -12,14 +12,9 @@ export function Projects({ projects }: ProjectsProps) {
     <section className="relative z-[3] flex justify-center px-[22px] pt-[46px] pb-2.5">
       <div className="w-full max-w-[1180px]">
         <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="mono text-xs tracking-[0.14em] uppercase" style={{ color: "var(--accent-ink)" }}>
-              02 — Data work
-            </div>
-            <h2 className="mt-2 font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-              Selected projects
-            </h2>
-          </div>
+          <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
+            Selected projects
+          </h2>
           <Link href="/projects" className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold">
             All projects
             <ArrowRightIcon />

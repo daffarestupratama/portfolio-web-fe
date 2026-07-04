@@ -12,7 +12,8 @@ export const HOME_PAGE_QUERY =
   "&populate[contactLinks]=*" +
   "&populate[featuredExperiences][populate]=*" +
   "&populate[featuredProjects][populate][coverImage]=true" +
-  "&populate[featuredArticles][populate][coverImage]=true";
+  "&populate[featuredArticles][populate][coverImage]=true" +
+  "&populate[seo][populate][ogImage]=true";
 // featuredSkills deliberately omitted — no skills UI on the ported homepage design.
 
 export const FEATURED_TOUR_PACKAGES_QUERY =
@@ -20,3 +21,6 @@ export const FEATURED_TOUR_PACKAGES_QUERY =
   "&populate[coverImage]=true" +
   "&populate[route]=true" +
   "&populate[priceOption]=*";
+
+export const SITE_SETTING_QUERY =
+  "populate[defaultSeo][populate][ogImage]=true" + "&populate[contactLinks]=*";

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { getSiteSettings } from "@/content/site";
+import { buildMetadata, FALLBACK_TITLE, SITE_URL } from "@/lib/seo";
 import "../styles/globals.css";
 
 const inter = Inter({
@@ -15,11 +17,19 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-export const metadata: Metadata = {
-  title: "Daffa Ilham Restupratama",
-  description:
-    "Portfolio of Daffa Ilham Restupratama — data, dashboards, maps, and walking tours.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  const base = buildMetadata(site.defaultSeo);
+  const siteName = site.siteName || "Daffa Ilham Restupratama";
+  return {
+    ...base,
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: site.defaultSeo.metaTitle || FALLBACK_TITLE,
+      template: `%s · ${siteName}`,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

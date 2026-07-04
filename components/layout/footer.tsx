@@ -13,10 +13,10 @@ export function Footer() {
         }}
       >
         <span className="text-[13px]" style={{ color: "var(--ink-faint)" }}>
-          © 2026 Daffa Ilham Restupratama — data, maps &amp; walking tours.
+          © 2026 Daffa Ilham Restupratama
         </span>
         <span className="mono text-[11px]" style={{ color: "var(--ink-faint)" }}>
-          Built with Next.js · Tailwind · shadcn/ui
+          Data · Business · Finance · Maps · Walking Tours
         </span>
       </div>
     </footer>

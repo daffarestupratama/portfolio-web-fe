@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { TourPackage } from "@/content/home";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
@@ -59,10 +60,10 @@ export function TourCard({ tour }: TourCardProps) {
               {tour.groupSize}
             </span>
           )}
-          <a href={`/tours/${tour.slug}`} className="btn-gradient ml-auto gap-[7px] px-[18px] py-[9px] text-[13.5px]">
-            Book
+          <Link href={`/tours/${tour.slug}`} className="btn-gradient ml-auto gap-[7px] px-[18px] py-[9px] text-[13.5px]">
+            Detail
             <ArrowRightIcon />
-          </a>
+          </Link>
         </div>
       </div>
     </div>

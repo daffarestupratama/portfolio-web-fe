@@ -75,12 +75,14 @@ export function deriveInitials(organization: string): string {
 }
 
 const EXPERIENCE_CATEGORY_MAP: Record<string, ExperienceCategory> = {
-  organization: "org",
   education: "education",
+  organization: "organization",
 };
 
+/** Every experienceType outside education/organization (work, freelance, volunteer,
+ *  project, certification, other, …) falls into the "others" bucket. */
 export function mapExperienceCategory(experienceType: string): ExperienceCategory {
-  return EXPERIENCE_CATEGORY_MAP[experienceType] ?? "professional";
+  return EXPERIENCE_CATEGORY_MAP[experienceType] ?? "others";
 }
 
 export function mapExperience(e: StrapiExperience): Experience {
@@ -92,7 +94,22 @@ export function mapExperience(e: StrapiExperience): Experience {
     role: e.title,
     dateRange: formatDateRange(e.startDate, e.endDate, e.isCurrent),
     description: e.description,
+    startDate: e.startDate,
+    endDate: e.endDate,
+    isCurrent: e.isCurrent ?? false,
   };
+}
+
+/** Newest-first: current roles first, then latest end date, then latest start date.
+ *  ISO date strings (YYYY-MM-DD) compare lexically = chronologically. Reused by the
+ *  homepage section and the future /about + experience list pages. */
+export function byNewestExperience(a: Experience, b: Experience): number {
+  if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+  const aEnd = a.endDate ?? a.startDate;
+  const bEnd = b.endDate ?? b.startDate;
+  if (aEnd !== bEnd) return aEnd < bEnd ? 1 : -1;
+  if (a.startDate !== b.startDate) return a.startDate < b.startDate ? 1 : -1;
+  return 0;
 }
 
 function toStringArray(value: unknown): string[] {

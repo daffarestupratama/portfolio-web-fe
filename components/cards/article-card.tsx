@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Article } from "@/content/home";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
@@ -34,7 +35,9 @@ export function ArticleCard({ article }: ArticleCardProps) {
         </div>
 
         <h3 className="mt-3 text-[16.5px] font-semibold" style={{ lineHeight: 1.3, letterSpacing: "-0.02em" }}>
-          {article.title}
+          <Link href={`/articles/${article.slug}`} className="transition-colors hover:text-(--accent-ink)">
+            {article.title}
+          </Link>
         </h3>
         <p className="mt-[9px] flex-1 text-[13px]" style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}>
           {article.excerpt}
@@ -44,7 +47,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
           <span>{article.publishedDate}</span>
           <span>·</span>
           <span>{article.readTime}</span>
-          <ArrowRightIcon className="ml-auto" />
+          <Link
+            href={`/articles/${article.slug}`}
+            className="mono ml-auto inline-flex items-center gap-1 font-medium transition-colors hover:text-(--accent-ink)"
+            style={{ color: "var(--ink-dim)" }}
+          >
+            Read
+            <ArrowRightIcon width={13} height={13} />
+          </Link>
         </div>
       </div>
     </div>

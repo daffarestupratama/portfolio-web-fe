@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Project } from "@/content/home";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
-import { DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
+import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
 import { titleCase } from "@/lib/mappers";
 
 const PROJECT_TYPE_META: Record<string, { label: string; hue: string }> = {
@@ -48,7 +49,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         <h3 className="mt-[13px] text-[19px] font-bold" style={{ letterSpacing: "-0.025em" }}>
-          {project.title}
+          <Link href={`/projects/${project.slug}`} className="transition-colors hover:text-(--accent-ink)">
+            {project.title}
+          </Link>
         </h3>
         <p className="mt-[9px] text-[13.5px]" style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}>
           {project.summary}
@@ -73,6 +76,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
               <DashboardIcon width={16} height={16} />
             </a>
           )}
+          <Link
+            href={`/projects/${project.slug}`}
+            className="inline-flex items-center gap-1 text-[13px] font-semibold transition-colors hover:text-(--accent-ink)"
+            style={{ color: "var(--ink-dim)" }}
+          >
+            Details
+            <ArrowRightIcon width={14} height={14} />
+          </Link>
           {project.liveDemoUrl && (
             <a href={project.liveDemoUrl} className="btn-gradient ml-auto gap-[7px] px-[15px] py-2 text-[13px]">
               Live demo

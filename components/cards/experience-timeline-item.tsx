@@ -1,7 +1,9 @@
 "use client";
 
+import { useId, useState } from "react";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Experience } from "@/content/home";
+import { ChevronDownIcon } from "@/components/ui/icons";
 
 const LOGO_GRADIENTS = [
   "linear-gradient(145deg, var(--sky), var(--teal))",
@@ -17,6 +19,8 @@ interface ExperienceTimelineItemProps {
 
 export function ExperienceTimelineItem({ experience, index }: ExperienceTimelineItemProps) {
   const ref = useTilt<HTMLDivElement>();
+  const [open, setOpen] = useState(false);
+  const bodyId = useId();
   const logoBg = LOGO_GRADIENTS[index % LOGO_GRADIENTS.length];
 
   return (
@@ -35,8 +39,15 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
       </span>
 
       <div ref={ref} data-tilt className="glass-card px-5 py-[18px]" style={{ borderRadius: 20 }}>
-        <div className="relative z-[2] flex items-start gap-[14px]">
-          <div
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          className="relative z-[2] flex w-full items-start gap-[14px] text-left"
+        >
+          <span
+            aria-hidden="true"
             className="flex h-[46px] w-[46px] shrink-0 items-center justify-center text-sm font-bold text-white"
             style={{
               borderRadius: 14,
@@ -46,24 +57,38 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
             }}
           >
             {experience.initials}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-1">
-              <h3 className="m-0 text-base font-semibold" style={{ letterSpacing: "-0.02em" }}>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-1">
+              <span className="text-base font-semibold" style={{ letterSpacing: "-0.02em" }}>
                 {experience.organization}
-              </h3>
+              </span>
               <span className="mono shrink-0 text-[11px]" style={{ color: "var(--ink-faint)" }}>
                 {experience.dateRange}
               </span>
-            </div>
-            <div className="mt-[3px] text-[13.5px] font-semibold" style={{ color: "var(--accent-ink)" }}>
+            </span>
+            <span className="mt-[3px] block text-[13.5px] font-semibold" style={{ color: "var(--accent-ink)" }}>
               {experience.role}
-            </div>
+            </span>
+          </span>
+          <ChevronDownIcon
+            aria-hidden="true"
+            className="mt-2.5 shrink-0"
+            style={{
+              color: "var(--ink-faint)",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s ease",
+            }}
+          />
+        </button>
+
+        {open && (
+          <div id={bodyId} className="relative z-[2] pl-[60px]">
             <p className="mt-2.5 text-[13.5px]" style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}>
               {experience.description}
             </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -8,8 +8,17 @@
 import { cache } from "react";
 import { strapiFind, strapiFindOne } from "@/lib/strapi";
 import { FEATURED_TOUR_PACKAGES_QUERY, HOME_PAGE_QUERY } from "@/lib/queries";
-import { mapArticle, mapContactLinks, mapCta, mapExperience, mapProject, mapTourPackage } from "@/lib/mappers";
+import {
+  byNewestExperience,
+  mapArticle,
+  mapContactLinks,
+  mapCta,
+  mapExperience,
+  mapProject,
+  mapTourPackage,
+} from "@/lib/mappers";
 import type { StrapiHomePage, StrapiTourPackage } from "@/lib/types";
+import { mapSeo, type Seo } from "@/content/site";
 
 export type ContactIcon = "linkedin" | "github" | "instagram" | "email";
 
@@ -30,6 +39,7 @@ export interface HeroStat {
 }
 
 export interface HomePage {
+  /** Hero tagline pill text. No Strapi field for this — hardcoded. */
   eyebrow: string;
   fullName: string;
   headline: string;
@@ -41,7 +51,7 @@ export interface HomePage {
   heroStats: HeroStat[];
 }
 
-export type ExperienceCategory = "professional" | "education" | "org";
+export type ExperienceCategory = "education" | "organization" | "others";
 
 export interface Experience {
   id: string;
@@ -52,6 +62,10 @@ export interface Experience {
   role: string;
   dateRange: string;
   description: string;
+  /** Raw dates carried through for newest-first sorting (see byNewestExperience). */
+  startDate: string;
+  endDate: string | null;
+  isCurrent: boolean;
 }
 
 /**
@@ -105,7 +119,7 @@ const getHomePageRaw = cache(() => strapiFindOne<StrapiHomePage>("home-page", HO
 export async function getHomePage(): Promise<HomePage> {
   const raw = await getHomePageRaw();
   return {
-    eyebrow: "Information systems · data & GIS · tour guide", // TODO: no Strapi field for this
+    eyebrow: "Information systems · data & GIS · tour guide",
     fullName: raw.fullName,
     headline: raw.headline,
     subheadline: raw.subheadline,
@@ -124,16 +138,19 @@ export async function getHomePage(): Promise<HomePage> {
 export async function getFeaturedExperiences(): Promise<Record<ExperienceCategory, Experience[]>> {
   const raw = await getHomePageRaw();
   const experiences = raw.featuredExperiences.map(mapExperience);
+  const bucket = (category: ExperienceCategory) =>
+    experiences.filter((e) => e.category === category).sort(byNewestExperience);
   return {
-    professional: experiences.filter((e) => e.category === "professional"),
-    education: experiences.filter((e) => e.category === "education"),
-    org: experiences.filter((e) => e.category === "org"),
+    education: bucket("education"),
+    organization: bucket("organization"),
+    others: bucket("others"),
   };
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {
   const raw = await getHomePageRaw();
-  return raw.featuredProjects.map(mapProject);
+  // Cap at 4 for the homepage grid ("selected" projects); the full list is /projects.
+  return raw.featuredProjects.map(mapProject).slice(0, 4);
 }
 
 export async function getFeaturedTours(): Promise<TourPackage[]> {
@@ -144,4 +161,10 @@ export async function getFeaturedTours(): Promise<TourPackage[]> {
 export async function getFeaturedArticles(): Promise<Article[]> {
   const raw = await getHomePageRaw();
   return raw.featuredArticles.map(mapArticle);
+}
+
+/** Homepage SEO component (falls back to site-setting.defaultSeo at the call site). */
+export async function getHomePageSeo(): Promise<Seo> {
+  const raw = await getHomePageRaw();
+  return mapSeo(raw.seo);
 }

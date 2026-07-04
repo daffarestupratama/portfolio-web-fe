@@ -3,13 +3,12 @@ export interface NavLink {
   label: string;
 }
 
-// Brief §6: Home, Projects, Articles, mkdir, Tours, About (the export's own
-// nav is missing mkdir since the export only covers the homepage).
+// mkdir lives in its own terminal-styled pill on the right (see mkdir-pill.tsx),
+// so it's intentionally not in this center-links / mobile-menu list.
 export const navLinks: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/articles", label: "Articles" },
-  { href: "/mkdir", label: "mkdir" },
   { href: "/tours", label: "Tours" },
   { href: "/about", label: "About" },
 ];

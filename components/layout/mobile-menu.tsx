@@ -24,7 +24,7 @@ export const MobileMenuButton = forwardRef<HTMLButtonElement, MobileMenuButtonPr
       aria-label={open ? "Close menu" : "Open menu"}
       aria-expanded={open}
       aria-controls={PANEL_ID}
-      className="glass-icon-btn flex h-10 w-10 shrink-0 md:hidden"
+      className="glass-icon-btn flex h-10 w-10 shrink-0"
     >
       {open ? <CloseIcon /> : <MenuIcon />}
     </button>

@@ -7,6 +7,7 @@ import { useScrolled } from "@/hooks/use-scrolled";
 import { Logo } from "./logo";
 import { navLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
+import { MkdirPill } from "./mkdir-pill";
 import { MobileMenuButton, MobileMenuPanel } from "./mobile-menu";
 
 export function Nav() {
@@ -36,8 +37,11 @@ export function Nav() {
           </div>
 
           <div className="flex items-center gap-2">
+            <MkdirPill />
             <ThemeToggle />
-            <MobileMenuButton ref={triggerRef} open={menuOpen} onOpenChange={setMenuOpen} />
+            <div className="md:hidden">
+              <MobileMenuButton ref={triggerRef} open={menuOpen} onOpenChange={setMenuOpen} />
+            </div>
           </div>
         </nav>
       </div>
