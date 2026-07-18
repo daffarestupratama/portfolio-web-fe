@@ -11,6 +11,7 @@ export const HOME_PAGE_QUERY =
   "&populate[heroCtaSecondary]=*" +
   "&populate[contactLinks]=*" +
   "&populate[featuredExperiences][populate][gallery][populate][image]=true" +
+  "&populate[featuredExperiences][populate][logo]=true" +
   "&populate[featuredProjects][populate][coverImage]=true" +
   "&populate[featuredArticles][populate][coverImage]=true" +
   "&populate[seo][populate][ogImage]=true";

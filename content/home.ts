@@ -79,6 +79,8 @@ export interface Experience {
   endDate: string | null;
   isCurrent: boolean;
   gallery: GalleryImage[];
+  /** Uploaded org logo when present; the item falls back to the initials box when null. */
+  logo: MappedImage | null;
 }
 
 /**
@@ -96,6 +98,7 @@ export interface Project {
   year: string;
   projectType: ProjectType;
   techStack: string[];
+  coverImage: MappedImage | null;
   githubUrl?: string;
   dashboardUrl?: string;
   liveDemoUrl?: string;
@@ -110,6 +113,7 @@ export interface TourPackage {
   route: string;
   duration: string;
   groupSize: string;
+  coverImage: MappedImage | null;
 }
 
 export type ArticleLanguage = "en" | "id" | "de";
@@ -123,6 +127,8 @@ export interface Article {
   language: ArticleLanguage;
   publishedDate: string;
   readTime: string;
+  tags: string[];
+  coverImage: MappedImage | null;
 }
 
 /** All four home-page-derived accessors read the same endpoint — cache() collapses

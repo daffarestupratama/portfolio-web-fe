@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "@/content/home";
 import { ArrowRightIcon, CloseIcon } from "@/components/ui/icons";
@@ -106,14 +107,15 @@ export function Gallery({ images }: GalleryProps) {
         ))}
       </ul>
 
-      {current && (
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={current.alt || "Image viewer"}
-          tabIndex={-1}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 outline-none"
+      {current &&
+        createPortal(
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={current.alt || "Image viewer"}
+            tabIndex={-1}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 outline-none"
           style={{ background: "rgba(6, 16, 20, 0.82)", backdropFilter: "blur(6px)" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) close();
@@ -169,8 +171,9 @@ export function Gallery({ images }: GalleryProps) {
               <ArrowRightIcon />
             </button>
           )}
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

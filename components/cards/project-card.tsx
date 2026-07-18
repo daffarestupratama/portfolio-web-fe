@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Project } from "@/content/home";
-import { MediaPlaceholder } from "@/components/ui/media-placeholder";
+import { CoverImage } from "@/components/ui/cover-image";
 import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
 import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
 
@@ -17,7 +17,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <div ref={ref} data-tilt className="glass-card p-[15px]">
-      <MediaPlaceholder variant="project" label={`${project.title} cover`} className="relative z-[2] aspect-video w-full" />
+      <CoverImage
+        image={project.coverImage}
+        variant="project"
+        label={`${project.title} cover`}
+        className="relative z-[2] aspect-video w-full"
+        sizes="(max-width: 768px) 100vw, 560px"
+      />
 
       <div className="relative z-[2] px-2 pt-4 pb-1.5">
         <div className="flex items-center justify-between gap-2.5">

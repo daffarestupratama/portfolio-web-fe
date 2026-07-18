@@ -125,6 +125,7 @@ export function mapExperience(e: StrapiExperience): Experience {
     endDate: e.endDate,
     isCurrent: e.isCurrent ?? false,
     gallery: mapGallery(e.gallery),
+    logo: mapImage(e.logo, e.organization),
   };
 }
 
@@ -153,6 +154,7 @@ export function mapProject(p: StrapiProject): Project {
     year: String(p.year),
     projectType: p.projectType,
     techStack: toStringArray(p.techStack),
+    coverImage: mapImage(p.coverImage, `${p.title} cover`),
     githubUrl: p.githubUrl || undefined,
     dashboardUrl: p.dashboardUrl || undefined,
     liveDemoUrl: p.liveDemoUrl || undefined,
@@ -194,6 +196,7 @@ export function mapTourPackage(t: StrapiTourPackage): TourPackage {
     route: formatRouteSummary(t),
     duration: t.duration,
     groupSize: "",
+    coverImage: mapImage(t.coverImage, `${t.title} cover`),
   };
 }
 
@@ -238,5 +241,7 @@ export function mapArticle(a: StrapiArticle): Article {
     language: mapLanguage(a.language),
     publishedDate: formatPublishedDate(a.publishedDate),
     readTime: estimateReadTime(a.body),
+    tags: toStringArray(a.tags),
+    coverImage: mapImage(a.coverImage, `${a.title} cover`),
   };
 }

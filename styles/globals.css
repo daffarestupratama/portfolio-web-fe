@@ -298,10 +298,21 @@ button {
   color: var(--ink-dim);
   transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
+.tab-btn:not([data-active="true"]):hover {
+  background: var(--chip);
+  color: var(--ink);
+}
 .tab-btn[data-active="true"] {
   background: linear-gradient(140deg, var(--accent), var(--accent-ink));
   color: #fff;
   box-shadow: 0 8px 18px -8px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+/* Dark mode: same fix as the primary button — the bright accent gradient
+   washes out a white label, so tone the far end and use a near-black label. */
+[data-theme="dark"] .tab-btn[data-active="true"] {
+  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #04121a));
+  color: #06141b;
+  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 /* Small meta/tech-stack/language chip. Padding, radius and font-size vary by
@@ -326,4 +337,24 @@ button {
   font-size: 11.5px;
   font-weight: 600;
   border: 1px solid transparent;
+}
+
+/* Loading skeleton block. Pulse is auto-disabled under prefers-reduced-motion
+   by the global rule above; base opacity stays 1 so it's still visible. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--glass-bg-2);
+  border: 1px solid var(--glass-brd);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
 }

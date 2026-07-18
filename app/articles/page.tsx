@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getAllArticles } from "@/content/articles";
-import { ArticlesFilter } from "@/components/articles/articles-filter";
+import { ArticlesBrowser } from "@/components/articles/articles-browser";
 
 export const revalidate = 60;
 
@@ -29,7 +29,7 @@ export default async function ArticlesPage() {
           No articles published yet.
         </p>
       ) : (
-        <ArticlesFilter articles={articles} />
+        <ArticlesBrowser articles={articles} />
       )}
     </main>
   );

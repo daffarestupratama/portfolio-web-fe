@@ -18,7 +18,10 @@
       "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const m=s.match\\(/>\\({.*?}\\)</g\\)||[];m.forEach\\(\\(x,i\\)=>{const j=x.slice\\(1,-1\\);try{console.log\\('LD#'+i+':',JSON.stringify\\(JSON.parse\\(j\\)\\).slice\\(0,400\\)\\);}catch\\(e\\){console.log\\('LD#'+i+' parse-fail:',j.slice\\(0,200\\)\\);}}\\);}\\)\")",
       "Bash(node verify-step4.mjs)",
       "Bash(git add *)",
-      "Bash(node verify-step5.mjs)"
+      "Bash(node verify-step5.mjs)",
+      "Bash(node verify-step6.mjs)",
+      "Bash(grep -oE '.{0,60}tab-btn.{0,90}' step6.css)",
+      "Bash(node -e ' *)"
     ]
   }
 }

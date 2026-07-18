@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AmbientBackground } from "@/components/layout/ambient-background";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
+import { RouteProgress } from "@/components/layout/route-progress";
 import { getSiteSettings } from "@/content/site";
 import { buildMetadata, FALLBACK_TITLE, SITE_URL } from "@/lib/seo";
 import "../styles/globals.css";
@@ -47,6 +48,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
+          <RouteProgress />
           <div
             className="relative min-h-screen overflow-x-hidden"
             style={{ background: "var(--bg)", color: "var(--ink)" }}

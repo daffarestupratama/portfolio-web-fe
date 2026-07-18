@@ -106,6 +106,7 @@ export interface StrapiExperience {
   sortOrder: number | null;
   isFeatured: boolean;
   gallery: StrapiGalleryImage[];
+  logo?: StrapiMedia | null;
 }
 
 export interface StrapiProject {

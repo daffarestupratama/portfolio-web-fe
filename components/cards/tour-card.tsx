@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { TourPackage } from "@/content/home";
-import { MediaPlaceholder } from "@/components/ui/media-placeholder";
+import { CoverImage } from "@/components/ui/cover-image";
 import { ArrowRightIcon, ClockIcon, MapPinIcon } from "@/components/ui/icons";
 
 interface TourCardProps {
@@ -15,10 +15,12 @@ export function TourCard({ tour }: TourCardProps) {
 
   return (
     <div ref={ref} data-tilt className="glass-card flex flex-col gap-4 p-[15px] sm:flex-row">
-      <MediaPlaceholder
+      <CoverImage
+        image={tour.coverImage}
         variant="tour"
         label={`${tour.title} photo`}
         className="relative z-[2] aspect-[16/9] w-full shrink-0 sm:aspect-auto sm:w-[150px] sm:min-h-[210px]"
+        sizes="(max-width: 640px) 100vw, 150px"
       />
 
       <div className="relative z-[2] flex min-w-0 flex-1 flex-col">

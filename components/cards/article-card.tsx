@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Article } from "@/content/home";
-import { MediaPlaceholder } from "@/components/ui/media-placeholder";
+import { CoverImage } from "@/components/ui/cover-image";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 interface ArticleCardProps {
@@ -15,10 +15,12 @@ export function ArticleCard({ article }: ArticleCardProps) {
 
   return (
     <div ref={ref} data-tilt className="glass-card flex flex-col p-[14px]">
-      <MediaPlaceholder
+      <CoverImage
+        image={article.coverImage}
         variant="article"
         label={`${article.title} cover`}
         className="relative z-[2] aspect-[16/10] w-full"
+        sizes="(max-width: 640px) 100vw, 380px"
       />
 
       <div className="relative z-[2] flex flex-1 flex-col px-1.5 pt-3.5 pb-1">

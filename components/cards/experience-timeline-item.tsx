@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import Image from "next/image";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Experience } from "@/content/home";
 import { ChevronDownIcon } from "@/components/ui/icons";
@@ -47,18 +48,32 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
           aria-controls={bodyId}
           className="relative z-[2] flex w-full items-start gap-[14px] text-left"
         >
-          <span
-            aria-hidden="true"
-            className="flex h-[46px] w-[46px] shrink-0 items-center justify-center text-sm font-bold text-white"
-            style={{
-              borderRadius: 14,
-              background: logoBg,
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 16px -8px color-mix(in srgb, var(--accent) 60%, transparent)",
-            }}
-          >
-            {experience.initials}
-          </span>
+          {experience.logo ? (
+            <span
+              aria-hidden="true"
+              className="relative h-[46px] w-[46px] shrink-0 overflow-hidden"
+              style={{
+                borderRadius: 14,
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 16px -8px color-mix(in srgb, var(--accent) 60%, transparent)",
+              }}
+            >
+              <Image src={experience.logo.url} alt="" fill sizes="46px" style={{ objectFit: "cover" }} />
+            </span>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="flex h-[46px] w-[46px] shrink-0 items-center justify-center text-sm font-bold text-white"
+              style={{
+                borderRadius: 14,
+                background: logoBg,
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 16px -8px color-mix(in srgb, var(--accent) 60%, transparent)",
+              }}
+            >
+              {experience.initials}
+            </span>
+          )}
           <span className="min-w-0 flex-1">
             <span className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-1">
               <span className="text-base font-semibold" style={{ letterSpacing: "-0.02em" }}>
