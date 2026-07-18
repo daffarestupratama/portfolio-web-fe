@@ -50,6 +50,37 @@ export function articleDetailQuery(slug: string): string {
   );
 }
 
+export const TOUR_LANDING_QUERY =
+  "populate[heroImage]=true" +
+  "&populate[primaryCta]=*" +
+  "&populate[contactLinks]=*" +
+  "&populate[featuredTours][populate][coverImage]=true" +
+  "&populate[seo][populate][ogImage]=true";
+
+export const TOURS_LIST_QUERY =
+  "populate[coverImage]=true&populate[route]=true&populate[priceOption]=*&pagination[pageSize]=100";
+
+export function tourDetailQuery(slug: string): string {
+  return (
+    `filters[slug][$eq]=${encodeURIComponent(slug)}` +
+    "&populate[coverImage]=true" +
+    "&populate[gallery][populate][image]=true" +
+    "&populate[route][populate][image]=true" +
+    "&populate[priceOption]=*" +
+    "&populate[bookingContact]=*" +
+    "&populate[seo][populate][ogImage]=true"
+  );
+}
+
+export const ABOUT_PAGE_QUERY =
+  "populate[profileImage]=true" +
+  "&populate[contactLinks]=*" +
+  "&populate[skills]=true" +
+  "&populate[experiences][populate][gallery][populate][image]=true" +
+  "&populate[experiences][populate][logo]=true" +
+  "&populate[seo][populate][ogImage]=true";
+
 /** Lightweight slug-only listings for generateStaticParams / sitemap. */
 export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
+export const TOUR_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";

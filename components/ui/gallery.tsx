@@ -1,10 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "@/content/home";
+import { StrapiImage } from "@/components/ui/strapi-image";
 import { ArrowRightIcon, CloseIcon } from "@/components/ui/icons";
+
+const imgFallback = <span className="absolute inset-0" style={{ background: "var(--glass-bg-2)" }} aria-hidden="true" />;
 
 interface GalleryProps {
   images: GalleryImage[];
@@ -101,7 +103,14 @@ export function Gallery({ images }: GalleryProps) {
               className="glass-icon-btn relative block h-20 w-28 overflow-hidden p-0"
               style={{ borderRadius: 12 }}
             >
-              <Image src={img.url} alt={img.alt} fill sizes="112px" style={{ objectFit: "cover" }} />
+              <StrapiImage
+                src={img.url}
+                alt={img.alt}
+                fill
+                sizes="112px"
+                style={{ objectFit: "cover" }}
+                fallback={imgFallback}
+              />
             </button>
           </li>
         ))}
@@ -144,7 +153,8 @@ export function Gallery({ images }: GalleryProps) {
           )}
 
           <figure className="flex max-h-full max-w-5xl flex-col items-center gap-3">
-            <Image
+            <StrapiImage
+              key={current.url}
               src={current.url}
               alt={current.alt}
               width={current.width}
@@ -152,6 +162,14 @@ export function Gallery({ images }: GalleryProps) {
               sizes="(max-width: 1024px) 92vw, 1024px"
               className="h-auto w-auto rounded-xl"
               style={{ maxHeight: "78vh", maxWidth: "100%", objectFit: "contain" }}
+              fallback={
+                <div
+                  className="mono flex items-center justify-center rounded-xl text-[13px]"
+                  style={{ width: 360, height: 220, background: "var(--glass-bg-2)", color: "rgba(255,255,255,0.7)" }}
+                >
+                  Image unavailable
+                </div>
+              }
             />
             {current.caption && (
               <figcaption className="mono max-w-[60ch] text-center text-[12.5px]" style={{ color: "rgba(255,255,255,0.82)" }}>

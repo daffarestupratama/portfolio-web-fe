@@ -22,6 +22,7 @@ interface ExperienceTimelineItemProps {
 export function ExperienceTimelineItem({ experience, index }: ExperienceTimelineItemProps) {
   const ref = useTilt<HTMLDivElement>();
   const [open, setOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const bodyId = useId();
   const logoBg = LOGO_GRADIENTS[index % LOGO_GRADIENTS.length];
 
@@ -48,17 +49,26 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
           aria-controls={bodyId}
           className="relative z-[2] flex w-full items-start gap-[14px] text-left"
         >
-          {experience.logo ? (
+          {experience.logo && !logoError ? (
             <span
               aria-hidden="true"
-              className="relative h-[46px] w-[46px] shrink-0 overflow-hidden"
+              className="flex h-[46px] w-[46px] shrink-0 items-center justify-center p-1.5"
               style={{
                 borderRadius: 14,
+                background: "var(--glass-bg-2)",
                 boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 16px -8px color-mix(in srgb, var(--accent) 60%, transparent)",
+                  "inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 16px -8px color-mix(in srgb, var(--accent) 40%, transparent)",
               }}
             >
-              <Image src={experience.logo.url} alt="" fill sizes="46px" style={{ objectFit: "cover" }} />
+              <Image
+                src={experience.logo.url}
+                alt=""
+                width={40}
+                height={40}
+                onError={() => setLogoError(true)}
+                className="h-full w-full"
+                style={{ objectFit: "contain" }}
+              />
             </span>
           ) : (
             <span

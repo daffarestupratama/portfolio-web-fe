@@ -38,7 +38,11 @@ export function buildMetadata(seo: Seo | null, options: BuildMetadataOptions = {
     title: options.absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical },
-    robots: seo?.noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    // Only set robots when explicitly hiding a page. Leaving it unset for normal
+    // pages keeps them indexable (the default) AND lets Next's own noindex on
+    // notFound() streamed responses take effect instead of being overridden by a
+    // forced index,follow — so unknown slugs are excluded from search.
+    robots: seo?.noIndex ? { index: false, follow: false } : undefined,
     openGraph: {
       type: "website",
       url: canonical,

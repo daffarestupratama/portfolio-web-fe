@@ -141,6 +141,14 @@ export function byNewestExperience(a: Experience, b: Experience): number {
   return 0;
 }
 
+/** Bucket mapped experiences into the 3 tab categories, each sorted newest-first.
+ *  Reused by the homepage (getFeaturedExperiences) and the /about page. */
+export function bucketExperiences(experiences: Experience[]): Record<ExperienceCategory, Experience[]> {
+  const bucket = (category: ExperienceCategory) =>
+    experiences.filter((e) => e.category === category).sort(byNewestExperience);
+  return { education: bucket("education"), organization: bucket("organization"), others: bucket("others") };
+}
+
 export function toStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
@@ -172,15 +180,21 @@ function formatRouteSummary(tour: StrapiTourPackage): string {
   return tour.meetingPoint ? `Starts at ${tour.meetingPoint}` : tour.duration;
 }
 
+/** Rp / currency formatting shared by the tour card ("from" price) and the
+ *  tour-detail price-option list. */
+export function formatCurrency(price: number, currency: string): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: currency || "IDR",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
 function formatPrice(tour: StrapiTourPackage): string {
   const options = tour.priceOption ?? [];
   if (options.length === 0) return "Contact for price";
   const cheapest = options.reduce((min, o) => (o.price < min.price ? o : min), options[0]!);
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: cheapest.currency || "IDR",
-    maximumFractionDigits: 0,
-  }).format(cheapest.price);
+  return formatCurrency(cheapest.price, cheapest.currency);
 }
 
 /** No max-group-size field exists on tour-package — `availabilityNote` is booking-logistics

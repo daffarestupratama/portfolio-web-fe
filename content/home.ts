@@ -9,7 +9,7 @@ import { cache } from "react";
 import { strapiFind, strapiFindOne } from "@/lib/strapi";
 import { FEATURED_TOUR_PACKAGES_QUERY, HOME_PAGE_QUERY } from "@/lib/queries";
 import {
-  byNewestExperience,
+  bucketExperiences,
   mapArticle,
   mapContactLinks,
   mapCta,
@@ -156,14 +156,7 @@ export async function getHomePage(): Promise<HomePage> {
 
 export async function getFeaturedExperiences(): Promise<Record<ExperienceCategory, Experience[]>> {
   const raw = await getHomePageRaw();
-  const experiences = raw.featuredExperiences.map(mapExperience);
-  const bucket = (category: ExperienceCategory) =>
-    experiences.filter((e) => e.category === category).sort(byNewestExperience);
-  return {
-    education: bucket("education"),
-    organization: bucket("organization"),
-    others: bucket("others"),
-  };
+  return bucketExperiences(raw.featuredExperiences.map(mapExperience));
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {

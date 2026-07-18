@@ -68,9 +68,11 @@ export interface StrapiPriceOption {
 export interface StrapiRouteStop {
   id: number;
   title: string;
+  description: string | null;
   locationText: string | null;
   mapUrl: string | null;
   order: number | null;
+  image: StrapiMedia | null;
 }
 
 export interface StrapiGalleryImage {
@@ -170,6 +172,57 @@ export interface StrapiTourPackage {
   priceOption: StrapiPriceOption[] | null;
   availabilityNote: string | null;
   isFeatured: boolean;
+}
+
+/** Extra fields only present when the detail query populates them. */
+export interface StrapiTourPackageDetail extends StrapiTourPackage {
+  description: unknown;
+  suitableFor: unknown;
+  notSuitableFor: unknown;
+  whatToPrepare: unknown;
+  included: unknown;
+  excluded: unknown;
+  gallery: StrapiGalleryImage[];
+  bookingContact: StrapiContactLink[];
+  seo: StrapiSeo | null;
+}
+
+export interface StrapiTourGuideLanding {
+  id: number;
+  documentId: string;
+  title: string | null;
+  subtitle: string | null;
+  intro: unknown;
+  whyChooseMe: unknown;
+  heroImage: StrapiMedia | null;
+  primaryCta: StrapiCta | null;
+  contactLinks: StrapiContactLink[];
+  featuredTours: StrapiTourPackage[];
+  seo: StrapiSeo | null;
+}
+
+export interface StrapiSkill {
+  id: number;
+  documentId: string;
+  name: string;
+  category: string;
+  level: string;
+  description: string | null;
+  isFeatured: boolean;
+  order: number | null;
+}
+
+export interface StrapiAboutPage {
+  id: number;
+  documentId: string;
+  title: string | null;
+  subtitle: string | null;
+  body: unknown;
+  profileImage: StrapiMedia | null;
+  contactLinks: StrapiContactLink[];
+  skills: StrapiSkill[];
+  experiences: StrapiExperience[];
+  seo: StrapiSeo | null;
 }
 
 export interface StrapiHomePage {
