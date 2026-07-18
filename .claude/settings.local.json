@@ -44,7 +44,16 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/ --max-time 5)",
       "Bash(cd \"d:/Project/portfolio-web-fe\" && rm \"app/projects/[slug]/loading.tsx\" \"app/articles/[slug]/loading.tsx\" \"app/tours/[slug]/loading.tsx\" && echo \"removed 3 detail loading.tsx files\" && ls app/*/loading.tsx app/*/*/loading.tsx 2>/dev/null)",
       "Bash(awk '/status.codes/,/^## [^S]/' node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/loading.md)",
-      "Bash(node verify-step7.mjs)"
+      "Bash(node verify-step7.mjs)",
+      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"https://cms.daffa.me/api/guestbook-messages?pagination%5BpageSize%5D=5\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const [b,h]=s.split\\('HTTP:'\\);console.log\\('HTTP',h.trim\\(\\)\\);try{const d=JSON.parse\\(b\\);if\\(d.error\\){console.log\\('ERR',d.error.status,d.error.message\\);return;}console.log\\('total:',d.meta?.pagination?.total\\);const x=d.data[0];if\\(x\\){console.log\\('keys:',Object.keys\\(x\\).join\\(', '\\)\\);console.log\\('sample:',JSON.stringify\\(x,null,1\\).slice\\(0,700\\)\\);}else{console.log\\('no messages returned \\(empty or all filtered\\)'\\);}}catch\\(e\\){console.log\\('parse fail',b.slice\\(0,300\\)\\);}}\\)\")",
+      "Bash(curl -s \"https://cms.daffa.me/api/guestbook-messages?filters%5BmoderationStatus%5D%5B%24eq%5D=visible&filters%5BisVisible%5D%5B%24eq%5D=true&sort%5B0%5D=isPinned%3Adesc&sort%5B1%5D=submittedAt%3Adesc\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('total',d.meta.pagination.total\\);d.data.forEach\\(function\\(m,i\\){console.log\\(\\(i+1\\)+'. pinned='+m.isPinned+' name='+\\(m.isAnonymous?'ANON':JSON.stringify\\(m.displayName\\)\\)+' cat='+m.category+' reply='+\\(m.reply?'YES':'-'\\)+' submittedAt='+m.submittedAt\\);}\\);}\\)\")",
+      "Bash(node verify-step8.mjs)",
+      "Bash(curl -s http://localhost:3000/guestbook)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('hidden rows via public API:',d.meta.pagination.total,'\\(0 expected if draftAndPublish keeps them unpublished\\)'\\);}\\)\")",
+      "Bash(curl -s \"https://cms.daffa.me/api/guestbook-messages?filters%5BmoderationStatus%5D%5B%24eq%5D=visible&filters%5BisVisible%5D%5B%24eq%5D=true\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('visible rows:',d.meta.pagination.total\\);}\\)\")"
     ],
     "additionalDirectories": [
       "D:\\Project\\portfolio-web-fe\\app\\projects\\[slug]"

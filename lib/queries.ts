@@ -80,6 +80,16 @@ export const ABOUT_PAGE_QUERY =
   "&populate[experiences][populate][logo]=true" +
   "&populate[seo][populate][ogImage]=true";
 
+/** Visible, approved guestbook messages: pinned first, then newest.
+ *  createdAt is the reliable tiebreaker since admin-added rows can have submittedAt=null. */
+export const GUESTBOOK_MESSAGES_QUERY =
+  "filters[moderationStatus][$eq]=visible" +
+  "&filters[isVisible][$eq]=true" +
+  "&sort[0]=isPinned:desc" +
+  "&sort[1]=submittedAt:desc" +
+  "&sort[2]=createdAt:desc" +
+  "&pagination[pageSize]=100";
+
 /** Lightweight slug-only listings for generateStaticParams / sitemap. */
 export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";

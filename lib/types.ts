@@ -251,3 +251,19 @@ export interface StrapiSiteSetting {
   contactLinks: StrapiContactLink[];
   defaultSeo: StrapiSeo | null;
 }
+
+export interface StrapiGuestbookMessage {
+  id: number;
+  documentId: string;
+  message: string;
+  displayName: string | null;
+  isAnonymous: boolean | null;
+  isVisible: boolean | null;
+  isPinned: boolean | null;
+  category: string | null;
+  submittedAt: string | null;
+  reply: string | null;
+  repliedAt: string | null;
+  moderationStatus: string;
+  createdAt: string;
+}
