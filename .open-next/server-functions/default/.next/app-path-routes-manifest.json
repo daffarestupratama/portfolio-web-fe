@@ -1,0 +1,17 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/about/page": "/about",
+  "/api/guestbook/route": "/api/guestbook",
+  "/articles/[slug]/page": "/articles/[slug]",
+  "/articles/page": "/articles",
+  "/guestbook/page": "/guestbook",
+  "/icon.svg/route": "/icon.svg",
+  "/page": "/",
+  "/projects/[slug]/page": "/projects/[slug]",
+  "/projects/page": "/projects",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/tours/[slug]/page": "/tours/[slug]",
+  "/tours/page": "/tours"
+}

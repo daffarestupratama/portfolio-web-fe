@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,40306,e=>{"use strict";var t=e.i(43476),u=e.i(71645);e.s(["Delayed",0,function({ms:e=200,children:r}){let[i,l]=(0,u.useState)(!1);return(0,u.useEffect)(()=>{let t=setTimeout(()=>l(!0),e);return()=>clearTimeout(t)},[e]),i?(0,t.jsx)(t.Fragment,{children:r}):null}])}]);
