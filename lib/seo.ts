@@ -3,12 +3,12 @@ import type { Seo } from "@/content/site";
 import { strapiImageUrl } from "./image";
 
 /** Canonical site origin — also used by sitemap/robots. Matches site-setting.defaultSeo.canonicalUrl. */
-export const SITE_URL = "https://daffa.me";
-export const JOB_TITLE = "Information Systems Student";
+export const SITE_URL = "https://daffarestupratama.com";
+export const JOB_TITLE = "Information Systems Graduate";
 
 export const FALLBACK_TITLE = "Daffa Ilham Restupratama — Information Systems, Data & Technology Portfolio";
 export const FALLBACK_DESCRIPTION =
-  "Portfolio of Daffa Ilham Restupratama, an Information Systems student at Universitas Indonesia focusing on data science, technology, business, and city-based tour experiences.";
+  "Portfolio of Daffa Ilham Restupratama, an Information Systems graduate at Universitas Indonesia focusing on data science, technology, business, and management.";
 
 interface BuildMetadataOptions {
   /** Absolute title bypasses the root layout's `%s · siteName` template (used by the homepage). */
