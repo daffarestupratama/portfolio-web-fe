@@ -57,7 +57,7 @@ export function MobileMenuPanel({ open, onOpenChange, returnFocusRef }: MobileMe
   if (!open) return null;
 
   return (
-    <div id={PANEL_ID} className="relative mx-auto w-full max-w-[1080px] px-5 pb-4 md:hidden">
+    <div id={PANEL_ID} className="relative mx-auto w-full max-w-[1080px] px-5 pb-4 lg:hidden">
       <button
         type="button"
         aria-hidden="true"

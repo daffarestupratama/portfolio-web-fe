@@ -252,6 +252,73 @@ export interface StrapiSiteSetting {
   defaultSeo: StrapiSeo | null;
 }
 
+export interface StrapiServiceFeature {
+  id: number;
+  title: string;
+  description: string;
+  icon: string | null;
+}
+
+export interface StrapiServiceProcess {
+  id: number;
+  title: string;
+  description: string;
+  order: number | null;
+}
+
+export interface StrapiServiceFaq {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+export interface StrapiServicePage {
+  id: number;
+  documentId: string;
+  title: string | null;
+  subtitle: string | null;
+  intro: unknown;
+  features: StrapiServiceFeature[];
+  process: StrapiServiceProcess[];
+  faqs: StrapiServiceFaq[];
+  ctaHeading: string | null;
+  ctaText: string | null;
+  featuredProjects: StrapiProject[];
+  seo: StrapiSeo | null;
+}
+
+export interface StrapiServicePackage {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  tagline: string | null;
+  kind: string;
+  billing: string;
+  startingPrice: number | null;
+  priceQualifier: string;
+  currency: string;
+  includes: unknown;
+  timeline: string | null;
+  revisions: string | null;
+  suitableFor: string | null;
+  isPopular: boolean | null;
+  isActive: boolean | null;
+  order: number | null;
+}
+
+export interface StrapiServiceAddon {
+  id: number;
+  documentId: string;
+  name: string;
+  category: string;
+  priceText: string | null;
+  unit: string | null;
+  description: string | null;
+  isPopular: boolean | null;
+  order: number | null;
+}
+
 export interface StrapiGuestbookMessage {
   id: number;
   documentId: string;

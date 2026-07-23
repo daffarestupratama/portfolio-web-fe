@@ -53,7 +53,19 @@
       "Bash(curl -s http://localhost:3000/guestbook)",
       "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('hidden rows via public API:',d.meta.pagination.total,'\\(0 expected if draftAndPublish keeps them unpublished\\)'\\);}\\)\")",
       "Bash(curl -s \"https://cms.daffa.me/api/guestbook-messages?filters%5BmoderationStatus%5D%5B%24eq%5D=visible&filters%5BisVisible%5D%5B%24eq%5D=true\")",
-      "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('visible rows:',d.meta.pagination.total\\);}\\)\")"
+      "Bash(node -e \"let s='';process.stdin.on\\('data',function\\(d\\){s+=d}\\).on\\('end',function\\(\\){var d=JSON.parse\\(s\\);console.log\\('visible rows:',d.meta.pagination.total\\);}\\)\")",
+      "Bash(curl -s 'https://cms.daffa.me/api/service-page?populate[features]=true&populate[process]=true&populate[faqs]=true&populate[featuredProjects][populate][coverImage]=true&populate[seo][populate][ogImage]=true')",
+      "Bash(curl -s 'https://cms.daffa.me/api/service-addons?pagination[pageSize]=100&sort[0]=order:asc')",
+      "Bash(curl -sg 'https://cms.daffa.me/api/service-packages?pagination[pageSize]=100&sort[0]=order:asc')",
+      "Bash(python -m json.tool)",
+      "Bash(python -c \"import sys,json,collections; d=json.load\\(sys.stdin\\)['data']; print\\(collections.Counter\\(r['kind'] for r in d\\)\\)\")",
+      "Bash(python -c \"import sys,json,collections; d=json.load\\(sys.stdin\\)['data']; print\\(collections.Counter\\(r['category'] for r in d\\)\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(curl -sg 'https://cms.daffa.me/api/service-packages?filters[slug][$eq]=landing-page-basic&fields[0]=timeline&fields[1]=tagline')",
+      "Bash(xxd)",
+      "Bash(curl -sg https://cms.daffa.me/api/site-setting?populate[contactLinks]=*)",
+      "Bash(curl -sg \"https://cms.daffa.me/api/service-page?populate[seo][populate][ogImage]=true\")",
+      "Bash(node verify-step9b.mjs)"
     ],
     "additionalDirectories": [
       "D:\\Project\\portfolio-web-fe\\app\\projects\\[slug]"

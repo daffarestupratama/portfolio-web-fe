@@ -28,7 +28,7 @@ export function Nav() {
         <nav className="nav-shell" data-scrolled={scrolled}>
           <Logo />
 
-          <div className="hidden items-center gap-0.5 md:flex">
+          <div className="hidden items-center gap-0.5 lg:flex">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className="nav-link" data-active={pathname === link.href}>
                 {link.label}
@@ -39,7 +39,7 @@ export function Nav() {
           <div className="flex items-center gap-2">
             <MkdirPill />
             <ThemeToggle />
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <MobileMenuButton ref={triggerRef} open={menuOpen} onOpenChange={setMenuOpen} />
             </div>
           </div>

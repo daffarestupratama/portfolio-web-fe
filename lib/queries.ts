@@ -90,6 +90,16 @@ export const GUESTBOOK_MESSAGES_QUERY =
   "&sort[2]=createdAt:desc" +
   "&pagination[pageSize]=100";
 
+export const SERVICE_PAGE_QUERY =
+  "populate[features]=true" +
+  "&populate[process]=true" +
+  "&populate[faqs]=true" +
+  "&populate[featuredProjects][populate][coverImage]=true" +
+  "&populate[seo][populate][ogImage]=true";
+
+export const SERVICE_PACKAGES_QUERY = "pagination[pageSize]=100&sort[0]=order:asc";
+export const SERVICE_ADDONS_QUERY = "pagination[pageSize]=100&sort[0]=order:asc";
+
 /** Lightweight slug-only listings for generateStaticParams / sitemap. */
 export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";

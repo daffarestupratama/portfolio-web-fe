@@ -8,7 +8,7 @@ export const revalidate = 60;
 
 // Static top-level routes. Tours/about/mkdir/guestbook ship in later steps but
 // are listed as known destinations already linked from the site.
-const STATIC_ROUTES = ["", "/projects", "/articles", "/tours", "/about", "/mkdir", "/guestbook"];
+const STATIC_ROUTES = ["", "/projects", "/articles", "/tours", "/about", "/services", "/mkdir", "/guestbook"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();

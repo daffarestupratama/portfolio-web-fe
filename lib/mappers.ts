@@ -35,6 +35,48 @@ export function titleCase(value: string): string {
   return value.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// Windows-1252 -> UTF-8 double-encoding artifacts seen in some CMS text (service
+// -page faqs/intro, package tagline/timeline/includes). Written entirely as \u
+// escapes so the source file's own encoding can never mangle them. Each mojibaked
+// mark is a distinct 3-code-point sequence sharing the "â€" prefix, so
+// the *full* sequence is matched — a bare prefix would greedily mis-replace all.
+const MOJIBAKE_REPLACEMENTS: ReadonlyArray<readonly [RegExp, string]> = [
+  [/â€“/g, "–"], // en dash  –
+  [/â€”/g, "—"], // em dash  —
+  [/â€™/g, "’"], // right single quote  ’
+  [/â€˜/g, "‘"], // left single quote   ‘
+  [/â€œ/g, "“"], // left double quote   “
+  [/â€/g, "”"], // right double quote  ”
+  [/â€¦/g, "…"], // ellipsis  …
+  [/â€¢/g, "•"], // bullet    •
+  [/Â /g, " "], // non-breaking space
+];
+
+/** Repairs double-encoded CMS text ("3<mojibake>5 hari" -> "3–5 hari"). Guarded so
+ *  it only touches strings showing mojibake markers, and idempotent (the targets
+ *  never reappear in the output). A plain latin1 Buffer re-decode is wrong here —
+ *  the source encoding is CP1252, whose 0x80->euro mapping latin1 lacks — so a
+ *  targeted replacement table is used. */
+export function fixMojibake(value: string): string {
+  if (!/â€|Â /.test(value)) return value;
+  return MOJIBAKE_REPLACEMENTS.reduce((out, [re, to]) => out.replace(re, to), value);
+}
+
+/** Deep-applies fixMojibake to the `text` nodes of a Strapi blocks tree (used for
+ *  the service-page `intro`), returning a repaired clone. */
+export function fixMojibakeBlocks(node: unknown): unknown {
+  if (Array.isArray(node)) return node.map(fixMojibakeBlocks);
+  if (node && typeof node === "object") {
+    return Object.fromEntries(
+      Object.entries(node as Record<string, unknown>).map(([k, v]) => [
+        k,
+        k === "text" && typeof v === "string" ? fixMojibake(v) : fixMojibakeBlocks(v),
+      ]),
+    );
+  }
+  return node;
+}
+
 /** Resolve a Strapi media object into an absolute-URL image with intrinsic size. */
 export function mapImage(media: StrapiMedia | null | undefined, alt = ""): MappedImage | null {
   if (!media?.url) return null;
