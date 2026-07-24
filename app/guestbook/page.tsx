@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getVisibleGuestbookMessages } from "@/content/guestbook";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata } from "@/lib/seo";
+import { buildPageMetadata } from "@/lib/seo";
 import { GuestbookForm } from "@/components/guestbook/guestbook-form";
 import { MessageCard } from "@/components/guestbook/message-card";
 
@@ -9,12 +9,12 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
-  return {
-    ...buildMetadata(site.defaultSeo),
+  return buildPageMetadata({
+    path: "/guestbook",
     title: "Guestbook",
     description: "Leave a note, a question, or a bit of feedback for Daffa Ilham Restupratama.",
-    alternates: { canonical: "/guestbook" },
-  };
+    defaultSeo: site.defaultSeo,
+  });
 }
 
 export default async function GuestbookPage() {

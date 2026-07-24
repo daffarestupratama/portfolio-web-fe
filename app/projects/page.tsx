@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
 import { getAllProjects } from "@/content/projects";
+import { getSiteSettings } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo";
 import { ProjectsFilter } from "@/components/projects/projects-filter";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description:
-    "Data science, machine learning, dashboards, and GIS projects by Daffa Ilham Restupratama — problem framing, approach, and results.",
-};
+const PROJECTS_DESCRIPTION =
+  "Data science, machine learning, dashboards, and GIS projects by Daffa Ilham Restupratama — problem framing, approach, and results.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  return buildPageMetadata({
+    path: "/projects",
+    title: "Projects",
+    description: PROJECTS_DESCRIPTION,
+    defaultSeo: site.defaultSeo,
+  });
+}
 
 export default async function ProjectsPage() {
   const projects = await getAllProjects();

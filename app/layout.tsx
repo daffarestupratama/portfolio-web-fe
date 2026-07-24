@@ -6,7 +6,7 @@ import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { RouteProgress } from "@/components/layout/route-progress";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, FALLBACK_TITLE, SITE_URL } from "@/lib/seo";
+import { buildPageMetadata, FALLBACK_TITLE, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "../styles/globals.css";
 
 const inter = Inter({
@@ -23,8 +23,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
-  const base = buildMetadata(site.defaultSeo);
-  const siteName = site.siteName || "Daffa Ilham Restupratama";
+  const base = buildPageMetadata({ path: "", defaultSeo: site.defaultSeo });
+  const siteName = site.siteName || SITE_NAME;
   return {
     ...base,
     metadataBase: new URL(SITE_URL),

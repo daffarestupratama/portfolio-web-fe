@@ -6,11 +6,11 @@
 
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFind } from "@/lib/strapi";
-import { PROJECT_SLUGS_QUERY, PROJECTS_LIST_QUERY, projectDetailQuery } from "@/lib/queries";
+import { PROJECT_SLUGS_QUERY, PROJECTS_LIST_QUERY, PROJECTS_SITEMAP_QUERY, projectDetailQuery } from "@/lib/queries";
 import { mapArticle, mapGallery, mapImage, mapProject } from "@/lib/mappers";
 import { strapiImageUrl } from "@/lib/image";
 import type { StrapiProject, StrapiProjectDetail } from "@/lib/types";
-import { mapSeo, type Seo } from "@/content/site";
+import { mapSeo, toSitemapEntries, type Seo, type SitemapEntry, type StrapiSitemapRow } from "@/content/site";
 import type { Article, GalleryImage, MappedImage, Project } from "@/content/home";
 
 export interface NotebookResource {
@@ -83,4 +83,8 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
 export async function getProjectSlugs(): Promise<string[]> {
   const projects = await strapiFind<{ slug: string }>("projects", PROJECT_SLUGS_QUERY);
   return projects.map((p) => p.slug).filter(Boolean);
+}
+
+export async function getProjectSitemapEntries(): Promise<SitemapEntry[]> {
+  return toSitemapEntries(await strapiFind<StrapiSitemapRow>("projects", PROJECTS_SITEMAP_QUERY));
 }

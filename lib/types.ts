@@ -151,6 +151,7 @@ export interface StrapiArticle {
   language?: string | null;
   isFeatured: boolean;
   publishedDate: string;
+  updatedAt: string;
   body: unknown;
 }
 

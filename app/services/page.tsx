@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getServicePage, getServicePackages, getServiceAddons } from "@/content/services";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo, SITE_URL } from "@/lib/seo";
+import { buildPageMetadata } from "@/lib/seo";
 import { waLink } from "@/lib/whatsapp";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { ContactCTA } from "@/components/sections/contact-cta";
@@ -21,10 +21,16 @@ const FALLBACK_EMAIL = "contact@daffa.me";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [page, site] = await Promise.all([getServicePage(), getSiteSettings()]);
-  const merged = mergeSeo(page.seo, site.defaultSeo);
-  // The CMS canonicalUrl for this entry is "…/service" (singular) but the route is
-  // "/services" — override so the canonical + OG url point at the real page.
-  return buildMetadata({ ...merged, canonicalUrl: `${SITE_URL}/services` }, { absoluteTitle: true });
+  // Canonical self-derives from the "/services" route. The CMS entry's canonicalUrl
+  // is a same-origin "…/service" (singular) typo, which resolveCanonical ignores.
+  return buildPageMetadata({
+    path: "/services",
+    seo: page.seo,
+    title: page.title,
+    description: page.subtitle,
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+  });
 }
 
 function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {

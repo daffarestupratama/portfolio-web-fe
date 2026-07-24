@@ -5,10 +5,10 @@
 
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFind } from "@/lib/strapi";
-import { ARTICLE_SLUGS_QUERY, ARTICLES_LIST_QUERY, articleDetailQuery } from "@/lib/queries";
+import { ARTICLE_SLUGS_QUERY, ARTICLES_LIST_QUERY, ARTICLES_SITEMAP_QUERY, articleDetailQuery } from "@/lib/queries";
 import { mapArticle, mapImage, mapProject, toStringArray } from "@/lib/mappers";
 import type { StrapiArticle, StrapiArticleDetail } from "@/lib/types";
-import { mapSeo, type Seo } from "@/content/site";
+import { mapSeo, toSitemapEntries, type Seo, type SitemapEntry, type StrapiSitemapRow } from "@/content/site";
 import type { Article, MappedImage, Project } from "@/content/home";
 
 export interface ArticleDetail extends Article {
@@ -16,6 +16,9 @@ export interface ArticleDetail extends Article {
   tags: string[];
   coverImage: MappedImage | null;
   relatedProjects: Project[];
+  /** Raw ISO dates (the card `publishedDate` is display-formatted) for OG/JSON-LD. */
+  publishedTime: string;
+  modifiedTime: string;
   seo: Seo;
 }
 
@@ -30,6 +33,8 @@ function mapArticleDetail(a: StrapiArticleDetail): ArticleDetail {
     tags: toStringArray(a.tags),
     coverImage: mapImage(a.coverImage, `${a.title} cover`),
     relatedProjects: (a.relatedProjects ?? []).map(mapProject),
+    publishedTime: a.publishedDate,
+    modifiedTime: a.updatedAt,
     seo: mapSeo(a.seo),
   };
 }
@@ -47,4 +52,8 @@ export async function getArticleBySlug(slug: string): Promise<ArticleDetail | nu
 export async function getArticleSlugs(): Promise<string[]> {
   const articles = await strapiFind<{ slug: string }>("articles", ARTICLE_SLUGS_QUERY);
   return articles.map((a) => a.slug).filter(Boolean);
+}
+
+export async function getArticleSitemapEntries(): Promise<SitemapEntry[]> {
+  return toSitemapEntries(await strapiFind<StrapiSitemapRow>("articles", ARTICLES_SITEMAP_QUERY));
 }

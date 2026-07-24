@@ -6,15 +6,45 @@
 
 import { cache } from "react";
 import { strapiFindOne } from "@/lib/strapi";
+import { strapiImageUrl } from "@/lib/image";
 import { SITE_SETTING_QUERY } from "@/lib/queries";
 import type { StrapiContactLink, StrapiSeo, StrapiSiteSetting } from "@/lib/types";
+
+export interface OgImage {
+  url: string;
+  width: number | null;
+  height: number | null;
+  alt: string | null;
+}
+
+/** A collection entry reduced to what the sitemap needs. */
+export interface SitemapEntry {
+  slug: string;
+  /** ISO timestamp used as `lastModified`. */
+  updatedAt: string;
+  noIndex: boolean;
+}
+
+/** Raw Strapi row for the sitemap listings (slug + updatedAt + seo.noIndex). */
+export interface StrapiSitemapRow {
+  slug: string;
+  updatedAt: string;
+  seo: { noIndex: boolean | null } | null;
+}
+
+/** Map raw sitemap rows → SitemapEntry (drops slugless rows; noIndex defaults false). */
+export function toSitemapEntries(rows: StrapiSitemapRow[]): SitemapEntry[] {
+  return rows
+    .filter((r) => r.slug)
+    .map((r) => ({ slug: r.slug, updatedAt: r.updatedAt, noIndex: r.seo?.noIndex ?? false }));
+}
 
 export interface Seo {
   metaTitle: string | null;
   metaDescription: string | null;
   canonicalUrl: string | null;
   noIndex: boolean;
-  ogImageUrl: string | null;
+  ogImage: OgImage | null;
 }
 
 export interface SiteContactLink {
@@ -34,12 +64,15 @@ export interface SiteSettings {
 }
 
 export function mapSeo(seo: StrapiSeo | null): Seo {
+  const og = seo?.ogImage;
   return {
     metaTitle: seo?.metaTitle ?? null,
     metaDescription: seo?.metaDescription ?? null,
     canonicalUrl: seo?.canonicalUrl ?? null,
     noIndex: seo?.noIndex ?? false,
-    ogImageUrl: seo?.ogImage?.url ?? null,
+    ogImage: og?.url
+      ? { url: strapiImageUrl(og.url), width: og.width, height: og.height, alt: og.alternativeText }
+      : null,
   };
 }
 

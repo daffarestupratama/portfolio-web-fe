@@ -65,7 +65,12 @@
       "Bash(xxd)",
       "Bash(curl -sg https://cms.daffa.me/api/site-setting?populate[contactLinks]=*)",
       "Bash(curl -sg \"https://cms.daffa.me/api/service-page?populate[seo][populate][ogImage]=true\")",
-      "Bash(node verify-step9b.mjs)"
+      "Bash(node verify-step9b.mjs)",
+      "Bash(curl -sg 'https://cms.daffa.me/api/articles?pagination[pageSize]=1&populate[seo][populate][ogImage]=true')",
+      "Bash(curl -sg 'https://cms.daffa.me/api/projects?pagination[pageSize]=2&populate[coverImage]=true&populate[seo][populate][ogImage]=true')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\)['data'][0]; print\\('sample:', {'slug':d.get\\('slug'\\),'updatedAt':d.get\\('updatedAt'\\),'seo':d.get\\('seo'\\)}\\)\")",
+      "Bash(npx eslint *)",
+      "Bash(node verify-seo.mjs)"
     ],
     "additionalDirectories": [
       "D:\\Project\\portfolio-web-fe\\app\\projects\\[slug]"

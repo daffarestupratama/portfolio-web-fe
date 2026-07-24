@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getAboutPage } from "@/content/about";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo } from "@/lib/seo";
+import { buildPageMetadata, mappedImageToOg } from "@/lib/seo";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { SkillsSection } from "@/components/about/skills-section";
@@ -11,7 +11,15 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [about, site] = await Promise.all([getAboutPage(), getSiteSettings()]);
-  return buildMetadata(mergeSeo(about.seo, site.defaultSeo), { absoluteTitle: true });
+  return buildPageMetadata({
+    path: "/about",
+    seo: about.seo,
+    title: about.title,
+    description: about.subtitle,
+    image: mappedImageToOg(about.profileImage),
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+  });
 }
 
 export default async function AboutPage() {

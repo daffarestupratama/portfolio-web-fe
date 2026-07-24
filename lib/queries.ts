@@ -100,7 +100,13 @@ export const SERVICE_PAGE_QUERY =
 export const SERVICE_PACKAGES_QUERY = "pagination[pageSize]=100&sort[0]=order:asc";
 export const SERVICE_ADDONS_QUERY = "pagination[pageSize]=100&sort[0]=order:asc";
 
-/** Lightweight slug-only listings for generateStaticParams / sitemap. */
+/** Lightweight slug-only listings for generateStaticParams. */
 export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const TOUR_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
+
+/** Sitemap listings: slug + updatedAt (for lastModified) + seo.noIndex (to exclude). */
+const SITEMAP_FIELDS = "fields[0]=slug&fields[1]=updatedAt&populate[seo][fields][0]=noIndex&pagination[pageSize]=100";
+export const PROJECTS_SITEMAP_QUERY = SITEMAP_FIELDS;
+export const ARTICLES_SITEMAP_QUERY = SITEMAP_FIELDS;
+export const TOURS_SITEMAP_QUERY = SITEMAP_FIELDS;

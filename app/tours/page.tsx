@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getAllTours, getTourLanding } from "@/content/tours";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo } from "@/lib/seo";
+import { buildPageMetadata } from "@/lib/seo";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { TourCard } from "@/components/cards/tour-card";
@@ -12,7 +12,14 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [landing, site] = await Promise.all([getTourLanding(), getSiteSettings()]);
-  return buildMetadata(mergeSeo(landing.seo, site.defaultSeo), { absoluteTitle: true });
+  return buildPageMetadata({
+    path: "/tours",
+    seo: landing.seo,
+    title: landing.title,
+    description: landing.subtitle,
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+  });
 }
 
 export default async function ToursPage() {

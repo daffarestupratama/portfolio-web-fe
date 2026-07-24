@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
 import { getAllArticles } from "@/content/articles";
+import { getSiteSettings } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo";
 import { ArticlesBrowser } from "@/components/articles/articles-browser";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Articles",
-  description:
-    "Notes and essays by Daffa Ilham Restupratama on data, technology, career, and city stories.",
-};
+const ARTICLES_DESCRIPTION =
+  "Notes and essays by Daffa Ilham Restupratama on data, technology, career, and city stories.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteSettings();
+  return buildPageMetadata({
+    path: "/articles",
+    title: "Articles",
+    description: ARTICLES_DESCRIPTION,
+    defaultSeo: site.defaultSeo,
+  });
+}
 
 export default async function ArticlesPage() {
   const articles = await getAllArticles();

@@ -14,22 +14,14 @@ import {
   getHomePage,
   getHomePageSeo,
 } from "@/content/home";
-import { getSiteSettings, type Seo } from "@/content/site";
-import { buildMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [homeSeo, site] = await Promise.all([getHomePageSeo(), getSiteSettings()]);
-  const fallback = site.defaultSeo;
-  const merged: Seo = {
-    metaTitle: homeSeo.metaTitle || fallback.metaTitle,
-    metaDescription: homeSeo.metaDescription || fallback.metaDescription,
-    canonicalUrl: homeSeo.canonicalUrl || fallback.canonicalUrl,
-    noIndex: homeSeo.noIndex,
-    ogImageUrl: homeSeo.ogImageUrl || fallback.ogImageUrl,
-  };
-  return buildMetadata(merged, { absoluteTitle: true });
+  return buildPageMetadata({ path: "", seo: homeSeo, defaultSeo: site.defaultSeo, absoluteTitle: true });
 }
 
 export default async function Home() {

@@ -6,7 +6,7 @@
 import { cache } from "react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFind, strapiFindOne } from "@/lib/strapi";
-import { TOUR_LANDING_QUERY, TOUR_SLUGS_QUERY, TOURS_LIST_QUERY, tourDetailQuery } from "@/lib/queries";
+import { TOUR_LANDING_QUERY, TOUR_SLUGS_QUERY, TOURS_LIST_QUERY, TOURS_SITEMAP_QUERY, tourDetailQuery } from "@/lib/queries";
 import { formatCurrency, mapGallery, mapImage, mapTourPackage, toStringArray } from "@/lib/mappers";
 import type {
   StrapiContactLink,
@@ -16,7 +16,7 @@ import type {
   StrapiTourPackage,
   StrapiTourPackageDetail,
 } from "@/lib/types";
-import { mapSeo, type Seo } from "@/content/site";
+import { mapSeo, toSitemapEntries, type Seo, type SitemapEntry, type StrapiSitemapRow } from "@/content/site";
 import type { GalleryImage, MappedImage, TourPackage } from "@/content/home";
 
 export interface ContactLinkOut {
@@ -152,4 +152,8 @@ export async function getTourBySlug(slug: string): Promise<TourDetail | null> {
 export async function getTourSlugs(): Promise<string[]> {
   const tours = await strapiFind<{ slug: string }>("tour-packages", TOUR_SLUGS_QUERY);
   return tours.map((t) => t.slug).filter(Boolean);
+}
+
+export async function getTourSitemapEntries(): Promise<SitemapEntry[]> {
+  return toSitemapEntries(await strapiFind<StrapiSitemapRow>("tour-packages", TOURS_SITEMAP_QUERY));
 }

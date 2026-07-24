@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTourBySlug, getTourSlugs } from "@/content/tours";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo } from "@/lib/seo";
+import { buildPageMetadata, mappedImageToOg, notFoundMetadata } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { Gallery } from "@/components/ui/gallery";
@@ -21,8 +22,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [tour, site] = await Promise.all([getTourBySlug(slug), getSiteSettings()]);
-  if (!tour) return {};
-  return buildMetadata(mergeSeo(tour.seo, site.defaultSeo), { absoluteTitle: true });
+  if (!tour) return notFoundMetadata();
+  return buildPageMetadata({
+    path: `/tours/${slug}`,
+    seo: tour.seo,
+    title: tour.title,
+    description: tour.shortDescription,
+    image: mappedImageToOg(tour.coverImage),
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+  });
 }
 
 const sectionHeading = "mt-10 mb-3 text-[22px] font-bold";
@@ -43,6 +52,13 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
   return (
     <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-28 pb-16 sm:pt-32">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "" },
+          { name: "Tours", path: "/tours" },
+          { name: tour.title, path: `/tours/${slug}` },
+        ]}
+      />
       <Link
         href="/tours"
         className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"

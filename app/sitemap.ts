@@ -1,35 +1,48 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
-import { getProjectSlugs } from "@/content/projects";
-import { getArticleSlugs } from "@/content/articles";
-import { getTourSlugs } from "@/content/tours";
+import { getProjectSitemapEntries } from "@/content/projects";
+import { getArticleSitemapEntries } from "@/content/articles";
+import { getTourSitemapEntries } from "@/content/tours";
+import type { SitemapEntry } from "@/content/site";
 
 export const revalidate = 60;
 
-// Static top-level routes. Tours/about/mkdir/guestbook ship in later steps but
-// are listed as known destinations already linked from the site.
-const STATIC_ROUTES = ["", "/projects", "/articles", "/tours", "/about", "/services", "/mkdir", "/guestbook"];
+// Real, indexable top-level routes. /mkdir is intentionally excluded while its page
+// is still deferred (it 404s); it will be added when the page ships.
+const STATIC_ROUTES = ["", "/projects", "/articles", "/tours", "/about", "/services", "/guestbook"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date();
-  const [projectSlugs, articleSlugs, tourSlugs] = await Promise.all([
-    getProjectSlugs(),
-    getArticleSlugs(),
-    getTourSlugs(),
+  const now = new Date();
+  const [projects, articles, tours] = await Promise.all([
+    getProjectSitemapEntries(),
+    getArticleSitemapEntries(),
+    getTourSitemapEntries(),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified,
+    lastModified: now,
     changeFrequency: "weekly",
     priority: path === "" ? 1 : 0.7,
   }));
 
+  // Detail routes: exclude noindex entries, and use each entry's updatedAt as lastModified.
   const detailEntries: MetadataRoute.Sitemap = [
-    ...projectSlugs.map((slug) => `/projects/${slug}`),
-    ...articleSlugs.map((slug) => `/articles/${slug}`),
-    ...tourSlugs.map((slug) => `/tours/${slug}`),
-  ].map((path) => ({ url: `${SITE_URL}${path}`, lastModified, changeFrequency: "weekly", priority: 0.6 }));
+    ...toUrls("/projects", projects),
+    ...toUrls("/articles", articles),
+    ...toUrls("/tours", tours),
+  ];
 
   return [...staticEntries, ...detailEntries];
+}
+
+function toUrls(base: string, entries: SitemapEntry[]): MetadataRoute.Sitemap {
+  return entries
+    .filter((entry) => !entry.noIndex)
+    .map((entry) => ({
+      url: `${SITE_URL}${base}/${entry.slug}`,
+      lastModified: entry.updatedAt ? new Date(entry.updatedAt) : new Date(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    }));
 }

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getArticleBySlug, getArticleSlugs } from "@/content/articles";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo } from "@/lib/seo";
+import { buildPageMetadata, mappedImageToOg, notFoundMetadata, SITE_NAME } from "@/lib/seo";
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { ProjectCard } from "@/components/cards/project-card";
@@ -19,8 +20,22 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [article, site] = await Promise.all([getArticleBySlug(slug), getSiteSettings()]);
-  if (!article) return {};
-  return buildMetadata(mergeSeo(article.seo, site.defaultSeo), { absoluteTitle: true });
+  if (!article) return notFoundMetadata();
+  return buildPageMetadata({
+    path: `/articles/${slug}`,
+    seo: article.seo,
+    title: article.title,
+    description: article.excerpt,
+    image: mappedImageToOg(article.coverImage),
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+    ogType: "article",
+    article: {
+      publishedTime: article.publishedTime,
+      modifiedTime: article.modifiedTime,
+      authors: [site.siteName || SITE_NAME],
+    },
+  });
 }
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -30,6 +45,22 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
   return (
     <main className="relative z-[3] mx-auto w-full max-w-[820px] px-[22px] pt-28 pb-16 sm:pt-32">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "" },
+          { name: "Articles", path: "/articles" },
+          { name: article.title, path: `/articles/${slug}` },
+        ]}
+      />
+      <ArticleJsonLd
+        headline={article.title}
+        description={article.excerpt}
+        imageUrl={article.coverImage?.url ?? null}
+        datePublished={article.publishedTime}
+        dateModified={article.modifiedTime}
+        authorName={SITE_NAME}
+        path={`/articles/${slug}`}
+      />
       <Link
         href="/articles"
         className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"

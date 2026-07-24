@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectBySlug, getProjectSlugs } from "@/content/projects";
 import { getSiteSettings } from "@/content/site";
-import { buildMetadata, mergeSeo } from "@/lib/seo";
+import { buildPageMetadata, mappedImageToOg, notFoundMetadata } from "@/lib/seo";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { titleCase } from "@/lib/mappers";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
@@ -23,8 +24,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [project, site] = await Promise.all([getProjectBySlug(slug), getSiteSettings()]);
-  if (!project) return {};
-  return buildMetadata(mergeSeo(project.seo, site.defaultSeo), { absoluteTitle: true });
+  if (!project) return notFoundMetadata();
+  return buildPageMetadata({
+    path: `/projects/${slug}`,
+    seo: project.seo,
+    title: project.title,
+    description: project.summary,
+    image: mappedImageToOg(project.coverImage),
+    defaultSeo: site.defaultSeo,
+    absoluteTitle: true,
+  });
 }
 
 const sectionHeading = "mt-10 mb-3 text-[22px] font-bold";
@@ -44,6 +53,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-28 pb-16 sm:pt-32">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "" },
+          { name: "Projects", path: "/projects" },
+          { name: project.title, path: `/projects/${slug}` },
+        ]}
+      />
       <Link
         href="/projects"
         className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"

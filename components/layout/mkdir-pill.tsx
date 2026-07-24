@@ -9,6 +9,9 @@ export function MkdirPill() {
     <Link
       href="/mkdir"
       aria-label="mkdir"
+      // The /mkdir page is still deferred (404s); disable prefetch so the nav pill
+      // doesn't fire a failing background request on every page. Re-enable when it ships.
+      prefetch={false}
       className="glass-pill mono h-10 shrink-0 gap-1.5 px-2.5 text-[13px] font-medium sm:px-3.5"
       style={{ color: "var(--ink)" }}
     >
