@@ -61,26 +61,32 @@ export function Terminal({ counts }: { counts: ContentCounts }) {
             <span className="term-prompt">
               <Segments segments={t.promptSeg} />
             </span>
-            <span className="term-mirror" aria-hidden="true">
-              {t.input}
-              <span className="term-cursor" />
-            </span>
             <label htmlFor="mkdir-input" className="sr-only">
               Terminal input
             </label>
-            <input
-              id="mkdir-input"
-              ref={inputRef}
-              className="term-realinput mono"
-              value={t.input}
-              onChange={(e) => t.setInput(e.target.value)}
-              onKeyDown={t.onInputKeyDown}
-              autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              aria-label="Terminal input"
-            />
+            <span className="term-field">
+              <input
+                id="mkdir-input"
+                ref={inputRef}
+                className="term-realinput mono"
+                value={t.input}
+                onChange={t.onInputChange}
+                onKeyDown={t.onInputKeyDown}
+                onKeyUp={t.onInputKeyUp}
+                onClick={t.onInputClick}
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-label="Terminal input"
+              />
+              {/* Visible overlay: the block cursor sits ON the character at the caret. */}
+              <span className="term-mirror" aria-hidden="true">
+                {t.input.slice(0, t.caret)}
+                <span className="term-cursor">{t.input.slice(t.caret, t.caret + 1) || " "}</span>
+                {t.input.slice(t.caret + 1)}
+              </span>
+            </span>
           </div>
         )}
       </div>

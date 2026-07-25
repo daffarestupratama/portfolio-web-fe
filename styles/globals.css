@@ -468,7 +468,6 @@ button {
 }
 
 .term-inputline {
-  position: relative;
   display: flex;
   align-items: flex-start;
   padding-bottom: 6px;
@@ -477,33 +476,17 @@ button {
   white-space: pre;
   flex: 0 0 auto;
 }
-.term-mirror {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+/* The real input and the visible mirror share this box, so they overlap exactly —
+   native click hit-testing then lands on the character the mirror shows. */
+.term-field {
+  position: relative;
+  flex: 1 1 auto;
   min-width: 0;
-}
-.term-cursor {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.05em;
-  transform: translateY(0.2em);
-  background: var(--t-accent);
-  opacity: 0.35;
-}
-.term-inputline:focus-within .term-cursor {
-  opacity: 1;
-  animation: term-blink 1.05s steps(1) infinite;
-}
-@keyframes term-blink {
-  50% {
-    opacity: 0;
-  }
+  overflow: hidden;
 }
 .term-realinput {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
   border: none;
@@ -512,7 +495,36 @@ button {
   color: transparent;
   caret-color: transparent;
   font: inherit;
+  line-height: inherit;
   letter-spacing: inherit;
+}
+.term-mirror {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: pre;
+  overflow: hidden;
+}
+/* Full-cell block cursor holding the glyph under the caret (inverted). */
+.term-cursor {
+  border-radius: 1px;
+  background: var(--t-accent);
+  color: var(--t-bg);
+}
+.term-inputline:not(:focus-within) .term-cursor {
+  background: color-mix(in srgb, var(--t-accent) 45%, transparent);
+  color: var(--t-fg);
+}
+.term-inputline:focus-within .term-cursor {
+  animation: term-blink 1.06s step-end infinite;
+}
+/* Block blink: the "off" half shows the glyph normally (not blank). Disabled under
+   prefers-reduced-motion by the global rule, leaving a solid block at the caret. */
+@keyframes term-blink {
+  50% {
+    background: transparent;
+    color: var(--t-fg);
+  }
 }
 
 .term-app {

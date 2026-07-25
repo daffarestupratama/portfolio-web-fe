@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type KeyboardEvent,
+  type RefObject,
+} from "react";
 import { useRouter } from "next/navigation";
 import type { CommandContext, TermApp, TermEnv, TermLine, TermSegment } from "./terminal-types";
 import { createFileSystem, isHidden } from "./filesystem";
@@ -49,6 +58,7 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
 
   const [lines, setLines] = useState<TermLine[]>([]);
   const [input, setInput] = useState("");
+  const [caret, setCaret] = useState(0);
   const [cwd, setCwd] = useState(HOME);
   const [activeApp, setActiveApp] = useState<TermApp | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -66,6 +76,37 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
   const bootDoneRef = useRef(false);
 
   const focusInput = useCallback(() => inputRef.current?.focus(), [inputRef]);
+
+  // Read the caret position from the real input (source of truth). Also mirror the
+  // input's horizontal scroll so the block stays aligned past the field width.
+  const syncCaret = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    setCaret(el.selectionStart ?? el.value.length);
+  }, [inputRef]);
+
+  // Set the input value programmatically (history recall, tab-completion, clears)
+  // and park the caret at the end — in state now, and in the DOM next frame.
+  const putInput = useCallback(
+    (value: string) => {
+      setInput(value);
+      setCaret(value.length);
+      requestAnimationFrame(() => inputRef.current?.setSelectionRange(value.length, value.length));
+    },
+    [inputRef],
+  );
+
+  const onInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    setCaret(e.target.selectionStart ?? e.target.value.length);
+  }, []);
+
+  // Caret moves that don't change the value (arrows, Home/End, click, drag) surface
+  // via keyup / click / the document selectionchange event.
+  useEffect(() => {
+    document.addEventListener("selectionchange", syncCaret);
+    return () => document.removeEventListener("selectionchange", syncCaret);
+  }, [syncCaret]);
 
   const finishBoot = useCallback(() => {
     if (bootDoneRef.current) return;
@@ -211,11 +252,11 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
 
   const runCommand = useCallback(
     (cmd: string) => {
-      setInput("");
+      putInput("");
       execute(cmd);
       focusInput();
     },
-    [execute, focusInput],
+    [execute, focusInput, putInput],
   );
 
   const navHistory = (dir: -1 | 1) => {
@@ -224,13 +265,13 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
     let idx = historyIndexRef.current ?? h.length;
     idx = Math.min(h.length, Math.max(0, idx + dir));
     historyIndexRef.current = idx;
-    setInput(idx >= h.length ? "" : h[idx]!);
+    putInput(idx >= h.length ? "" : h[idx]!);
   };
 
   const cancelLine = () => {
     const snapshot = input;
     setLines((prev) => [...prev, rich([...promptSegments(cwdRef.current), { text: `${snapshot}^C` }])]);
-    setInput("");
+    putInput("");
     historyIndexRef.current = null;
   };
 
@@ -243,11 +284,11 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
     if (completingCommand) {
       const token = parts[0] ?? "";
       const cands = Array.from(new Set(registry.names().filter((n) => n.startsWith(token)))).sort();
-      if (cands.length === 1) setInput(`${cands[0]} `);
+      if (cands.length === 1) putInput(`${cands[0]} `);
       else if (cands.length > 1) {
         setLines((prev) => [...prev, plain(cands.join("  "), "dim")]);
         const prefix = commonPrefix(cands);
-        if (prefix.length > token.length) setInput(prefix);
+        if (prefix.length > token.length) putInput(prefix);
       }
       return;
     }
@@ -266,11 +307,11 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
 
     if (cands.length === 1) {
       const m = cands[0]!;
-      setInput(`${prefixTokens}${dirPart}${m.endsWith("/") ? m : `${m} `}`);
+      putInput(`${prefixTokens}${dirPart}${m.endsWith("/") ? m : `${m} `}`);
     } else if (cands.length > 1) {
       setLines((prev) => [...prev, plain(cands.join("  "), "dim")]);
       const prefix = commonPrefix(cands);
-      if (prefix.length > base.length) setInput(`${prefixTokens}${dirPart}${prefix}`);
+      if (prefix.length > base.length) putInput(`${prefixTokens}${dirPart}${prefix}`);
     }
   };
 
@@ -278,7 +319,7 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
     if (e.key === "Enter") {
       e.preventDefault();
       const value = input;
-      setInput("");
+      putInput("");
       execute(value);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -299,6 +340,10 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
     }
   };
 
+  // Caret-moving keys apply on keyup; clicks position the caret too — resync after both.
+  const onInputKeyUp = () => syncCaret();
+  const onInputClick = () => syncCaret();
+
   const onContainerMouseUp = () => {
     // Don't steal focus mid-selection (keeps scrollback copyable).
     if (typeof window !== "undefined" && window.getSelection()?.toString()) return;
@@ -315,13 +360,16 @@ export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
     visibleBoot: bootHidden ? [] : bootLines.slice(0, bootCount),
     lines,
     input,
-    setInput,
+    caret,
     promptSeg: promptSegments(cwd),
     bootDone,
     activeApp,
     announcement,
     // handlers
+    onInputChange,
     onInputKeyDown,
+    onInputKeyUp,
+    onInputClick,
     focusInput,
     onContainerMouseUp,
     runCommand,
