@@ -358,3 +358,214 @@ button {
     opacity: 0.9;
   }
 }
+
+/* ---------------------------------------------------------------------- */
+/* /mkdir terminal — an ALWAYS-DARK scheme, independent of the site theme. */
+/* Tokens live on .mkdir-term (not under [data-theme]) so light mode never  */
+/* touches the terminal interior.                                          */
+/* ---------------------------------------------------------------------- */
+.mkdir-term {
+  --t-bg: #0a0e0f;
+  --t-bg-2: #10171a;
+  --t-fg: #cdd6d3;
+  --t-dim: #708179;
+  --t-green: #52d18a;
+  --t-accent: #6fb2e6;
+  --t-red: #f2727b;
+  --t-yellow: #e6c07a;
+  --t-brd: rgba(255, 255, 255, 0.09);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: clamp(440px, 74dvh, 760px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--t-bg);
+  color: var(--t-fg);
+  border: 1px solid var(--t-brd);
+  box-shadow:
+    0 30px 80px -40px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 0 60px -20px rgba(111, 178, 230, 0.14);
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.term-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--t-bg-2);
+  border-bottom: 1px solid var(--t-brd);
+  flex: 0 0 auto;
+}
+.term-dots {
+  display: inline-flex;
+  gap: 7px;
+}
+.term-dots i {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: #3a4448;
+}
+.term-dots i:nth-child(1) {
+  background: #f2727b;
+}
+.term-dots i:nth-child(2) {
+  background: #e6c07a;
+}
+.term-dots i:nth-child(3) {
+  background: #52d18a;
+}
+.term-title {
+  font-size: 12px;
+  color: var(--t-dim);
+}
+
+.term-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 16px 8px;
+  cursor: text;
+  /* faint top vignette/glow, tasteful — not scanlines */
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(111, 178, 230, 0.06), transparent 60%),
+    var(--t-bg);
+}
+
+.term-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.term-pre {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.t-fg {
+  color: var(--t-fg);
+}
+.t-dim {
+  color: var(--t-dim);
+}
+.t-green {
+  color: var(--t-green);
+}
+.t-accent {
+  color: var(--t-accent);
+}
+.t-red {
+  color: var(--t-red);
+}
+.t-yellow {
+  color: var(--t-yellow);
+}
+
+.term-inputline {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 6px;
+}
+.term-prompt {
+  white-space: pre;
+  flex: 0 0 auto;
+}
+.term-mirror {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.term-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  transform: translateY(0.2em);
+  background: var(--t-accent);
+  opacity: 0.35;
+}
+.term-inputline:focus-within .term-cursor {
+  opacity: 1;
+  animation: term-blink 1.05s steps(1) infinite;
+}
+@keyframes term-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.term-realinput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.term-app {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #05080b;
+  outline: none;
+}
+.term-matrix {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.term-matrix canvas {
+  display: block;
+}
+.term-exit {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--t-fg);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--t-brd);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.term-exit:hover {
+  border-color: var(--t-accent);
+  color: var(--t-accent);
+}
+
+.term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--t-bg-2);
+  border-top: 1px solid var(--t-brd);
+  flex: 0 0 auto;
+}
+.term-chip {
+  padding: 4px 11px;
+  font-size: 12px;
+  color: var(--t-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--t-brd);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.term-chip:hover {
+  color: var(--t-accent);
+  border-color: var(--t-accent);
+}

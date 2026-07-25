@@ -7,9 +7,8 @@ import type { SitemapEntry } from "@/content/site";
 
 export const revalidate = 60;
 
-// Real, indexable top-level routes. /mkdir is intentionally excluded while its page
-// is still deferred (it 404s); it will be added when the page ships.
-const STATIC_ROUTES = ["", "/projects", "/articles", "/tours", "/about", "/services", "/guestbook"];
+// Genuinely static top-level routes (no single child entry drives their freshness).
+const STATIC_ROUTES = ["", "/about", "/services", "/guestbook", "/mkdir"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -26,6 +25,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "" ? 1 : 0.7,
   }));
 
+  // List routes: lastModified = the most recent child updatedAt, so a rebuild alone
+  // doesn't churn their timestamp (only real content changes do).
+  const listEntries: MetadataRoute.Sitemap = [
+    { path: "/projects", entries: projects },
+    { path: "/articles", entries: articles },
+    { path: "/tours", entries: tours },
+  ].map(({ path, entries }) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: mostRecent(entries) ?? now,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
   // Detail routes: exclude noindex entries, and use each entry's updatedAt as lastModified.
   const detailEntries: MetadataRoute.Sitemap = [
     ...toUrls("/projects", projects),
@@ -33,7 +45,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...toUrls("/tours", tours),
   ];
 
-  return [...staticEntries, ...detailEntries];
+  return [...staticEntries, ...listEntries, ...detailEntries];
+}
+
+/** Most recent updatedAt across a collection's entries (indexable ones), or null. */
+function mostRecent(entries: SitemapEntry[]): Date | null {
+  const times = entries
+    .filter((e) => !e.noIndex && e.updatedAt)
+    .map((e) => new Date(e.updatedAt).getTime())
+    .filter((t) => !Number.isNaN(t));
+  return times.length ? new Date(Math.max(...times)) : null;
 }
 
 function toUrls(base: string, entries: SitemapEntry[]): MetadataRoute.Sitemap {
