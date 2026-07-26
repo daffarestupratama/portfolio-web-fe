@@ -46,8 +46,33 @@ export interface FileSystem {
 
 // ----- command registry + context -----
 
-export type CommandCategory = "shell" | "filesystem" | "personality" | "system";
+// Built-in categories + the CMS `terminal-command` enum (custom/about/fun/links/misc).
+export type CommandCategory =
+  | "shell"
+  | "filesystem"
+  | "personality"
+  | "system"
+  | "custom"
+  | "about"
+  | "fun"
+  | "links"
+  | "misc";
 export type CommandSource = "builtin" | "cms";
+
+export type CmsOutputType = "text" | "ascii" | "link";
+
+/** Serializable CMS command data — crosses the server→client boundary as a prop.
+ *  The client turns each of these into a Command (with a run() closure). */
+export interface CmsCommandData {
+  name: string;
+  aliases: string[];
+  summary: string;
+  manText: string;
+  category: CommandCategory;
+  outputType: CmsOutputType;
+  output: string;
+  linkUrl: string | null;
+}
 
 export interface TermEnv {
   user: string;

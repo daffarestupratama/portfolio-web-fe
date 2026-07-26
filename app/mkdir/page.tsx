@@ -4,6 +4,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import { getProjectSlugs } from "@/content/projects";
 import { getArticleSlugs } from "@/content/articles";
 import { getTourSlugs } from "@/content/tours";
+import { getTerminalCommands } from "@/content/mkdir";
 import { Terminal } from "@/components/mkdir/terminal";
 
 export const revalidate = 60;
@@ -20,7 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MkdirPage() {
-  const [projects, articles, tours] = await Promise.all([getProjectSlugs(), getArticleSlugs(), getTourSlugs()]);
+  const [projects, articles, tours, cmsCommands] = await Promise.all([
+    getProjectSlugs(),
+    getArticleSlugs(),
+    getTourSlugs(),
+    getTerminalCommands(),
+  ]);
   const counts = { projects: projects.length, articles: articles.length, tours: tours.length };
 
   return (
@@ -37,7 +43,7 @@ export default async function MkdirPage() {
         </p>
       </section>
 
-      <Terminal counts={counts} />
+      <Terminal counts={counts} cmsCommands={cmsCommands} />
     </main>
   );
 }

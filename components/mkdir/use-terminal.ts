@@ -11,7 +11,7 @@ import {
   type RefObject,
 } from "react";
 import { useRouter } from "next/navigation";
-import type { CommandContext, TermApp, TermEnv, TermLine, TermSegment } from "./terminal-types";
+import type { Command, CommandContext, TermApp, TermEnv, TermLine, TermSegment } from "./terminal-types";
 import { createFileSystem, isHidden } from "./filesystem";
 import { buildRegistry } from "./registry";
 import { builtinCommands } from "./commands";
@@ -40,16 +40,18 @@ function promptSegments(cwd: string): TermSegment[] {
 
 interface UseTerminalArgs {
   counts: ContentCounts;
+  /** CMS commands (already built into runnable Commands); merged after built-ins. */
+  cmsCommands: Command[];
   // DOM refs are owned by the component and passed in — a hook must not *return*
   // refs (reading them off the returned object counts as ref-access during render).
   inputRef: RefObject<HTMLInputElement | null>;
   scrollRef: RefObject<HTMLDivElement | null>;
 }
 
-export function useTerminal({ counts, inputRef, scrollRef }: UseTerminalArgs) {
+export function useTerminal({ counts, cmsCommands, inputRef, scrollRef }: UseTerminalArgs) {
   const router = useRouter();
   const fs = useMemo(() => createFileSystem(HOME), []);
-  const registry = useMemo(() => buildRegistry(builtinCommands), []);
+  const registry = useMemo(() => buildRegistry(builtinCommands, cmsCommands), [cmsCommands]);
   const env = useMemo<TermEnv>(
     () => ({ user: USER, host: HOST, launchedAt: SITE_LAUNCHED_AT, counts, stack: STACK }),
     [counts],

@@ -4,12 +4,10 @@ import { isHidden } from "../filesystem";
 import { formatUptime } from "../util";
 import { tildePath } from "../config";
 
-const HELP_CATEGORIES = [
-  { cat: "shell", label: "shell" },
-  { cat: "filesystem", label: "filesystem" },
-  { cat: "system", label: "system" },
-  { cat: "personality", label: "fun" },
-] as const;
+// Display-group order for `help`. Built-in "personality" and CMS "fun" merge under
+// one "fun" header; any unlisted category (unexpected CMS value) is appended.
+const HELP_GROUP_ORDER = ["shell", "filesystem", "system", "fun", "about", "links", "custom", "misc"];
+const displayGroup = (c: Command): string => (c.category === "personality" ? "fun" : c.category);
 
 const help: Command = {
   name: "help",
@@ -31,15 +29,22 @@ const help: Command = {
       ctx.print(cmd.manText);
       return;
     }
-    ctx.print("dirOS built-in commands — `help <cmd>` or `man <cmd>` for details.", "dim");
-    for (const { cat, label } of HELP_CATEGORIES) {
-      const cmds = ctx.registry
-        .list()
-        .filter((c) => c.category === cat)
-        .sort((a, b) => a.name.localeCompare(b.name));
-      if (!cmds.length) continue;
+    ctx.print("dirOS commands — `help <cmd>` or `man <cmd>` for details.", "dim");
+    const groups = new Map<string, Command[]>();
+    for (const c of ctx.registry.list()) {
+      const g = displayGroup(c);
+      const arr = groups.get(g) ?? [];
+      arr.push(c);
+      groups.set(g, arr);
+    }
+    const ordered = [
+      ...HELP_GROUP_ORDER.filter((g) => groups.has(g)),
+      ...[...groups.keys()].filter((g) => !HELP_GROUP_ORDER.includes(g)).sort(),
+    ];
+    for (const g of ordered) {
+      const cmds = groups.get(g)!.slice().sort((a, b) => a.name.localeCompare(b.name));
       ctx.print("");
-      ctx.print(label, "accent");
+      ctx.print(g, "accent");
       for (const c of cmds) ctx.print(`  ${c.name.padEnd(10)} ${c.summary}`);
     }
   },

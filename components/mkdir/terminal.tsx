@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useTerminal, type ContentCounts } from "./use-terminal";
+import { buildCmsCommands } from "./cms-commands";
 import { ShortcutChips } from "./shortcut-chips";
-import type { TermLine, TermSegment } from "./terminal-types";
+import type { CmsCommandData, TermLine, TermSegment } from "./terminal-types";
 
 function Segments({ segments }: { segments: TermSegment[] }) {
   return (
@@ -25,10 +26,11 @@ function Line({ line }: { line: TermLine }) {
   );
 }
 
-export function Terminal({ counts }: { counts: ContentCounts }) {
+export function Terminal({ counts, cmsCommands }: { counts: ContentCounts; cmsCommands: CmsCommandData[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const t = useTerminal({ counts, inputRef, scrollRef });
+  const cmsCmds = useMemo(() => buildCmsCommands(cmsCommands), [cmsCommands]);
+  const t = useTerminal({ counts, inputRef, scrollRef, cmsCommands: cmsCmds });
 
   return (
     <div className="mkdir-term">

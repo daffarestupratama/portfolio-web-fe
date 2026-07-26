@@ -105,6 +105,10 @@ export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const TOUR_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 
+/** Active, published terminal commands for /mkdir (phase 2 CMS commands). */
+export const TERMINAL_COMMANDS_QUERY =
+  "filters[isActive][$eq]=true&sort[0]=order:asc&pagination[pageSize]=100";
+
 /** Sitemap listings: slug + updatedAt (for lastModified) + seo.noIndex (to exclude). */
 const SITEMAP_FIELDS = "fields[0]=slug&fields[1]=updatedAt&populate[seo][fields][0]=noIndex&pagination[pageSize]=100";
 export const PROJECTS_SITEMAP_QUERY = SITEMAP_FIELDS;

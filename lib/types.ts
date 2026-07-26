@@ -320,6 +320,21 @@ export interface StrapiServiceAddon {
   order: number | null;
 }
 
+export interface StrapiTerminalCommand {
+  id: number;
+  documentId: string;
+  name: string | null;
+  aliases: unknown;
+  summary: string | null;
+  manText: string | null;
+  output: string | null;
+  outputType: string | null;
+  linkUrl: string | null;
+  category: string | null;
+  isActive: boolean | null;
+  order: number | null;
+}
+
 export interface StrapiGuestbookMessage {
   id: number;
   documentId: string;
