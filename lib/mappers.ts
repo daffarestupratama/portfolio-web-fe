@@ -13,6 +13,7 @@ import type {
   StrapiGalleryImage,
   StrapiMedia,
   StrapiProject,
+  StrapiSkill,
   StrapiTourPackage,
 } from "./types";
 import { strapiImageUrl } from "./image";
@@ -27,6 +28,7 @@ import type {
   GalleryImage,
   MappedImage,
   Project,
+  Technology,
   TourPackage,
 } from "@/content/home";
 
@@ -195,6 +197,27 @@ export function toStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
 
+/** A `skill` row as a UI technology. The logo's alternativeText is often null, so the
+ *  skill name is passed as the alt fallback. */
+export function mapTechnology(s: StrapiSkill): Technology {
+  return {
+    id: s.documentId,
+    name: s.name,
+    logo: mapImage(s.logo, s.name),
+    category: s.category,
+    level: s.level,
+    order: s.order,
+  };
+}
+
+/** Sort by `order` (nulls last — many skills have none) then name, so the tile row is
+ *  deterministic across renders. */
+export function mapTechnologies(list: StrapiSkill[] | null | undefined): Technology[] {
+  return (list ?? [])
+    .map(mapTechnology)
+    .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) || a.name.localeCompare(b.name));
+}
+
 export function mapProject(p: StrapiProject): Project {
   return {
     id: p.documentId,
@@ -204,6 +227,7 @@ export function mapProject(p: StrapiProject): Project {
     year: String(p.year),
     projectType: p.projectType,
     techStack: toStringArray(p.techStack),
+    technologies: mapTechnologies(p.technologies),
     coverImage: mapImage(p.coverImage, `${p.title} cover`),
     githubUrl: p.githubUrl || undefined,
     dashboardUrl: p.dashboardUrl || undefined,

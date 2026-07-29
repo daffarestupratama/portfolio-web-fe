@@ -118,7 +118,10 @@ export interface StrapiProject {
   slug: string;
   summary: string;
   coverImage: StrapiMedia | null;
+  /** Legacy plain-text stack. Retained as the fallback while entries migrate to `technologies`. */
   techStack: unknown;
+  /** manyToMany → skill. Empty until an entry is migrated. */
+  technologies?: StrapiSkill[];
   projectType: string;
   year: number;
   githubUrl: string;
@@ -211,6 +214,8 @@ export interface StrapiSkill {
   description: string | null;
   isFeatured: boolean;
   order: number | null;
+  /** Technology logo (images only). Absent for non-technology skills (e.g. languages). */
+  logo?: StrapiMedia | null;
 }
 
 export interface StrapiAboutPage {

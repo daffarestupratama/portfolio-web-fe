@@ -13,6 +13,7 @@ export const HOME_PAGE_QUERY =
   "&populate[featuredExperiences][populate][gallery][populate][image]=true" +
   "&populate[featuredExperiences][populate][logo]=true" +
   "&populate[featuredProjects][populate][coverImage]=true" +
+  "&populate[featuredProjects][populate][technologies][populate][logo]=true" +
   "&populate[featuredArticles][populate][coverImage]=true" +
   "&populate[seo][populate][ogImage]=true";
 // featuredSkills deliberately omitted — no skills UI on the ported homepage design.
@@ -26,12 +27,16 @@ export const FEATURED_TOUR_PACKAGES_QUERY =
 export const SITE_SETTING_QUERY =
   "populate[defaultSeo][populate][ogImage]=true" + "&populate[contactLinks]=*";
 
-export const PROJECTS_LIST_QUERY = "populate[coverImage]=true&sort[0]=year:desc&pagination[pageSize]=100";
+export const PROJECTS_LIST_QUERY =
+  "populate[coverImage]=true" +
+  "&populate[technologies][populate][logo]=true" +
+  "&sort[0]=year:desc&pagination[pageSize]=100";
 
 export function projectDetailQuery(slug: string): string {
   return (
     `filters[slug][$eq]=${encodeURIComponent(slug)}` +
     "&populate[coverImage]=true" +
+    "&populate[technologies][populate][logo]=true" +
     "&populate[gallery][populate][image]=true" +
     "&populate[notebookResources][populate][file]=true" +
     "&populate[relatedArticles][populate][coverImage]=true" +
@@ -75,7 +80,7 @@ export function tourDetailQuery(slug: string): string {
 export const ABOUT_PAGE_QUERY =
   "populate[profileImage]=true" +
   "&populate[contactLinks]=*" +
-  "&populate[skills]=true" +
+  "&populate[skills][populate][logo]=true" +
   "&populate[experiences][populate][gallery][populate][image]=true" +
   "&populate[experiences][populate][logo]=true" +
   "&populate[seo][populate][ogImage]=true";

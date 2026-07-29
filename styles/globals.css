@@ -326,6 +326,83 @@ button {
   color: var(--ink-dim);
 }
 
+/* Technology logo tile. The surface is a FIXED off-white in both themes (not
+   token-driven, same "always-X" approach as the mkdir terminal's always-dark):
+   many brand logos are black/dark and would vanish on the dark glass. It's held
+   at ~0.94 rather than pure white so it doesn't glare in dark mode. */
+.tech-tile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  /* Inner padding comes from the component as a px value derived from `size`.
+     A percentage must NOT be used here: percentage padding resolves against the
+     containing block's width, not the tile, which would blow the tile up and
+     collapse the logo to 0px. */
+  border-radius: 11px;
+  cursor: pointer;
+  background: rgba(246, 248, 247, 0.94);
+  border: 1px solid rgba(15, 32, 38, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px -3px rgba(9, 24, 30, 0.35);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+[data-theme="dark"] .tech-tile {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 8px -3px rgba(0, 0, 0, 0.6);
+}
+.tech-tile:hover,
+.tech-tile:focus-visible {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 6px 14px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+/* object-contain + the tile's padding: any aspect ratio (wordmark or icon) fits
+   fully inside the square without cropping or distortion. */
+.tech-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* Name label — revealed on hover, keyboard focus, or tap (data-open). */
+.tech-tile-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 4px 8px;
+  border-radius: 7px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+  transition: opacity 0.15s ease;
+}
+.tech-tile:hover .tech-tile-label,
+.tech-tile:focus-visible .tech-tile-label,
+.tech-tile[data-open] .tech-tile-label {
+  opacity: 1;
+}
+/* "+N" overflow indicator — same square footprint as a tile. */
+.tech-tile-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--glass-bg-2);
+  border: 1px solid var(--glass-brd);
+  color: var(--ink-dim);
+}
+
 /* Type/category badge — background/border/text color set per-instance via
    style (color-mix against the type's hue), shape/spacing shared here. */
 .badge {

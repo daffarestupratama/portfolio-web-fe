@@ -14,6 +14,8 @@ export interface Skill {
   name: string;
   level: string;
   description: string | null;
+  /** Technology logo when the skill has one — those render as logo tiles instead of chips. */
+  logo: MappedImage | null;
 }
 
 export interface SkillGroup {
@@ -41,7 +43,12 @@ function groupSkills(skills: StrapiSkill[]): SkillGroup[] {
   const sorted = skills.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   for (const s of sorted) {
     const arr = groups.get(s.category) ?? [];
-    arr.push({ name: s.name, level: s.level, description: s.description || null });
+    arr.push({
+      name: s.name,
+      level: s.level,
+      description: s.description || null,
+      logo: mapImage(s.logo, s.name),
+    });
     groups.set(s.category, arr);
   }
   return Array.from(groups.entries()).map(([category, list]) => ({ category, label: titleCase(category), skills: list }));

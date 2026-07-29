@@ -8,6 +8,7 @@ import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { titleCase } from "@/lib/mappers";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
+import { TechTileRow } from "@/components/ui/tech-tile";
 import { Gallery } from "@/components/ui/gallery";
 import { NotebookResources } from "@/components/projects/notebook-resources";
 import { ArticleCard } from "@/components/cards/article-card";
@@ -97,14 +98,24 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         priority
       />
 
-      {project.techStack.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-[7px]">
-          {project.techStack.map((tech) => (
-            <span key={tech} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-              {tech}
-            </span>
-          ))}
-        </div>
+      {/* Logo tiles once an entry has `technologies`; legacy techStack chips otherwise. */}
+      {project.technologies.length > 0 ? (
+        <section className="mt-6">
+          <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
+            Technologies
+          </div>
+          <TechTileRow items={project.technologies} size={44} />
+        </section>
+      ) : (
+        project.techStack.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-[7px]">
+            {project.techStack.map((tech) => (
+              <span key={tech} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
+                {tech}
+              </span>
+            ))}
+          </div>
+        )
       )}
 
       {links.length > 0 && (

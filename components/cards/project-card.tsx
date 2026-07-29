@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Project } from "@/content/home";
 import { CoverImage } from "@/components/ui/cover-image";
+import { TechTileRow } from "@/components/ui/tech-tile";
 import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
 import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
 
@@ -44,13 +45,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.summary}
         </p>
 
-        <div className="mt-[15px] flex flex-wrap gap-[7px]">
-          {project.techStack.map((tech) => (
-            <span key={tech} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-              {tech}
-            </span>
-          ))}
-        </div>
+        {/* Logo tiles once an entry has `technologies`; the legacy techStack chips
+            remain the fallback for entries still awaiting migration. */}
+        {project.technologies.length > 0 ? (
+          <div className="mt-[15px]">
+            <TechTileRow items={project.technologies} size={32} max={6} />
+          </div>
+        ) : (
+          <div className="mt-[15px] flex flex-wrap gap-[7px]">
+            {project.techStack.map((tech) => (
+              <span key={tech} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
+                {tech}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 flex items-center gap-2 pt-[15px]" style={{ borderTop: "1px solid var(--border)" }}>
           {project.githubUrl && (

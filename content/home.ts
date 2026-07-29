@@ -90,6 +90,17 @@ export interface Experience {
  */
 export type ProjectType = string;
 
+/** A technology (a `skill` row reached through project.technologies) rendered as a logo tile. */
+export interface Technology {
+  id: string;
+  name: string;
+  /** Null for skills without a logo — the tile degrades to a text chip. */
+  logo: MappedImage | null;
+  category: string;
+  level: string;
+  order: number | null;
+}
+
 export interface Project {
   id: string;
   slug: string;
@@ -97,7 +108,9 @@ export interface Project {
   summary: string;
   year: string;
   projectType: ProjectType;
+  /** Legacy plain-text stack — the fallback when `technologies` is empty. */
   techStack: string[];
+  technologies: Technology[];
   coverImage: MappedImage | null;
   githubUrl?: string;
   dashboardUrl?: string;
