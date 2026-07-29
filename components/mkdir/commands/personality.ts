@@ -40,7 +40,11 @@ function neofetchInfo(env: {
     kv("Uptime:", formatUptime(env.launchedAt)),
     kv("Packages:", `${env.stack.length} (curated)`),
     kv("Stack:", env.stack.slice(0, 5).join(", ")),
-    kv("Content:", `${env.counts.projects} projects · ${env.counts.articles} articles · ${env.counts.tours} tours`),
+    kv(
+      "Content:",
+      `${env.counts.projects} projects · ${env.counts.articles} articles` +
+        (env.counts.tours > 0 ? ` · ${env.counts.tours} tours` : ""),
+    ),
     [{ text: "" }],
     [{ text: COLOR_BLOCKS, tone: "accent" }],
   ];

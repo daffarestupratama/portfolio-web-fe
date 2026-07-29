@@ -13,7 +13,7 @@ export function Writing({ articles }: WritingProps) {
       <div className="w-full max-w-[1180px]">
         <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-            Writing
+            Articles
           </h2>
           <Link href="/articles" className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold">
             All articles

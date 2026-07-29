@@ -16,7 +16,7 @@ or \`neofetch\` for the vitals. \`exit\` drops you back to the site.
 Daffa Ilham Restupratama
 Information Systems graduate, Universitas Indonesia.
 I live where data, business, and technology overlap — data science,
-dashboards, GIS, and, on weekends, city walking tours.
+dashboards, GIS, and building things for the web.
 `),
     "stack.txt": file(`
 Everyday tools:

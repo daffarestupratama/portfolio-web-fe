@@ -16,7 +16,7 @@ export function Footer() {
           © 2026 Daffa Ilham Restupratama
         </span>
         <span className="mono text-[11px]" style={{ color: "var(--ink-faint)" }}>
-          Data · Business · Finance · Maps · Walking Tours
+          Data · Business · Finance · Maps · Technology
         </span>
       </div>
     </footer>

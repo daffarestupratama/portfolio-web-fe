@@ -5,6 +5,7 @@ import { getProjectSlugs } from "@/content/projects";
 import { getArticleSlugs } from "@/content/articles";
 import { getTourSlugs } from "@/content/tours";
 import { getTerminalCommands } from "@/content/mkdir";
+import { FEATURES } from "@/lib/features";
 import { Terminal } from "@/components/mkdir/terminal";
 
 export const revalidate = 60;
@@ -27,7 +28,12 @@ export default async function MkdirPage() {
     getTourSlugs(),
     getTerminalCommands(),
   ]);
-  const counts = { projects: projects.length, articles: articles.length, tours: tours.length };
+  // Tours are hidden while FEATURES.tours is off — report 0 so neofetch/motd omit them.
+  const counts = {
+    projects: projects.length,
+    articles: articles.length,
+    tours: FEATURES.tours ? tours.length : 0,
+  };
 
   return (
     <main className="relative z-[3] mx-auto w-full max-w-[1080px] px-[22px] pt-28 pb-16 sm:pt-32">

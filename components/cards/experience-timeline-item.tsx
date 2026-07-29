@@ -47,7 +47,7 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls={bodyId}
-          className="relative z-[2] flex w-full items-start gap-[14px] text-left"
+          className="relative z-[2] flex w-full cursor-pointer items-start gap-[14px] text-left"
         >
           {experience.logo && !logoError ? (
             <span

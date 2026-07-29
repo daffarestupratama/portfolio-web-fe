@@ -10,7 +10,6 @@ const CATEGORY_OPTIONS = [
   { value: "question", label: "Question" },
   { value: "career", label: "Career" },
   { value: "personal", label: "Personal" },
-  { value: "tour", label: "Tour" },
   { value: "website", label: "Website" },
   { value: "critics", label: "Critics" },
   { value: "other", label: "Other" },
@@ -77,7 +76,7 @@ export function GuestbookForm() {
             Thanks for signing! 🎉
           </h2>
           <p className="mx-auto mt-2 max-w-[42ch] text-[14px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-            Your message is pending review and will appear here once it&apos;s approved.
+            Your message is live — it should appear in the list right away.
           </p>
           <button
             type="button"

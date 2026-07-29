@@ -87,10 +87,11 @@ export async function POST(req: Request) {
           displayName,
           isAnonymous,
           category,
-          // New submissions are held for moderation: hidden + not visible (and an
-          // unpublished draft under Strapi draftAndPublish) until the owner approves.
-          moderationStatus: "hidden",
-          isVisible: false,
+          // Auto-publish: submissions are created visible and appear immediately.
+          // (Verified live: token-created entries are published, so the public find
+          // returns them right away. Honeypot + rate limit remain the spam guard.)
+          moderationStatus: "visible",
+          isVisible: true,
           submittedAt: new Date().toISOString(),
         },
       }),

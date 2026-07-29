@@ -16,6 +16,7 @@ import {
 } from "@/content/home";
 import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
+import { FEATURES } from "@/lib/features";
 
 export const revalidate = 60;
 
@@ -29,7 +30,7 @@ export default async function Home() {
     getHomePage(),
     getFeaturedExperiences(),
     getFeaturedProjects(),
-    getFeaturedTours(),
+    FEATURES.tours ? getFeaturedTours() : Promise.resolve([]),
     getFeaturedArticles(),
     getSiteSettings(),
   ]);
@@ -42,7 +43,7 @@ export default async function Home() {
       <Hero home={home} />
       <Experiences experiences={experiences} />
       <Projects projects={projects} />
-      <Tours tours={tours} />
+      {FEATURES.tours && <Tours tours={tours} />}
       <Writing articles={articles} />
       <ContactCTA email={site.email} whatsappUrl={site.whatsappUrl} />
     </>

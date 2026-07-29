@@ -46,8 +46,10 @@ export function buildBootLines(env: TermEnv): TermLine[] {
     { text: `${env.counts.projects} projects`, tone: "accent" },
     { text: "  ·  " },
     { text: `${env.counts.articles} articles`, tone: "accent" },
-    { text: "  ·  " },
-    { text: `${env.counts.tours} tours`, tone: "accent" },
+    // Tours are omitted while the feature is off (count arrives as 0).
+    ...(env.counts.tours > 0
+      ? [{ text: "  ·  " }, { text: `${env.counts.tours} tours`, tone: "accent" as const }]
+      : []),
   ]);
   f("");
   f(` Last login: ${now.toDateString()} from 203.0.113.7`, "dim");

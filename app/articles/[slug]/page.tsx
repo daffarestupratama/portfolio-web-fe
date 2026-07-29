@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getArticleBySlug, getArticleSlugs } from "@/content/articles";
+import { getAllArticles, getArticleBySlug, getArticleSlugs } from "@/content/articles";
 import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata, mappedImageToOg, notFoundMetadata, SITE_NAME } from "@/lib/seo";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
+import { extractToc } from "@/components/blocks/toc";
+import { ArticleToc } from "@/components/articles/article-toc";
+import { getRelatedArticles } from "@/components/articles/related-articles";
 import { CoverImage } from "@/components/ui/cover-image";
 import { ProjectCard } from "@/components/cards/project-card";
 import { ArrowRightIcon } from "@/components/ui/icons";
@@ -43,8 +46,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
+  const allArticles = await getAllArticles();
+  const related = getRelatedArticles(article, allArticles);
+  const toc = extractToc(article.body);
+
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[820px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 sm:pt-32">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
@@ -61,76 +68,123 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         authorName={SITE_NAME}
         path={`/articles/${slug}`}
       />
-      <Link
-        href="/articles"
-        className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-        style={{ color: "var(--ink-dim)" }}
-      >
-        <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-        All articles
-      </Link>
 
-      <div className="mt-5 flex flex-wrap items-center gap-2.5">
-        <span
-          className="badge"
-          style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
-        >
-          {article.category}
-        </span>
-        <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
-          {article.language.toUpperCase()}
-        </span>
-        <span className="mono text-[12px]" style={{ color: "var(--ink-faint)" }}>
-          {article.publishedDate} · {article.readTime}
-        </span>
-      </div>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-12">
+        {/* Article content */}
+        <div className="min-w-0">
+          <Link
+            href="/articles"
+            className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
+            style={{ color: "var(--ink-dim)" }}
+          >
+            <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+            All articles
+          </Link>
 
-      <h1 className="mt-3 font-bold" style={{ fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-0.03em" }}>
-        {article.title}
-      </h1>
-      {article.excerpt && (
-        <p className="mt-4 text-[16px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-          {article.excerpt}
-        </p>
-      )}
-
-      <CoverImage
-        image={article.coverImage}
-        variant="article"
-        label={`${article.title} cover`}
-        className="mt-6 aspect-[16/9] w-full"
-        sizes="(max-width: 860px) 100vw, 820px"
-        priority
-      />
-
-      {article.body && (
-        <article className="mt-8">
-          <StrapiBlocks content={article.body} />
-        </article>
-      )}
-
-      {article.tags.length > 0 && (
-        <div className="mt-8 flex flex-wrap gap-[7px]">
-          {article.tags.map((tag) => (
-            <span key={tag} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-              #{tag}
+          <div className="mt-5 flex flex-wrap items-center gap-2.5">
+            <span
+              className="badge"
+              style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
+            >
+              {article.category}
             </span>
-          ))}
-        </div>
-      )}
-
-      {article.relatedProjects.length > 0 && (
-        <section>
-          <h2 className="mt-10 mb-3 text-[22px] font-bold" style={{ letterSpacing: "-0.02em" }}>
-            Related projects
-          </h2>
-          <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2">
-            {article.relatedProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
+            <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
+              {article.language.toUpperCase()}
+            </span>
+            <span className="mono text-[12px]" style={{ color: "var(--ink-faint)" }}>
+              {article.publishedDate} · {article.readTime}
+            </span>
           </div>
-        </section>
-      )}
+
+          <h1 className="mt-3 font-bold" style={{ fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-0.03em" }}>
+            {article.title}
+          </h1>
+          {article.excerpt && (
+            <p className="mt-4 text-[16px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
+              {article.excerpt}
+            </p>
+          )}
+
+          <CoverImage
+            image={article.coverImage}
+            variant="article"
+            label={`${article.title} cover`}
+            className="mt-6 aspect-[16/9] w-full"
+            sizes="(max-width: 860px) 100vw, 820px"
+            priority
+          />
+
+          {article.body && (
+            <article className="mt-8">
+              <StrapiBlocks content={article.body} headingIds={toc.map((t) => t.id)} />
+            </article>
+          )}
+
+          {article.tags.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-[7px]">
+              {article.tags.map((tag) => (
+                <span key={tag} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {article.relatedProjects.length > 0 && (
+            <section>
+              <h2 className="mt-10 mb-3 text-[22px] font-bold" style={{ letterSpacing: "-0.02em" }}>
+                Related projects
+              </h2>
+              <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2">
+                {article.relatedProjects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Sidebar — sticky beside the article on wide screens, below it on narrow. */}
+        <aside className="mt-12 lg:mt-0">
+          <div className="flex flex-col gap-8 lg:sticky lg:top-28">
+            <ArticleToc entries={toc} />
+
+            {related.length > 0 && (
+              <section aria-label="Related articles">
+                <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
+                  Related articles
+                </div>
+                <ul className="flex flex-col gap-3">
+                  {related.map((a) => (
+                    <li key={a.id}>
+                      <Link href={`/articles/${a.slug}`} className="group block">
+                        <span
+                          className="block text-[13.5px] font-semibold transition-colors group-hover:text-(--accent-ink)"
+                          style={{ lineHeight: 1.35 }}
+                        >
+                          {a.title}
+                        </span>
+                        <span className="mono mt-0.5 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
+                          {a.category} · {a.publishedDate}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <Link
+              href="/articles"
+              className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
+              style={{ color: "var(--ink-dim)" }}
+            >
+              <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+              Back to all articles
+            </Link>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

@@ -7,7 +7,7 @@ import { ArticlesBrowser } from "@/components/articles/articles-browser";
 export const revalidate = 60;
 
 const ARTICLES_DESCRIPTION =
-  "Notes and essays by Daffa Ilham Restupratama on data, technology, career, and city stories.";
+  "Notes and essays by Daffa Ilham Restupratama on data, technology, business, and career.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
@@ -29,7 +29,7 @@ export default async function ArticlesPage() {
           Articles
         </h1>
         <p className="mt-3 max-w-[52ch] text-[15px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-          Notes on data, technology, career, and the small stories behind city walks.
+          Notes on data, technology, business, and the ideas I explore along the way.
         </p>
       </header>
 

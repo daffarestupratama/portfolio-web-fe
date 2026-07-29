@@ -1,9 +1,17 @@
 "use client";
 
 import { BlocksRenderer, type BlocksContent } from "@strapi/blocks-react-renderer";
+import { strapiImageUrl } from "@/lib/image";
+import { StrapiImage } from "@/components/ui/strapi-image";
+import { MediaPlaceholder } from "@/components/ui/media-placeholder";
+import { CodeBlock } from "@/components/blocks/code-block";
+import { TOC_LEVELS } from "@/components/blocks/toc";
 
 interface StrapiBlocksProps {
   content: BlocksContent;
+  /** Ordered ids for the level-2/3 headings (from extractToc) — assigned positionally
+   *  so TOC anchors match. Omit on pages without a TOC (headings get no id). */
+  headingIds?: string[];
 }
 
 const HEADING_SIZES: Record<number, string> = {
@@ -18,7 +26,10 @@ const HEADING_SIZES: Record<number, string> = {
 /** Renders a Strapi `blocks` rich-text field as readable prose on the base/glass
  *  surface, styled with the design tokens. First real long-form usage: article
  *  body + project approach/result. */
-export function StrapiBlocks({ content }: StrapiBlocksProps) {
+export function StrapiBlocks({ content, headingIds }: StrapiBlocksProps) {
+  // Assigns headingIds positionally to level-2/3 headings, matching extractToc's
+  // order. Reset each render; the renderer calls the heading handler in document order.
+  let headingIndex = 0;
   return (
     <BlocksRenderer
       content={content}
@@ -30,10 +41,17 @@ export function StrapiBlocks({ content }: StrapiBlocksProps) {
         ),
         heading: ({ children, level }) => {
           const Tag = `h${level}` as const;
+          const id = headingIds && TOC_LEVELS.includes(level) ? headingIds[headingIndex++] : undefined;
           return (
             <Tag
+              id={id}
               className={`mt-8 mb-1 font-bold first:mt-0 ${HEADING_SIZES[level]}`}
-              style={{ letterSpacing: "-0.02em", lineHeight: 1.25, color: "var(--ink)" }}
+              style={{
+                letterSpacing: "-0.02em",
+                lineHeight: 1.25,
+                color: "var(--ink)",
+                ...(id ? { scrollMarginTop: "96px" } : {}),
+              }}
             >
               {children}
             </Tag>
@@ -63,14 +81,43 @@ export function StrapiBlocks({ content }: StrapiBlocksProps) {
             {children}
           </blockquote>
         ),
-        code: ({ children, plainText }) => (
-          <pre
-            className="mono mt-5 overflow-x-auto rounded-xl p-4 text-[13px] leading-relaxed"
-            style={{ background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)", color: "var(--ink)" }}
-          >
-            <code>{plainText ?? children}</code>
-          </pre>
-        ),
+        // The renderer's type omits `language`, but Block.js spreads it into props
+        // at runtime (verified) — read it via a cast; unknown/absent → plain text.
+        code: (props) => {
+          const { plainText, language } = props as { plainText?: string; language?: string };
+          return <CodeBlock code={plainText ?? ""} language={language} />;
+        },
+        image: ({ image }) => {
+          const width = image.width || 1200;
+          const height = image.height || 675;
+          const caption = image.caption?.trim();
+          return (
+            <figure className="mt-6 mb-2">
+              <div className="mx-auto overflow-hidden" style={{ borderRadius: 15, maxWidth: Math.min(width, 760) }}>
+                <StrapiImage
+                  src={strapiImageUrl(image.url)}
+                  alt={image.alternativeText || ""}
+                  width={width}
+                  height={height}
+                  sizes="(max-width: 768px) 100vw, 760px"
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                  fallback={
+                    <MediaPlaceholder
+                      variant="article"
+                      label={image.alternativeText || "image"}
+                      className="aspect-video w-full"
+                    />
+                  }
+                />
+              </div>
+              {caption && (
+                <figcaption className="mt-2 text-center text-[12.5px]" style={{ color: "var(--ink-faint)" }}>
+                  {caption}
+                </figcaption>
+              )}
+            </figure>
+          );
+        },
         link: ({ children, url }) => (
           <a
             href={url}

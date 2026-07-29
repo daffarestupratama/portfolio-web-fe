@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
+import { FEATURES } from "@/lib/features";
 import { getProjectSitemapEntries } from "@/content/projects";
 import { getArticleSitemapEntries } from "@/content/articles";
 import { getTourSitemapEntries } from "@/content/tours";
@@ -15,7 +16,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, articles, tours] = await Promise.all([
     getProjectSitemapEntries(),
     getArticleSitemapEntries(),
-    getTourSitemapEntries(),
+    // Tours are hidden while FEATURES.tours is off — omit them from the sitemap
+    // (routes still resolve, they're just not advertised).
+    FEATURES.tours ? getTourSitemapEntries() : Promise.resolve<SitemapEntry[]>([]),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
@@ -27,11 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // List routes: lastModified = the most recent child updatedAt, so a rebuild alone
   // doesn't churn their timestamp (only real content changes do).
-  const listEntries: MetadataRoute.Sitemap = [
+  const listRoutes = [
     { path: "/projects", entries: projects },
     { path: "/articles", entries: articles },
-    { path: "/tours", entries: tours },
-  ].map(({ path, entries }) => ({
+    ...(FEATURES.tours ? [{ path: "/tours", entries: tours }] : []),
+  ];
+  const listEntries: MetadataRoute.Sitemap = listRoutes.map(({ path, entries }) => ({
     url: `${SITE_URL}${path}`,
     lastModified: mostRecent(entries) ?? now,
     changeFrequency: "weekly",
@@ -42,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const detailEntries: MetadataRoute.Sitemap = [
     ...toUrls("/projects", projects),
     ...toUrls("/articles", articles),
-    ...toUrls("/tours", tours),
+    ...(FEATURES.tours ? toUrls("/tours", tours) : []),
   ];
 
   return [...staticEntries, ...listEntries, ...detailEntries];

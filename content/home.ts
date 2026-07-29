@@ -138,7 +138,7 @@ const getHomePageRaw = cache(() => strapiFindOne<StrapiHomePage>("home-page", HO
 export async function getHomePage(): Promise<HomePage> {
   const raw = await getHomePageRaw();
   return {
-    eyebrow: "Data · Business · Finance · Maps · Walking Tours",
+    eyebrow: "Data · Business · Finance · Maps · Technology",
     fullName: raw.fullName,
     headline: raw.headline,
     subheadline: raw.subheadline,
@@ -146,10 +146,10 @@ export async function getHomePage(): Promise<HomePage> {
     heroCtaSecondary: mapCta(raw.heroCtaSecondary, { label: "About me", url: "/about" }),
     contactLinks: mapContactLinks(raw.contactLinks),
     heroStats: [
-      // TODO: no Strapi field for this — hardcoded until home-page grows one.
+      // TODO: no Strapi field for these — placeholder values until home-page grows one.
       { label: "Models", value: "12" },
       { label: "Dashboards", value: "8" },
-      { label: "Tours led", value: "40+" },
+      { label: "Reports", value: "20+" },
     ],
   };
 }
