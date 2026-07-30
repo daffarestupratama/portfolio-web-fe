@@ -326,6 +326,92 @@ button {
   color: var(--ink-dim);
 }
 
+/* ---------------- Hero data-viz panel (map + decorative charts) ---------------- */
+
+/* Coastline from the real province GeoJSON — subtle in both themes. */
+.hero-map-land path {
+  fill: color-mix(in srgb, var(--accent) 13%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 42%, transparent);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+[data-theme="dark"] .hero-map-land path {
+  fill: color-mix(in srgb, var(--accent) 17%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+/* Network edges with a travelling dash pulse (cheap; the global reduced-motion rule
+   disables the animation and leaves a static dashed line). */
+.hero-map-edge {
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1.6;
+  stroke-dasharray: 26 210;
+  animation: hero-pulse 4.2s linear infinite;
+  vector-effect: non-scaling-stroke;
+}
+@keyframes hero-pulse {
+  from {
+    stroke-dashoffset: 236;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.hero-map-node {
+  cursor: pointer;
+  outline: none;
+}
+.hero-node-halo {
+  fill: color-mix(in srgb, var(--accent) 26%, transparent);
+  transition: fill 0.18s ease;
+}
+.hero-node-dot {
+  fill: var(--accent-ink);
+  transition: fill 0.18s ease;
+}
+.hero-map-node:hover .hero-node-halo,
+.hero-map-node[data-active] .hero-node-halo,
+.hero-map-node:focus-visible .hero-node-halo {
+  fill: color-mix(in srgb, var(--accent) 58%, transparent);
+}
+.hero-map-node:focus-visible .hero-node-dot {
+  fill: var(--ink);
+}
+/* Node popup — HTML overlay above the node (crisp text at any panel width). */
+.hero-city-popup {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, calc(-100% - 10px));
+  padding: 3px 8px;
+  border-radius: 7px;
+  font-size: 10.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
+}
+/* Bars grow from their bottom edge via scaleY — transitioning the SVG y/height
+   geometry properties is not reliable across browsers (Safari notably ignores it). */
+.hero-bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero-donut-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 10%, transparent);
+  stroke-width: 7;
+}
+.hero-donut-slice {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: butt;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 1.1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Technology logo tile. The surface is a FIXED off-white in both themes (not
    token-driven, same "always-X" approach as the mkdir terminal's always-dark):
    many brand logos are black/dark and would vanish on the dark glass. It's held
@@ -365,29 +451,25 @@ button {
   height: 100%;
   object-fit: contain;
 }
-/* Name label — revealed on hover, keyboard focus, or tap (data-open). */
+/* Name label. PORTALLED to document.body and fixed-positioned by the component:
+   `.glass-card` sets overflow:hidden AND backdrop-filter, and backdrop-filter makes
+   the card a containing block even for fixed descendants — so an in-card tooltip is
+   clipped at the card edge. Coordinates come from the tile's bounding rect, clamped
+   to the viewport, so an edge tile's name stays fully readable. */
 .tech-tile-label {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
+  position: fixed;
+  z-index: 60;
   transform: translateX(-50%);
-  z-index: 20;
   padding: 4px 8px;
   border-radius: 7px;
   font-size: 10.5px;
   line-height: 1.2;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0;
   background: var(--ink);
   color: var(--bg);
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
   transition: opacity 0.15s ease;
-}
-.tech-tile:hover .tech-tile-label,
-.tech-tile:focus-visible .tech-tile-label,
-.tech-tile[data-open] .tech-tile-label {
-  opacity: 1;
 }
 /* "+N" overflow indicator — same square footprint as a tile. */
 .tech-tile-more {

@@ -33,11 +33,6 @@ export interface Cta {
   url: string;
 }
 
-export interface HeroStat {
-  label: string;
-  value: string;
-}
-
 export interface HomePage {
   /** Hero tagline pill text. No Strapi field for this — hardcoded. */
   eyebrow: string;
@@ -47,8 +42,6 @@ export interface HomePage {
   heroCtaPrimary: Cta;
   heroCtaSecondary: Cta;
   contactLinks: ContactLink[];
-  /** No Strapi field for this — hardcoded until home-page grows one. */
-  heroStats: HeroStat[];
 }
 
 /** A resolved image (absolute URL + intrinsic size) for next/image. */
@@ -158,12 +151,6 @@ export async function getHomePage(): Promise<HomePage> {
     heroCtaPrimary: mapCta(raw.heroCtaPrimary, { label: "Resume", url: "#" }),
     heroCtaSecondary: mapCta(raw.heroCtaSecondary, { label: "About me", url: "/about" }),
     contactLinks: mapContactLinks(raw.contactLinks),
-    heroStats: [
-      // TODO: no Strapi field for these — placeholder values until home-page grows one.
-      { label: "Models", value: "12" },
-      { label: "Dashboards", value: "8" },
-      { label: "Reports", value: "20+" },
-    ],
   };
 }
 

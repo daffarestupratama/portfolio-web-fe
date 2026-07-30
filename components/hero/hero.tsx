@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HomePage } from "@/content/home";
-import { HeroGraph } from "./hero-graph";
+import { indonesiaMap } from "@/lib/geo/indonesia";
+import { HeroPanel } from "./hero-panel";
 import { FileTextIcon, UserIcon, LinkedinIcon, GithubIcon, InstagramIcon, MailIcon } from "@/components/ui/icons";
 
 const contactIcons = {
@@ -105,9 +106,9 @@ export function Hero({ home }: HeroProps) {
             animationPlayState: "var(--float-play)",
           }}
         >
-          <div className="pointer-events-none absolute top-4 right-[18px] left-[18px] z-[3] flex items-center justify-between">
+          <div className="pointer-events-none relative z-[3] mb-1.5 flex items-center justify-between">
             <span className="mono text-[11px] tracking-wide uppercase" style={{ color: "var(--ink-faint)" }}>
-              network.graph
+              geo.network
             </span>
             <span className="inline-flex items-center gap-1.5 text-[11px]" style={{ color: "var(--ink-faint)" }}>
               <span
@@ -119,22 +120,7 @@ export function Hero({ home }: HeroProps) {
             </span>
           </div>
 
-          <HeroGraph />
-
-          <div className="relative z-[3] mt-3.5 flex gap-2 px-0.5">
-            {home.heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="flex-1 px-3 py-2.5"
-                style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
-              >
-                <div className="text-[11px]" style={{ color: "var(--ink-faint)" }}>
-                  {stat.label}
-                </div>
-                <div className="mt-0.5 text-[17px] font-bold">{stat.value}</div>
-              </div>
-            ))}
-          </div>
+          <HeroPanel map={indonesiaMap} />
         </div>
       </div>
     </header>
