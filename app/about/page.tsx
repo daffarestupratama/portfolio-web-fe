@@ -7,7 +7,7 @@ import { CoverImage } from "@/components/ui/cover-image";
 import { SkillsSection } from "@/components/about/skills-section";
 import { Experiences } from "@/components/sections/experiences";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [about, site] = await Promise.all([getAboutPage(), getSiteSettings()]);

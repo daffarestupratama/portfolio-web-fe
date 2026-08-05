@@ -8,7 +8,7 @@ import { TourCard } from "@/components/cards/tour-card";
 import { InfoList } from "@/components/tours/info-list";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [landing, site] = await Promise.all([getTourLanding(), getSiteSettings()]);

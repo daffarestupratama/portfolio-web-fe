@@ -8,6 +8,23 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
+  // Incremental (ISR/SSG) cache storage. The binding NAME is required by
+  // @opennextjs/cloudflare — it is hardcoded as BINDING_NAME in
+  // overrides/incremental-cache/r2-incremental-cache.js and is not a free choice.
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "portfolio-web-fe-cache",
+    },
+  ],
+  // Self-reference used by the R2 cache and by memoryQueue to trigger background
+  // ISR revalidation. "service" must match this Worker's own "name" above.
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "portfolio-web-fe",
+    },
+  ],
   "observability": {
     "logs": {
       "enabled": true,

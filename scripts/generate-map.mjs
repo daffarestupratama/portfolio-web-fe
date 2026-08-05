@@ -135,8 +135,17 @@ export const MAP_BOUNDS = {
 export const MAP_WIDTH = ${MAP_WIDTH};
 export const MAP_HEIGHT = ${height};
 
-/** Coastline rings as SVG path data, in a ${MAP_WIDTH}×${height} equirectangular space. */
-export const MAP_PATHS: readonly string[] = ${JSON.stringify(paths)};
+/**
+ * The ${paths.length} coastline rings, pre-serialised as SVG markup and injected in one go via
+ * dangerouslySetInnerHTML, in a ${MAP_WIDTH}×${height} equirectangular space.
+ *
+ * Emitted as a single string rather than an array of path data because rendering
+ * ${paths.length} separate React <path> elements measured ~6.3ms of server CPU — a large share
+ * of the Cloudflare Workers free-plan 10ms budget — versus ~0.02ms for this string. The
+ * cost scales with element count, not payload size. Safe to inject: it is built solely
+ * from the rounded numeric coordinates computed above, with no external or user content.
+ */
+export const MAP_MARKUP = ${JSON.stringify(paths.map((d) => `<path d="${d}"/>`).join(""))};
 `;
 
 mkdirSync(dirname(TARGET), { recursive: true });

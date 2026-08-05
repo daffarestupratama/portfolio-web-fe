@@ -9,7 +9,7 @@
  */
 
 import { CITY_EDGES, INDONESIA_CITIES } from "@/components/hero/hero-cities";
-import { MAP_BOUNDS, MAP_HEIGHT, MAP_PATHS, MAP_WIDTH } from "./indonesia-geometry";
+import { MAP_BOUNDS, MAP_HEIGHT, MAP_MARKUP, MAP_WIDTH } from "./indonesia-geometry";
 
 /** Minimum on-map distance between two city nodes, in viewBox units (~6 screen px). */
 const MIN_NODE_GAP = 14;
@@ -67,7 +67,8 @@ function separate(nodes: CityNode[], minGap: number): CityNode[] {
 }
 
 export interface IndonesiaMap {
-  paths: readonly string[];
+  /** Pre-serialised <path> markup for the whole coastline (injected as one string). */
+  markup: string;
   viewBox: string;
   width: number;
   height: number;
@@ -77,7 +78,7 @@ export interface IndonesiaMap {
 
 /** The finished, client-safe map payload. */
 export const indonesiaMap: IndonesiaMap = {
-  paths: MAP_PATHS,
+  markup: MAP_MARKUP,
   viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
   width: MAP_WIDTH,
   height: MAP_HEIGHT,

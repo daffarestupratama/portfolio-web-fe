@@ -6,7 +6,7 @@ import { getArticleSitemapEntries } from "@/content/articles";
 import { getTourSitemapEntries } from "@/content/tours";
 import type { SitemapEntry } from "@/content/site";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 // Genuinely static top-level routes (no single child entry drives their freshness).
 const STATIC_ROUTES = ["", "/about", "/services", "/guestbook", "/mkdir"];

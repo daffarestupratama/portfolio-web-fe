@@ -12,7 +12,7 @@ import { TourRoute } from "@/components/tours/tour-route";
 import { InfoList } from "@/components/tours/info-list";
 import { ArrowRightIcon, ClockIcon, ExternalLinkIcon, MapPinIcon } from "@/components/ui/icons";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   const slugs = await getTourSlugs();

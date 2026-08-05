@@ -18,7 +18,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { FEATURES } from "@/lib/features";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [homeSeo, site] = await Promise.all([getHomePageSeo(), getSiteSettings()]);

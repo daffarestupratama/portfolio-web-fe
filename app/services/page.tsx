@@ -14,7 +14,7 @@ import { ProcessList } from "@/components/services/process-list";
 import { FaqAccordion } from "@/components/services/faq-accordion";
 import { ServicesJsonLd } from "@/components/seo/services-json-ld";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const FALLBACK_WHATSAPP_URL = "https://wa.me/6288233300541";
 const FALLBACK_EMAIL = "contact@daffa.me";

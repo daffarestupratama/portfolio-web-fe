@@ -77,11 +77,11 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
           role="img"
           aria-label="Map of Indonesia with a network of major cities"
         >
-          <g className="hero-map-land">
-            {map.paths.map((d, i) => (
-              <path key={i} d={d} />
-            ))}
-          </g>
+          {/* Injected as one pre-serialised string rather than ~321 React <path> elements:
+              measured ~6.3ms vs ~0.02ms of server CPU (the cost scales with element count),
+              which matters on the Workers free plan's 10ms budget. Content is build-time
+              generated numeric path data — see lib/geo/indonesia-geometry.ts. */}
+          <g className="hero-map-land" dangerouslySetInnerHTML={{ __html: map.markup }} />
 
           <g className="hero-map-edges">
             {map.edges.map(([from, to], i) => {

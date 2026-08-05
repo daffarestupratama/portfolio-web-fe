@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import { GuestbookForm } from "@/components/guestbook/guestbook-form";
 import { MessageCard } from "@/components/guestbook/message-card";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();

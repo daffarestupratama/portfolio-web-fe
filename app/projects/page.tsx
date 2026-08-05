@@ -4,7 +4,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { ProjectsFilter } from "@/components/projects/projects-filter";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const PROJECTS_DESCRIPTION =
   "Data science, machine learning, dashboards, and GIS projects by Daffa Ilham Restupratama — problem framing, approach, and results.";

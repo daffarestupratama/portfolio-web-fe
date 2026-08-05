@@ -15,7 +15,7 @@ import { ArticleCard } from "@/components/cards/article-card";
 import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
 import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs();

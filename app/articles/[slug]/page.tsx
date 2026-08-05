@@ -13,7 +13,7 @@ import { CoverImage } from "@/components/ui/cover-image";
 import { ProjectCard } from "@/components/cards/project-card";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getArticleSlugs();

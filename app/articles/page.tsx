@@ -4,7 +4,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { ArticlesBrowser } from "@/components/articles/articles-browser";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const ARTICLES_DESCRIPTION =
   "Notes and essays by Daffa Ilham Restupratama on data, technology, business, and career.";

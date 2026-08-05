@@ -1,31 +1,50 @@
 "use client";
 
-import { Highlight, themes, type Language } from "prism-react-renderer";
-
-// A curated set of languages Prism ships with in prism-react-renderer. Anything
-// else falls back to plain text (no highlighting, but still preformatted).
-const SUPPORTED = new Set([
-  "markup", "html", "xml", "svg", "css", "clike", "javascript", "js", "jsx", "typescript", "ts", "tsx",
-  "python", "py", "bash", "shell", "sh", "json", "yaml", "yml", "sql", "go", "rust", "java", "c", "cpp",
-  "csharp", "php", "ruby", "kotlin", "swift", "r", "graphql", "diff", "markdown", "md", "docker", "toml",
-]);
-
-function normalizeLang(language: string | undefined): { lang: Language; label: string } {
-  const raw = (language || "text").toLowerCase();
-  return { lang: (SUPPORTED.has(raw) ? raw : "text") as Language, label: raw };
-}
+import { useEffect, useState, type ComponentType } from "react";
+import { normalizeLang, PRE_CLASS, PRE_STYLE, type CodeBlockInnerProps } from "./code-block-shared";
 
 interface CodeBlockProps {
   code: string;
   language?: string;
 }
 
-/** Syntax-highlighted code block. Uses a single dark surface in BOTH site themes
- *  (code reads better dark and it matches the mkdir terminal). Long lines scroll
- *  horizontally; whitespace is preserved. */
+/** The server-rendered / pre-hydration state: the real code, preformatted and readable,
+ *  just without token colours. Shares PRE_CLASS/PRE_STYLE with the highlighted version, so
+ *  the later swap is a pure colour change with no reflow. */
+function PlainCode({ code }: { code: string }) {
+  return (
+    <pre className={PRE_CLASS} style={PRE_STYLE}>
+      {code}
+    </pre>
+  );
+}
+
+/** Syntax-highlighted code block. Uses a single dark surface in BOTH site themes (code
+ *  reads better dark and it matches the mkdir terminal). Long lines scroll horizontally;
+ *  whitespace is preserved in both states.
+ *
+ *  Prism runs in the BROWSER only: it is imported from an effect after mount, so the
+ *  tokenizer never executes during server rendering (Worker CPU is scarce on the
+ *  Cloudflare free plan) and never ships in the initial chunk. The server HTML and the
+ *  first client paint both render the identical plain block, so there is no hydration
+ *  mismatch and highlighting simply colours it in once the chunk lands. */
 export function CodeBlock({ code, language }: CodeBlockProps) {
   const { lang, label } = normalizeLang(language);
   const source = code.replace(/\n$/, "");
+  const [Highlighted, setHighlighted] = useState<ComponentType<CodeBlockInnerProps> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    import("./code-block-highlight")
+      .then((mod) => {
+        // Highlighting is decorative — if the chunk fails, the plain block stays.
+        if (!cancelled) setHighlighted(() => mod.default);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div
@@ -40,22 +59,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
           {label}
         </span>
       )}
-      <Highlight theme={themes.nightOwl} code={source} language={lang}>
-        {({ style, tokens, getLineProps, getTokenProps }) => (
-          <pre
-            className="mono overflow-x-auto p-4 text-[13px] leading-relaxed"
-            style={{ ...style, background: "transparent", margin: 0 }}
-          >
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
-                {line.map((token, j) => (
-                  <span key={j} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </pre>
-        )}
-      </Highlight>
+      {Highlighted ? <Highlighted code={source} lang={lang} /> : <PlainCode code={source} />}
     </div>
   );
 }

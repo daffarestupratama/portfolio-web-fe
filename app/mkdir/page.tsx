@@ -8,7 +8,7 @@ import { getTerminalCommands } from "@/content/mkdir";
 import { FEATURES } from "@/lib/features";
 import { Terminal } from "@/components/mkdir/terminal";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
