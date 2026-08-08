@@ -8,11 +8,23 @@ interface ArticleListItemProps {
 }
 
 /** Horizontal article row for the /articles list (distinct from the vertical
- *  ArticleCard used on the homepage + related sections). */
+ *  ArticleCard used on the homepage + related sections).
+ *
+ *  `isFeatured` highlights the row inline (accent ring + badge) rather than lifting it
+ *  into a separate pinned block: the list is filterable by category/language/tag and
+ *  ordered by date, and a pinned block would fight both. */
 export function ArticleListItem({ article }: ArticleListItemProps) {
   const href = `/articles/${article.slug}`;
   return (
-    <article className="glass-card flex gap-4 p-3.5 sm:gap-5 sm:p-4" style={{ borderRadius: 18 }}>
+    <article
+      className="glass-card flex gap-4 p-3.5 sm:gap-5 sm:p-4"
+      style={{
+        borderRadius: 18,
+        ...(article.isFeatured
+          ? { boxShadow: "0 0 0 1.5px var(--accent), var(--glass-sh)" }
+          : null),
+      }}
+    >
       <Link href={href} aria-label={article.title} className="relative z-[2] block w-[104px] shrink-0 sm:w-[150px]">
         <CoverImage
           image={article.coverImage}
@@ -34,6 +46,14 @@ export function ArticleListItem({ article }: ArticleListItemProps) {
           <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
             {article.language.toUpperCase()}
           </span>
+          {article.isFeatured && (
+            <span
+              className="badge"
+              style={{ background: "var(--accent)", borderColor: "var(--accent)", color: "var(--bg)" }}
+            >
+              Featured
+            </span>
+          )}
         </div>
 
         <h3 className="mt-2 text-[16.5px] font-semibold" style={{ lineHeight: 1.3, letterSpacing: "-0.02em" }}>

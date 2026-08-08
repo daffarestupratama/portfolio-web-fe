@@ -323,5 +323,6 @@ export function mapArticle(a: StrapiArticle): Article {
     readTime: estimateReadTime(a.body),
     tags: toStringArray(a.tags),
     coverImage: mapImage(a.coverImage, `${a.title} cover`),
+    isFeatured: a.isFeatured ?? false,
   };
 }

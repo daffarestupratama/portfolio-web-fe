@@ -10,10 +10,18 @@ import { cache } from "react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFind, strapiFindOne } from "@/lib/strapi";
 import { SERVICE_ADDONS_QUERY, SERVICE_PACKAGES_QUERY, SERVICE_PAGE_QUERY } from "@/lib/queries";
-import { fixMojibake, fixMojibakeBlocks, formatCurrency, mapProject, titleCase, toStringArray } from "@/lib/mappers";
+import {
+  fixMojibake,
+  fixMojibakeBlocks,
+  formatCurrency,
+  mapImage,
+  mapProject,
+  titleCase,
+  toStringArray,
+} from "@/lib/mappers";
 import type { StrapiServiceAddon, StrapiServicePackage, StrapiServicePage } from "@/lib/types";
 import { mapSeo, type Seo } from "@/content/site";
-import type { Project } from "@/content/home";
+import type { MappedImage, Project } from "@/content/home";
 
 export interface ServiceFeature {
   title: string;
@@ -40,6 +48,10 @@ export interface ServicePage {
   faqs: ServiceFaq[];
   ctaHeading: string | null;
   ctaText: string | null;
+  /** Device-mockup hero screens; null when not uploaded (that device is then hidden). */
+  heroImageDesktop: MappedImage | null;
+  heroImageLaptop: MappedImage | null;
+  heroImageMobile: MappedImage | null;
   featuredProjects: Project[];
   seo: Seo;
 }
@@ -167,6 +179,9 @@ export const getServicePage = cache(async (): Promise<ServicePage> => {
     })),
     ctaHeading: fix(raw.ctaHeading),
     ctaText: fix(raw.ctaText),
+    heroImageDesktop: mapImage(raw.heroImageDesktop, "Desktop screenshot"),
+    heroImageLaptop: mapImage(raw.heroImageLaptop, "Laptop screenshot"),
+    heroImageMobile: mapImage(raw.heroImageMobile, "Mobile screenshot"),
     featuredProjects: (raw.featuredProjects ?? []).map(mapProject),
     seo: mapSeo(raw.seo),
   };

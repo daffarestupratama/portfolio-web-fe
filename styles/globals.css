@@ -341,16 +341,22 @@ button {
 }
 /* Network edges with a travelling dash pulse (cheap; the global reduced-motion rule
    disables the animation and leaves a static dashed line). */
+/* Each <line> carries pathLength="100", so the dash pattern is in percent of the edge
+   regardless of its real length: one 18% dash is always somewhere on every edge, and
+   short and long edges pulse identically. Duration, (negative) delay and direction come
+   from inline styles — see edgePulse() in components/hero/hero-cities.ts — so the edges
+   are desynchronised and several are always mid-pulse. `alternate` sends each pulse back
+   the other way on the next cycle, so pulses travel in both directions over time. */
 .hero-map-edge {
   stroke: color-mix(in srgb, var(--accent) 55%, transparent);
-  stroke-width: 1.6;
-  stroke-dasharray: 26 210;
-  animation: hero-pulse 4.2s linear infinite;
+  stroke-width: 2.6;
+  stroke-dasharray: 18 82;
+  animation: hero-pulse 3.6s linear infinite alternate;
   vector-effect: non-scaling-stroke;
 }
 @keyframes hero-pulse {
   from {
-    stroke-dashoffset: 236;
+    stroke-dashoffset: 100;
   }
   to {
     stroke-dashoffset: 0;
@@ -401,15 +407,320 @@ button {
 .hero-donut-track {
   fill: none;
   stroke: color-mix(in srgb, var(--ink) 10%, transparent);
-  stroke-width: 7;
+  stroke-width: 9;
 }
 .hero-donut-slice {
   fill: none;
-  stroke-width: 7;
+  stroke-width: 9;
   stroke-linecap: butt;
   transform: rotate(-90deg);
   transform-origin: center;
   transition: stroke-dasharray 1.1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------- /services device mockups ---------------- */
+
+/* Overlapping composition: monitor centre-back, laptop front-left, phone front-right.
+   Sized in % of the stage so the whole group scales as one. */
+.device-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 560px;
+}
+@media (max-width: 767px) {
+  .device-stage {
+    aspect-ratio: 3 / 4;
+    max-width: 240px;
+    margin-inline: auto;
+  }
+}
+.device-bezel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  padding: 6px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--ink) 82%, transparent), #0c1a1f);
+  border: 1px solid var(--glass-brd);
+  box-shadow: var(--glass-sh-lg), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.device-screen {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+  background: #0d1117;
+}
+/* Subtle sheen so an empty or flat screenshot still reads as glass. */
+.device-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 46%);
+}
+
+.device-monitor {
+  position: absolute;
+  top: 2%;
+  left: 12%;
+  width: 74%;
+}
+.device-monitor .device-bezel {
+  aspect-ratio: 16 / 10;
+}
+.device-monitor-neck {
+  display: block;
+  width: 12%;
+  height: 9%;
+  margin: 0 auto;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 55%, transparent), color-mix(in srgb, var(--ink) 30%, transparent));
+}
+.device-monitor-foot {
+  display: block;
+  width: 34%;
+  height: 7px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 42%, transparent);
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.6);
+}
+
+.device-laptop {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  width: 58%;
+  z-index: 2;
+}
+.device-bezel-laptop {
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+}
+.device-laptop-base {
+  display: block;
+  width: 118%;
+  height: 9px;
+  margin-left: -9%;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 58%, transparent), color-mix(in srgb, var(--ink) 34%, transparent));
+  box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.65);
+}
+
+.device-phone {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  width: 22%;
+  z-index: 3;
+}
+@media (max-width: 767px) {
+  /* Phone only: centre it and let it fill the stage. */
+  .device-phone {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+  }
+}
+.device-bezel-phone {
+  aspect-ratio: 9 / 19;
+  border-radius: 18px;
+  padding: 4px;
+}
+.device-screen-phone {
+  border-radius: 14px;
+}
+.device-notch {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  z-index: 2;
+  width: 34%;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* ---------------- Article TOC dot rail (narrow viewports) ---------------- */
+
+/* Pinned to the left edge, vertically centred. Collapsed it is a slim column of dots
+   that sits outside the text column; expanded it becomes a labelled panel. */
+.toc-rail {
+  position: fixed;
+  top: 50%;
+  left: 6px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateY(-50%);
+  max-height: 74dvh;
+}
+.toc-rail-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-brd);
+  box-shadow: var(--glass-sh);
+  color: var(--ink-dim);
+}
+.toc-rail-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 8px 4px;
+  list-style: none;
+  margin: 0;
+}
+.toc-rail-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 26%, transparent);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.toc-rail-dot[data-sub] {
+  width: 5px;
+  height: 5px;
+  margin-left: 1px;
+}
+.toc-rail-dot[data-active] {
+  background: var(--accent);
+  transform: scale(1.7);
+}
+.toc-rail-panel {
+  max-height: 74dvh;
+  overflow-y: auto;
+  padding: 10px 12px 10px 8px;
+  border-radius: 14px;
+  background: var(--glass-bg);
+  background-image: var(--glass-tint);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-brd);
+  box-shadow: var(--glass-sh-lg);
+  min-width: 168px;
+  max-width: 62vw;
+}
+
+/* ---------------- Project bento card (cover-filled) ---------------- */
+
+/* Uniform ratio by default. Inside a bento grid the row/col spans drive the height from
+   `lg` up instead, so the ratio is released only there — cards used in ordinary grids
+   (services portfolio, related projects) keep their aspect ratio at every width. */
+.pcard {
+  aspect-ratio: 16 / 10;
+}
+@media (min-width: 1024px) {
+  .bento .pcard {
+    aspect-ratio: auto;
+  }
+}
+.pcard-cover {
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.pcard:hover .pcard-cover {
+  transform: scale(1.04);
+}
+/* Type-hue panel for projects without a cover yet, plus a faint grain so it doesn't
+   read as a flat colour block. */
+.pcard-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 20% 10%, color-mix(in srgb, var(--pcard-hue) 55%, transparent), transparent 60%),
+    linear-gradient(150deg, color-mix(in srgb, var(--pcard-hue) 42%, #0d1c21), #0d1c21 70%);
+}
+.pcard-fallback::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px);
+  background-size: 5px 5px;
+}
+/* Fixed dark scrim — theme-independent, so white overlay text keeps contrast over any
+   image in both light and dark mode. */
+.pcard-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(6, 16, 20, 0.88) 0%,
+    rgba(6, 16, 20, 0.62) 34%,
+    rgba(6, 16, 20, 0.16) 66%,
+    rgba(6, 16, 20, 0.04) 100%
+  );
+}
+/* Clamp the title so a long project name can't push the badge out of the top of a
+   short (single-row) tile, which overflow:hidden would then clip. */
+.pcard-heading {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.22;
+}
+.pcard[data-tall] .pcard-heading {
+  -webkit-line-clamp: 3;
+}
+.pcard-title::after {
+  /* Full-card hit target for the title link, while keeping it a real <a>. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+/* The whole card is a navigation target, so tap-to-reveal would fight tapping through.
+   Hover-capable pointers get the summary on hover/focus; touch gets a permanent
+   2-line clamp instead. */
+.pcard-summary {
+  display: none;
+}
+@media (hover: hover) {
+  .pcard-summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    transition: max-height 0.28s ease, opacity 0.28s ease, margin-top 0.28s ease;
+  }
+  /* Short tiles only have room for ~2 lines; two-row tiles can afford the full 3. */
+  .pcard:hover .pcard-summary,
+  .pcard:focus-within .pcard-summary {
+    max-height: 3.2em;
+    margin-top: 7px;
+    opacity: 1;
+  }
+  .pcard[data-tall]:hover .pcard-summary,
+  .pcard[data-tall]:focus-within .pcard-summary {
+    max-height: 4.8em;
+  }
+}
+@media (hover: none) {
+  .pcard-summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin-top: 7px;
+    opacity: 1;
+  }
 }
 
 /* Technology logo tile. The surface is a FIXED off-white in both themes (not

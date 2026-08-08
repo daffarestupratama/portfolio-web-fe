@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Project } from "@/content/home";
 import { ProjectCard } from "@/components/cards/project-card";
+import { BENTO_GRID_CLASS } from "@/components/cards/bento";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 interface ProjectsProps {
@@ -21,9 +22,9 @@ export function Projects({ projects }: ProjectsProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-[18px] md:grid-cols-2">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+        <div className={BENTO_GRID_CLASS}>
+          {projects.map((project, i) => (
+            <ProjectCard key={project.id} project={project} index={i} />
           ))}
         </div>
       </div>

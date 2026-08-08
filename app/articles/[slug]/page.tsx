@@ -8,6 +8,7 @@ import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { extractToc } from "@/components/blocks/toc";
 import { ArticleToc } from "@/components/articles/article-toc";
+import { TocRail } from "@/components/articles/toc-rail";
 import { getRelatedArticles } from "@/components/articles/related-articles";
 import { CoverImage } from "@/components/ui/cover-image";
 import { ProjectCard } from "@/components/cards/project-card";
@@ -51,7 +52,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const toc = extractToc(article.body);
 
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 sm:pt-32">
+    // Below lg the fixed TocRail occupies the left edge, so the content gets its own
+    // gutter there — the rail sits in that space and never overlaps the text.
+    <main className="relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 max-lg:pl-[58px] sm:pt-32">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
@@ -69,7 +72,53 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         path={`/articles/${slug}`}
       />
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-12">
+      {/* Narrow viewports: the sidebar is replaced by a fixed dot rail on the left edge. */}
+      <TocRail entries={toc} />
+
+      <div className="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12">
+        {/* Sidebar — FIRST in DOM so it sits to the LEFT of the content at lg, anchored
+            while scrolling. Hidden below lg, where TocRail takes over and the related
+            articles move to the bottom of the page. */}
+        <aside className="hidden lg:block">
+          <div className="flex flex-col gap-8 lg:sticky lg:top-28 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+            <ArticleToc entries={toc} />
+
+            {related.length > 0 && (
+              <section aria-label="Related articles">
+                <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
+                  Related articles
+                </div>
+                <ul className="flex flex-col gap-3">
+                  {related.map((a) => (
+                    <li key={a.id}>
+                      <Link href={`/articles/${a.slug}`} className="group block">
+                        <span
+                          className="block text-[13.5px] font-semibold transition-colors group-hover:text-(--accent-ink)"
+                          style={{ lineHeight: 1.35 }}
+                        >
+                          {a.title}
+                        </span>
+                        <span className="mono mt-0.5 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
+                          {a.category} · {a.publishedDate}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <Link
+              href="/articles"
+              className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
+              style={{ color: "var(--ink-dim)" }}
+            >
+              <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+              Back to all articles
+            </Link>
+          </div>
+        </aside>
+
         {/* Article content */}
         <div className="min-w-0">
           <Link
@@ -144,47 +193,42 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           )}
         </div>
 
-        {/* Sidebar — sticky beside the article on wide screens, below it on narrow. */}
-        <aside className="mt-12 lg:mt-0">
-          <div className="flex flex-col gap-8 lg:sticky lg:top-28">
-            <ArticleToc entries={toc} />
-
-            {related.length > 0 && (
-              <section aria-label="Related articles">
-                <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
-                  Related articles
-                </div>
-                <ul className="flex flex-col gap-3">
-                  {related.map((a) => (
-                    <li key={a.id}>
-                      <Link href={`/articles/${a.slug}`} className="group block">
-                        <span
-                          className="block text-[13.5px] font-semibold transition-colors group-hover:text-(--accent-ink)"
-                          style={{ lineHeight: 1.35 }}
-                        >
-                          {a.title}
-                        </span>
-                        <span className="mono mt-0.5 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
-                          {a.category} · {a.publishedDate}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            <Link
-              href="/articles"
-              className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-              style={{ color: "var(--ink-dim)" }}
-            >
-              <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-              Back to all articles
-            </Link>
-          </div>
-        </aside>
       </div>
+
+      {/* Narrow viewports only: related articles live at the very bottom, after the
+          article content (the lg sidebar carries them otherwise). */}
+      {related.length > 0 && (
+        <section aria-label="Related articles" className="mt-12 lg:hidden">
+          <h2 className="mb-4 text-[20px] font-bold" style={{ letterSpacing: "-0.02em" }}>
+            Related articles
+          </h2>
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {related.map((a) => (
+              <li key={a.id} className="glass-card p-4" style={{ borderRadius: 16 }}>
+                <Link href={`/articles/${a.slug}`} className="group relative z-[2] block">
+                  <span
+                    className="block text-[14px] font-semibold transition-colors group-hover:text-(--accent-ink)"
+                    style={{ lineHeight: 1.35 }}
+                  >
+                    {a.title}
+                  </span>
+                  <span className="mono mt-1 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
+                    {a.category} · {a.publishedDate}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/articles"
+            className="mono mt-5 inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
+            style={{ color: "var(--ink-dim)" }}
+          >
+            <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+            Back to all articles
+          </Link>
+        </section>
+      )}
     </main>
   );
 }

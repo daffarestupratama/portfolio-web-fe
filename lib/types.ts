@@ -127,7 +127,8 @@ export interface StrapiProject {
   githubUrl: string;
   liveDemoUrl: string;
   dashboardUrl: string;
-  isFeatured: boolean;
+  // No `isFeatured`: the homepage uses the home-page `featuredProjects` relation as the
+  // source of truth, and the Strapi field is being removed.
 }
 
 /** Extra fields only present when the detail query populates them. */
@@ -289,6 +290,10 @@ export interface StrapiServicePage {
   faqs: StrapiServiceFaq[];
   ctaHeading: string | null;
   ctaText: string | null;
+  /** Screens for the device-mockup hero. Any of them may be empty. */
+  heroImageDesktop?: StrapiMedia | null;
+  heroImageLaptop?: StrapiMedia | null;
+  heroImageMobile?: StrapiMedia | null;
   featuredProjects: StrapiProject[];
   seo: StrapiSeo | null;
 }

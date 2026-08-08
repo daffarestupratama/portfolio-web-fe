@@ -1,32 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { TocEntry } from "@/components/blocks/toc";
+import { useActiveHeading } from "@/hooks/use-active-heading";
 
-/** Table of contents with scroll-spy. Highlights the heading currently in view via
- *  IntersectionObserver; anchor links jump to each section (keyboard accessible). */
+/** Table of contents with scroll-spy. Highlights the heading currently in view;
+ *  anchor links jump to each section (keyboard accessible). */
 export function ArticleToc({ entries }: { entries: TocEntry[] }) {
-  const [active, setActive] = useState<string | null>(entries[0]?.id ?? null);
-
-  useEffect(() => {
-    const headings = entries
-      .map((e) => document.getElementById(e.id))
-      .filter((el): el is HTMLElement => el !== null);
-    if (headings.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (obsEntries) => {
-        const visible = obsEntries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      // Trigger when a heading enters the top ~30% band (below the fixed nav).
-      { rootMargin: "-96px 0px -70% 0px", threshold: 0 },
-    );
-    headings.forEach((h) => observer.observe(h));
-    return () => observer.disconnect();
-  }, [entries]);
+  const active = useActiveHeading(entries);
 
   if (entries.length === 0) return null;
 

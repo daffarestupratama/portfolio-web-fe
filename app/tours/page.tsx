@@ -6,6 +6,7 @@ import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { TourCard } from "@/components/cards/tour-card";
 import { InfoList } from "@/components/tours/info-list";
+import { CtaLink } from "@/components/ui/cta-link";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 export const revalidate = 86400;
@@ -63,15 +64,10 @@ export default async function ToursPage() {
 
       {landing.primaryCta && (
         <div className="mt-7 flex flex-wrap items-center gap-4">
-          <a
-            href={landing.primaryCta.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-gradient gap-2 px-[21px] py-3 text-[14.5px]"
-          >
+          <CtaLink href={landing.primaryCta.url} className="btn-gradient gap-2 px-[21px] py-3 text-[14.5px]">
             {landing.primaryCta.label}
             <ArrowRightIcon />
-          </a>
+          </CtaLink>
           {landing.primaryCta.description && (
             <span className="max-w-[36ch] text-[13px]" style={{ color: "var(--ink-faint)" }}>
               {landing.primaryCta.description}

@@ -2,14 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { IndonesiaMap } from "@/lib/geo/indonesia";
+import { edgePulse } from "./hero-cities";
 
-const BAR_COUNT = 7;
+const BAR_COUNT = 6;
 const DONUT_SLICES = 4;
 const TICK_MS = 2600;
 
 /** Deterministic first frame — identical on server and client, so no hydration mismatch.
  *  Also the single static state rendered under prefers-reduced-motion. */
-const INITIAL_BARS = [0.45, 0.72, 0.38, 0.9, 0.6, 0.8, 0.52];
+const INITIAL_BARS = [0.45, 0.72, 0.38, 0.9, 0.6, 0.8];
 const INITIAL_SLICES = [0.34, 0.26, 0.22, 0.18];
 
 function randomBars(): number[] {
@@ -88,6 +89,7 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
               const a = map.nodes[from];
               const b = map.nodes[to];
               if (!a || !b) return null;
+              const pulse = edgePulse(i, map.edges.length);
               return (
                 <line
                   key={i}
@@ -96,7 +98,16 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
                   x2={b.x}
                   y2={b.y}
                   className="hero-map-edge"
-                  style={{ animationDelay: `${(i % 5) * 0.5}s` }}
+                  // Normalises every edge to 100 units regardless of real length, so one
+                  // dash of fixed proportion is always somewhere on the line — short and
+                  // long edges pulse identically and none ever sits visibly empty.
+                  pathLength={100}
+                  style={{
+                    // 3dp so two edges never round to the same duration.
+                    animationDuration: `${pulse.duration.toFixed(3)}s`,
+                    animationDelay: `${pulse.delay.toFixed(3)}s`,
+                    animationDirection: pulse.reversed ? "alternate-reverse" : "alternate",
+                  }}
                 />
               );
             })}
@@ -140,10 +151,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
                   }
                 }}
               >
-                {/* Generous invisible hit area — the visible dot is only ~5 units wide. */}
-                <circle cx={node.x} cy={node.y} r={13} fill="transparent" />
-                <circle cx={node.x} cy={node.y} r={7} className="hero-node-halo" />
-                <circle cx={node.x} cy={node.y} r={3.4} className="hero-node-dot" />
+                {/* Generous invisible hit area, larger than the visible dot. */}
+                <circle cx={node.x} cy={node.y} r={16} fill="transparent" />
+                <circle cx={node.x} cy={node.y} r={11} className="hero-node-halo" />
+                <circle cx={node.x} cy={node.y} r={5.5} className="hero-node-dot" />
               </g>
             ))}
           </g>
@@ -166,7 +177,7 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
       </div>
 
       {/* ---------- Charts (decorative — deliberately unlabelled) ---------- */}
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1.55fr_1fr]">
         <div
           className="px-3 py-2.5"
           style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
@@ -178,9 +189,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
             {bars.map((v, i) => (
               <rect
                 key={i}
-                x={i * 17.4}
+                // 6 bars: pitch 21 × 5 + width 15 = exactly the 120-unit viewBox.
+                x={i * 21}
                 y={0}
-                width={11}
+                width={15}
                 height={34}
                 className="hero-bar"
                 // scaleY from the bottom edge: universally supported, unlike CSS
@@ -193,13 +205,16 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
 
         {/* Hidden below 640px: map + two charts would make the hero far too tall. */}
         <div
-          className="hidden px-3 py-2.5 sm:block"
+          className="hidden flex-col items-center px-3 py-2.5 sm:flex"
           style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
         >
-          <div className="mono mb-1.5 text-[10px] tracking-[0.14em] uppercase" style={{ color: "var(--ink-faint)" }}>
+          <div
+            className="mono mb-1.5 self-start text-[10px] tracking-[0.14em] uppercase"
+            style={{ color: "var(--ink-faint)" }}
+          >
             mix
           </div>
-          <svg viewBox="0 0 44 44" className="block h-[46px] w-[46px]" aria-hidden="true">
+          <svg viewBox="0 0 44 44" className="block h-[76px] w-[76px]" aria-hidden="true">
             <circle cx={22} cy={22} r={DONUT_R} className="hero-donut-track" />
             {slices.map((v, i) => {
               const offset = slices.slice(0, i).reduce((a, b) => a + b, 0);

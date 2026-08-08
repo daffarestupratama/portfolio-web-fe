@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { HomePage } from "@/content/home";
 import { indonesiaMap } from "@/lib/geo/indonesia";
+import { CtaLink } from "@/components/ui/cta-link";
 import { HeroPanel } from "./hero-panel";
 import { FileTextIcon, UserIcon, LinkedinIcon, GithubIcon, InstagramIcon, MailIcon } from "@/components/ui/icons";
 
@@ -43,7 +43,8 @@ export function Hero({ home }: HeroProps) {
             className="mt-5 font-bold"
             style={{ fontSize: "clamp(34px,4.7vw,60px)", lineHeight: 1.03, letterSpacing: "-0.04em" }}
           >
-            {home.headline}
+            {/* ~2/3 of the fullName clamp below, so the name clearly dominates. */}
+            <span style={{ fontSize: "clamp(23px,3.1vw,40px)" }}>{home.headline}</span>
             <br />
             <span
               style={{
@@ -65,17 +66,17 @@ export function Hero({ home }: HeroProps) {
           </p>
 
           <div className="mt-7 flex flex-wrap items-center gap-[11px]">
-            <Link href={home.heroCtaPrimary.url} className="btn-gradient gap-[9px] px-[21px] py-3 text-[14.5px]">
+            <CtaLink href={home.heroCtaPrimary.url} className="btn-gradient gap-[9px] px-[21px] py-3 text-[14.5px]">
               <FileTextIcon />
               {home.heroCtaPrimary.label}
-            </Link>
-            <Link
+            </CtaLink>
+            <CtaLink
               href={home.heroCtaSecondary.url}
               className="glass-pill gap-[9px] px-[21px] py-3 text-[14.5px] font-semibold"
             >
               <UserIcon />
               {home.heroCtaSecondary.label}
-            </Link>
+            </CtaLink>
             <span aria-hidden="true" className="mx-0.5 h-[26px] w-px shrink-0" style={{ background: "var(--border)" }} />
             {home.contactLinks.map((link) => {
               const Icon = contactIcons[link.icon];

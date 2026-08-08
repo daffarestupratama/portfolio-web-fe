@@ -96,7 +96,10 @@ export const GUESTBOOK_MESSAGES_QUERY =
   "&pagination[pageSize]=100";
 
 export const SERVICE_PAGE_QUERY =
-  "populate[features]=true" +
+  "populate[heroImageDesktop]=true" +
+  "&populate[heroImageLaptop]=true" +
+  "&populate[heroImageMobile]=true" +
+  "&populate[features]=true" +
   "&populate[process]=true" +
   "&populate[faqs]=true" +
   "&populate[featuredProjects][populate][coverImage]=true" +

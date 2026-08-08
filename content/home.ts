@@ -135,6 +135,9 @@ export interface Article {
   readTime: string;
   tags: string[];
   coverImage: MappedImage | null;
+  /** Highlights the article in the /articles list. (The homepage uses the
+   *  home-page `featuredArticles` relation instead, not this flag.) */
+  isFeatured: boolean;
 }
 
 /** All four home-page-derived accessors read the same endpoint — cache() collapses
@@ -159,10 +162,14 @@ export async function getFeaturedExperiences(): Promise<Record<ExperienceCategor
   return bucketExperiences(raw.featuredExperiences.map(mapExperience));
 }
 
+/** How many of the home-page `featuredProjects` relation the homepage grid renders.
+ *  The relation itself is the source of truth for *which* projects and their order —
+ *  this only caps the count. Raise it if the bento grid should show more. */
+export const HOME_FEATURED_PROJECTS_LIMIT = 4;
+
 export async function getFeaturedProjects(): Promise<Project[]> {
   const raw = await getHomePageRaw();
-  // Cap at 4 for the homepage grid ("selected" projects); the full list is /projects.
-  return raw.featuredProjects.map(mapProject).slice(0, 4);
+  return raw.featuredProjects.map(mapProject).slice(0, HOME_FEATURED_PROJECTS_LIMIT);
 }
 
 export async function getFeaturedTours(): Promise<TourPackage[]> {

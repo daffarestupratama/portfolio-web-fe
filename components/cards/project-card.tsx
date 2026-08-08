@@ -1,93 +1,121 @@
 "use client";
 
 import Link from "next/link";
-import { useTilt } from "@/hooks/use-tilt";
 import type { Project } from "@/content/home";
-import { CoverImage } from "@/components/ui/cover-image";
+import { StrapiImage } from "@/components/ui/strapi-image";
 import { TechTileRow } from "@/components/ui/tech-tile";
-import { ArrowRightIcon, DashboardIcon, ExternalLinkIcon, GithubIcon } from "@/components/ui/icons";
-import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
+import { ArrowRightIcon } from "@/components/ui/icons";
+import { bentoSpan, isTallSpan } from "@/components/cards/bento";
+import { projectTypeMeta } from "@/components/cards/project-type-meta";
 
 interface ProjectCardProps {
   project: Project;
+  /** Position in the grid — drives the bento tile shape. */
+  index?: number;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
-  const ref = useTilt<HTMLDivElement>();
+/** Cover-filled bento tile: the cover image fills the card and the metadata sits on top
+ *  of a bottom-up scrim. The scrim is a fixed dark gradient (not token-driven) so overlay
+ *  text is white-on-dark and legible in BOTH themes over any image — the same
+ *  "always-X" approach as the tech tiles' fixed light surface. */
+export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const meta = projectTypeMeta(project.projectType);
+  const cover = project.coverImage;
+  const aspect = cover ? cover.width / cover.height : null;
+  const span = bentoSpan(index, aspect);
 
   return (
-    <div ref={ref} data-tilt className="glass-card p-[15px]">
-      <CoverImage
-        image={project.coverImage}
-        variant="project"
-        label={`${project.title} cover`}
-        className="relative z-[2] aspect-video w-full"
-        sizes="(max-width: 768px) 100vw, 560px"
-      />
+    <article
+      // `data-tall` marks two-row tiles, which have room to reveal a longer summary.
+      data-tall={isTallSpan(span) || undefined}
+      className={`pcard group relative isolate overflow-hidden ${span}`}
+      style={{
+        borderRadius: 20,
+        border: "1px solid var(--glass-brd)",
+        boxShadow: "var(--glass-sh)",
+      }}
+    >
+      {/* Cover, or a type-hue gradient panel when the project has no cover yet. Both get
+          the identical scrim + overlay, so a cover-less card reads as deliberately
+          colour-coded by project type rather than broken. */}
+      {cover ? (
+        <StrapiImage
+          src={cover.url}
+          alt=""
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 560px"
+          style={{ objectFit: "cover" }}
+          className="pcard-cover"
+          fallback={<span className="pcard-fallback" style={{ ["--pcard-hue" as string]: meta.hue }} />}
+        />
+      ) : (
+        <span className="pcard-fallback" style={{ ["--pcard-hue" as string]: meta.hue }} aria-hidden="true" />
+      )}
 
-      <div className="relative z-[2] px-2 pt-4 pb-1.5">
+      <span className="pcard-scrim" aria-hidden="true" />
+
+      <div className="pcard-body relative z-[2] flex h-full flex-col justify-end p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2.5">
-          <span className="badge" style={badgeStyle(meta.hue)}>
+          <span
+            className="badge"
+            style={{
+              background: `color-mix(in srgb, ${meta.hue} 30%, rgba(8,18,22,0.62))`,
+              borderColor: `color-mix(in srgb, ${meta.hue} 50%, transparent)`,
+              color: "#fff",
+            }}
+          >
             {meta.label}
           </span>
-          <span className="mono shrink-0 text-[11px]" style={{ color: "var(--ink-faint)" }}>
+          <span className="mono shrink-0 text-[11px]" style={{ color: "rgba(255,255,255,0.72)" }}>
             {project.year}
           </span>
         </div>
 
-        <h3 className="mt-[13px] text-[19px] font-bold" style={{ letterSpacing: "-0.025em" }}>
-          <Link href={`/projects/${project.slug}`} className="transition-colors hover:text-(--accent-ink)">
+        <h3 className="pcard-heading mt-2.5 text-[18px] font-bold" style={{ letterSpacing: "-0.025em", color: "#fff" }}>
+          <Link href={`/projects/${project.slug}`} className="pcard-title transition-opacity hover:opacity-85">
             {project.title}
           </Link>
         </h3>
-        <p className="mt-[9px] text-[13.5px]" style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}>
+
+        {/* Hidden until hover on hover-capable pointers; permanently visible (2 lines) on
+            touch — see .pcard-summary in globals.css. */}
+        <p className="pcard-summary text-[13px]" style={{ lineHeight: 1.5, color: "rgba(255,255,255,0.86)" }}>
           {project.summary}
         </p>
 
-        {/* Logo tiles once an entry has `technologies`; the legacy techStack chips
-            remain the fallback for entries still awaiting migration. */}
-        {project.technologies.length > 0 ? (
-          <div className="mt-[15px]">
-            <TechTileRow items={project.technologies} size={32} max={6} />
-          </div>
-        ) : (
-          <div className="mt-[15px] flex flex-wrap gap-[7px]">
-            {project.techStack.map((tech) => (
-              <span key={tech} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="mt-3 flex items-end justify-between gap-3">
+          {project.technologies.length > 0 ? (
+            <TechTileRow items={project.technologies} size={28} max={5} />
+          ) : (
+            <div className="flex flex-wrap gap-[6px]">
+              {project.techStack.slice(0, 4).map((tech) => (
+                <span
+                  key={tech}
+                  className="mono px-[7px] py-[3px] text-[10.5px]"
+                  style={{
+                    borderRadius: 7,
+                    background: "rgba(255,255,255,0.14)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.9)",
+                  }}
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          )}
 
-        <div className="mt-4 flex items-center gap-2 pt-[15px]" style={{ borderTop: "1px solid var(--border)" }}>
-          {project.githubUrl && (
-            <a href={project.githubUrl} aria-label="View source on GitHub" className="glass-icon-btn h-9 w-9" style={{ borderRadius: 10 }}>
-              <GithubIcon width={16} height={16} />
-            </a>
-          )}
-          {project.dashboardUrl && (
-            <a href={project.dashboardUrl} aria-label="Open dashboard" className="glass-icon-btn h-9 w-9" style={{ borderRadius: 10 }}>
-              <DashboardIcon width={16} height={16} />
-            </a>
-          )}
           <Link
             href={`/projects/${project.slug}`}
-            className="inline-flex items-center gap-1 text-[13px] font-semibold transition-colors hover:text-(--accent-ink)"
-            style={{ color: "var(--ink-dim)" }}
+            aria-label={`Details: ${project.title}`}
+            className="mono inline-flex shrink-0 items-center gap-1 text-[12px] font-medium transition-opacity hover:opacity-80"
+            style={{ color: "rgba(255,255,255,0.9)" }}
           >
             Details
-            <ArrowRightIcon width={14} height={14} />
+            <ArrowRightIcon width={13} height={13} />
           </Link>
-          {project.liveDemoUrl && (
-            <a href={project.liveDemoUrl} className="btn-gradient ml-auto gap-[7px] px-[15px] py-2 text-[13px]">
-              Live demo
-              <ExternalLinkIcon />
-            </a>
-          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

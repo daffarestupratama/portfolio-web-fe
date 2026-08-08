@@ -29,14 +29,16 @@ export default async function AboutPage() {
     <main className="relative z-[3] pt-28 pb-16 sm:pt-32">
       {/* Top: square profile image on the left, all text on the right (stacks on mobile). */}
       <div className="mx-auto w-full max-w-[920px] px-[22px]">
-        <div className="grid gap-8 md:grid-cols-[300px_minmax(0,1fr)] md:items-start">
+        <div className="grid gap-8 md:grid-cols-[260px_minmax(0,1fr)] md:items-start">
           {about.profileImage && (
+            // 2:3 matches the source photo (844×1264), so the whole portrait is shown
+            // instead of a square crop that cut off the top of the head.
             <CoverImage
               image={about.profileImage}
               variant="article"
               label={about.title || "Profile photo"}
-              className="aspect-square w-full"
-              sizes="(max-width: 768px) 100vw, 300px"
+              className="mx-auto aspect-[2/3] w-full max-w-[260px]"
+              sizes="(max-width: 768px) 260px, 260px"
               priority
             />
           )}

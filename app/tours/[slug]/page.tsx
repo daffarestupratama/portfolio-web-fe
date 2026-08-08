@@ -10,6 +10,7 @@ import { CoverImage } from "@/components/ui/cover-image";
 import { Gallery } from "@/components/ui/gallery";
 import { TourRoute } from "@/components/tours/tour-route";
 import { InfoList } from "@/components/tours/info-list";
+import { CtaLink } from "@/components/ui/cta-link";
 import { ArrowRightIcon, ClockIcon, ExternalLinkIcon, MapPinIcon } from "@/components/ui/icons";
 
 export const revalidate = 86400;
@@ -169,11 +170,9 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </h2>
           <div className="flex flex-wrap gap-2.5">
             {tour.bookingContact.map((link, i) => (
-              <a
+              <CtaLink
                 key={i}
                 href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className={
                   i === 0
                     ? "btn-gradient gap-2 px-[21px] py-3 text-[14.5px]"
@@ -182,7 +181,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
               >
                 {link.label}
                 <ExternalLinkIcon />
-              </a>
+              </CtaLink>
             ))}
           </div>
         </section>

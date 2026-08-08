@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "@/content/home";
 import { ProjectCard } from "@/components/cards/project-card";
+import { BENTO_GRID_CLASS } from "@/components/cards/bento";
 import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
 
 interface ProjectsFilterProps {
@@ -82,9 +83,9 @@ export function ProjectsFilter({ projects }: ProjectsFilterProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-[18px] md:grid-cols-2">
-        {shown.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+      <div className={BENTO_GRID_CLASS}>
+        {shown.map((project, i) => (
+          <ProjectCard key={project.id} project={project} index={i} />
         ))}
       </div>
 

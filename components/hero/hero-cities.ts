@@ -49,3 +49,41 @@ export const CITY_EDGES: readonly (readonly [number, number])[] = [
   [10, 11], // Makassar – Manado
   [10, 12], // Makassar – Jayapura
 ];
+
+/** Deterministic 0..1 from an integer (xorshift-style, 32-bit safe via Math.imul).
+ *  Deliberately NOT Math.random(): the values are rendered into inline styles, so
+ *  server and client must produce identical output or hydration mismatches. */
+function hash01(n: number): number {
+  let x = Math.imul(n + 1, 2654435761);
+  x ^= x >>> 15;
+  x = Math.imul(x, 2246822519);
+  x ^= x >>> 13;
+  x = Math.imul(x, 3266489917);
+  x ^= x >>> 16;
+  return (x >>> 0) / 4294967296;
+}
+
+export interface EdgePulse {
+  /** Animation duration in seconds (2.4–5.2), unique-ish per edge. */
+  duration: number;
+  /** NEGATIVE delay so the edge starts already mid-cycle — this is what removes the
+   *  "dead" moment where every edge is between pulses. */
+  delay: number;
+  /** Half the edges start travelling the other way; `alternate` then flips each edge's
+   *  direction every cycle, so pulses run both ways over time. */
+  reversed: boolean;
+}
+
+/** Per-edge pulse timing. Durations are jittered so the network never looks
+ *  synchronised, while the delays are spread evenly across each edge's own cycle so
+ *  activity is continuous — several edges are always mid-pulse. */
+export function edgePulse(index: number, total: number): EdgePulse {
+  const duration = 2.4 + hash01(index * 3 + 1) * 2.8;
+  const slot = (index / Math.max(total, 1)) * duration;
+  const jitter = hash01(index * 3 + 2) * (duration / Math.max(total, 1));
+  return {
+    duration,
+    delay: -(slot + jitter),
+    reversed: hash01(index * 3 + 3) < 0.5,
+  };
+}

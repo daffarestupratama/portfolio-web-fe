@@ -12,6 +12,7 @@ import { PackageCard } from "@/components/services/package-card";
 import { AddonsSection } from "@/components/services/addons-section";
 import { ProcessList } from "@/components/services/process-list";
 import { FaqAccordion } from "@/components/services/faq-accordion";
+import { DeviceShowcase } from "@/components/services/device-showcase";
 import { ServicesJsonLd } from "@/components/seo/services-json-ld";
 
 export const revalidate = 3600;
@@ -64,8 +65,13 @@ export default async function ServicesPage() {
   return (
     <main className="relative z-[3] pt-28 pb-8 sm:pt-32">
       <div className="mx-auto w-full max-w-[1180px] px-[22px]">
-        {/* 1. Hero */}
-        <header className="max-w-[760px]">
+        {/* 1. Hero — text left, device mockups right (the visual omits itself entirely
+            when none of the three screens are uploaded). */}
+        {/* The device column needs a DEFINITE track width: with `auto`, the stage's
+            width:100% resolves against an indefinite size and — since every device is
+            absolutely positioned and contributes no intrinsic width — collapses to zero. */}
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_480px]">
+          <header className="max-w-[760px]">
           <h1 className="font-bold" style={{ fontSize: "clamp(30px,4.8vw,50px)", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
             {page.title}
           </h1>
@@ -94,7 +100,14 @@ export default async function ServicesPage() {
               Email
             </a>
           </div>
-        </header>
+          </header>
+
+          <DeviceShowcase
+            desktop={page.heroImageDesktop}
+            laptop={page.heroImageLaptop}
+            mobile={page.heroImageMobile}
+          />
+        </div>
 
         {/* 2. Features */}
         {page.features.length > 0 && (
@@ -104,7 +117,19 @@ export default async function ServicesPage() {
           </section>
         )}
 
-        {/* 3. Base packages */}
+        {/* 3. Portfolio — sits directly after the features section, before the packages. */}
+        {page.featuredProjects.length > 0 && (
+          <section className="mt-16">
+            <SectionHeading title="Portofolio" subtitle="Beberapa proyek yang pernah saya kerjakan." />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {page.featuredProjects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 4. Base packages */}
         {packages.packages.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Paket Dasar" subtitle="Pilihan paket untuk memulai kehadiran digital Anda, dari satu halaman hingga sistem custom." />
@@ -116,7 +141,7 @@ export default async function ServicesPage() {
           </section>
         )}
 
-        {/* 4. Bundles */}
+        {/* 5. Bundles */}
         {packages.bundles.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Bundling Hemat" subtitle="Paket lengkap yang menggabungkan beberapa layanan sekaligus, lebih hemat dibanding memesan terpisah." />
@@ -128,7 +153,7 @@ export default async function ServicesPage() {
           </section>
         )}
 
-        {/* 5. Add-ons */}
+        {/* 6. Add-ons */}
         {addons.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Add-on Populer" subtitle="Tambahkan fitur sesuai kebutuhan. Semua add-on bisa dikombinasikan dengan paket mana pun." />
@@ -136,7 +161,7 @@ export default async function ServicesPage() {
           </section>
         )}
 
-        {/* 6. Maintenance */}
+        {/* 7. Maintenance */}
         {packages.maintenance.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Maintenance" subtitle="Perawatan rutin agar website Anda tetap aman, cepat, dan up to date." />
@@ -148,23 +173,11 @@ export default async function ServicesPage() {
           </section>
         )}
 
-        {/* 7. Process */}
+        {/* 8. Process */}
         {page.process.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Proses Kerja" subtitle="Alur pengerjaan yang jelas dari awal diskusi hingga website Anda go-live." />
             <ProcessList steps={page.process} />
-          </section>
-        )}
-
-        {/* 8. Portfolio */}
-        {page.featuredProjects.length > 0 && (
-          <section className="mt-16">
-            <SectionHeading title="Portofolio" subtitle="Beberapa proyek yang pernah saya kerjakan." />
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {page.featuredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
           </section>
         )}
 
