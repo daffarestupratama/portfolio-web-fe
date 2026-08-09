@@ -83,11 +83,15 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           {project.summary}
         </p>
 
-        <div className="mt-3 flex items-end justify-between gap-3">
-          {project.technologies.length > 0 ? (
-            <TechTileRow items={project.technologies} size={28} max={5} />
-          ) : (
-            <div className="flex flex-wrap gap-[6px]">
+        {/* Compact (2×1) tiles hide the tech tiles at rest and reveal them with the
+            summary on hover/tap — see .pcard-tech in globals.css. Feature (2×2) tiles
+            have the height to show them always. */}
+        <div className="pcard-foot mt-3 flex items-end justify-between gap-3">
+          <div className="pcard-tech min-w-0">
+            {project.technologies.length > 0 ? (
+              <TechTileRow items={project.technologies} size={28} max={5} />
+            ) : (
+              <div className="flex flex-wrap gap-[6px]">
               {project.techStack.slice(0, 4).map((tech) => (
                 <span
                   key={tech}
@@ -98,12 +102,13 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                     border: "1px solid rgba(255,255,255,0.2)",
                     color: "rgba(255,255,255,0.9)",
                   }}
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
           <Link
             href={`/projects/${project.slug}`}

@@ -49,8 +49,14 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <RouteProgress />
+          {/* `overflow-x: clip`, NOT `hidden`. `overflow-x: hidden` forces the computed
+              `overflow-y` to `auto`, which turns this wrapper into a scroll container —
+              and `position: sticky` then resolves against this non-scrolling box instead
+              of the viewport, so every sticky element on the site silently stops working.
+              `clip` still contains the ambient background blobs (they overhang the
+              viewport) without creating a scroll container. */}
           <div
-            className="relative min-h-screen overflow-x-hidden"
+            className="relative min-h-screen overflow-x-clip"
             style={{ background: "var(--bg)", color: "var(--ink)" }}
           >
             <AmbientBackground />

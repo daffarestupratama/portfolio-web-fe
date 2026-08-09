@@ -19,7 +19,9 @@ export function TocRail({ entries }: { entries: TocEntry[] }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="toc-rail lg:hidden" data-open={open || undefined}>
+    // Breakpoint hiding lives in the .toc-rail CSS rule, not a `lg:hidden` utility —
+    // see the note in globals.css (source order made the utility a no-op here).
+    <div className="toc-rail" data-open={open || undefined}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

@@ -1,12 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IndonesiaMap } from "@/lib/geo/indonesia";
-import { edgePulse } from "./hero-cities";
 
 const BAR_COUNT = 6;
 const DONUT_SLICES = 4;
 const TICK_MS = 2600;
+
+// ---- Edge "pluck" (guitar-string) physics --------------------------------------
+/** Peak perpendicular bow of the control point, in viewBox units. */
+const PLUCK_AMPLITUDE = 12;
+/** Oscillation frequency (Hz) — ~4 visible swings before it dies out. */
+const PLUCK_FREQUENCY = 5.5;
+/** Exponential decay constant; with 5.5 the bow is <2% of peak by ~800ms. */
+const PLUCK_DECAY = 5.5;
+/** Stop animating once the remaining bow is imperceptible. */
+const PLUCK_DURATION_MS = 900;
+const AUTO_PLUCK_MIN_MS = 1000;
+const AUTO_PLUCK_MAX_MS = 2000;
+
+/** Straight-line path: a quadratic bezier whose control point is the midpoint IS the
+ *  straight segment, so the rest state is exact rather than approximated. */
+function edgePath(ax: number, ay: number, bx: number, by: number, offset: number): string {
+  const mx = (ax + bx) / 2;
+  const my = (ay + by) / 2;
+  if (offset === 0) return `M${ax},${ay} Q${mx},${my} ${bx},${by}`;
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len = Math.hypot(dx, dy) || 1;
+  // Unit normal to the edge; the control point rides out along it and back.
+  const nx = -dy / len;
+  const ny = dx / len;
+  // ×2 because a quadratic curve only reaches half way to its control point.
+  return `M${ax},${ay} Q${mx + nx * offset * 2},${my + ny * offset * 2} ${bx},${by}`;
+}
+
+/** Damped sine: amplitude · sin(2πft) · e^(−λt). */
+function pluckOffset(elapsedMs: number): number {
+  const t = elapsedMs / 1000;
+  return PLUCK_AMPLITUDE * Math.sin(2 * Math.PI * PLUCK_FREQUENCY * t) * Math.exp(-PLUCK_DECAY * t);
+}
 
 /** Deterministic first frame — identical on server and client, so no hydration mismatch.
  *  Also the single static state rendered under prefers-reduced-motion. */
@@ -35,6 +68,86 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
   /** Pointer type of the most recent press, so click-toggle only applies to touch/pen. */
   const lastPointer = useRef<string>("mouse");
 
+  // --- Pluck engine -------------------------------------------------------------
+  // Paths are mutated directly through refs rather than React state: at 60fps a state
+  // update per frame would re-render every edge, node and chart in the panel.
+  const edgeRefs = useRef<(SVGPathElement | null)[]>([]);
+  /** edgeIndex → timestamp the pluck started. Only these are animated. */
+  const vibrating = useRef<Map<number, number>>(new Map());
+  const frame = useRef(0);
+  const onScreen = useRef(true);
+
+  /** Set up in the effect below; the stable `pluck` wrapper delegates to it. */
+  const pluckRef = useRef<(index: number) => void>(() => {});
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // A function declaration (not a useCallback) so the loop can re-schedule itself
+    // without the memoized-identity problem.
+    function step() {
+      frame.current = 0;
+      const now = performance.now();
+      for (const [index, start] of vibrating.current) {
+        const el = edgeRefs.current[index];
+        const edge = map.edges[index];
+        const a = edge && map.nodes[edge[0]];
+        const b = edge && map.nodes[edge[1]];
+        if (!el || !a || !b) {
+          vibrating.current.delete(index);
+          continue;
+        }
+        const elapsed = now - start;
+        if (elapsed >= PLUCK_DURATION_MS) {
+          // Settle exactly straight so no residual bow is left behind.
+          el.setAttribute("d", edgePath(a.x, a.y, b.x, b.y, 0));
+          vibrating.current.delete(index);
+          continue;
+        }
+        el.setAttribute("d", edgePath(a.x, a.y, b.x, b.y, pluckOffset(elapsed)));
+      }
+      if (vibrating.current.size > 0) frame.current = requestAnimationFrame(step);
+    }
+
+    pluckRef.current = (index: number) => {
+      if (reduced) return; // no vibration at all — hover gets a colour highlight instead
+      vibrating.current.set(index, performance.now());
+      if (!frame.current) frame.current = requestAnimationFrame(step);
+    };
+
+    const vibrations = vibrating.current;
+    return () => {
+      if (frame.current) cancelAnimationFrame(frame.current);
+      frame.current = 0;
+      vibrations.clear();
+    };
+  }, [map]);
+
+  const pluck = useCallback((index: number) => pluckRef.current(index), []);
+
+  // Auto-pluck a random edge every 1–2s so the network reads as alive. Math.random()
+  // only runs in this client timer, never during render, so hydration stays stable.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const edgeCount = map.edges.length;
+    if (edgeCount === 0) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      const delay = AUTO_PLUCK_MIN_MS + Math.random() * (AUTO_PLUCK_MAX_MS - AUTO_PLUCK_MIN_MS);
+      timer = setTimeout(() => {
+        if (onScreen.current) pluck(Math.floor(Math.random() * edgeCount));
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => {
+      clearTimeout(timer);
+      if (frame.current) cancelAnimationFrame(frame.current);
+      frame.current = 0;
+    };
+  }, [map.edges.length, pluck]);
+
   // Animate only while the panel is on screen, and never under reduced motion.
   useEffect(() => {
     const root = rootRef.current;
@@ -56,7 +169,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
     };
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) start();
+      const visible = entries.some((e) => e.isIntersecting);
+      // Also gates the auto-pluck timer (see the pluck engine above).
+      onScreen.current = visible;
+      if (visible) start();
       else stop();
     });
     observer.observe(root);
@@ -89,26 +205,32 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
               const a = map.nodes[from];
               const b = map.nodes[to];
               if (!a || !b) return null;
-              const pulse = edgePulse(i, map.edges.length);
+              const rest = edgePath(a.x, a.y, b.x, b.y, 0);
               return (
-                <line
-                  key={i}
-                  x1={a.x}
-                  y1={a.y}
-                  x2={b.x}
-                  y2={b.y}
-                  className="hero-map-edge"
-                  // Normalises every edge to 100 units regardless of real length, so one
-                  // dash of fixed proportion is always somewhere on the line — short and
-                  // long edges pulse identically and none ever sits visibly empty.
-                  pathLength={100}
-                  style={{
-                    // 3dp so two edges never round to the same duration.
-                    animationDuration: `${pulse.duration.toFixed(3)}s`,
-                    animationDelay: `${pulse.delay.toFixed(3)}s`,
-                    animationDirection: pulse.reversed ? "alternate-reverse" : "alternate",
-                  }}
-                />
+                <g key={i} className="hero-edge-group">
+                  {/* Visible string — solid and complete at rest; `d` is mutated by the
+                      rAF loop while it's vibrating. */}
+                  <path
+                    ref={(el) => {
+                      edgeRefs.current[i] = el;
+                    }}
+                    d={rest}
+                    className="hero-map-edge"
+                  />
+                  {/* Wide transparent overlay: the visible line is ~2.6px, far too thin
+                      to hit reliably. pointer-events:stroke makes only the band clickable. */}
+                  <path
+                    d={rest}
+                    className="hero-edge-hit"
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === "mouse") pluck(i);
+                    }}
+                    onPointerDown={(e) => {
+                      // Touch/pen have no hover — a tap plucks instead.
+                      if (e.pointerType !== "mouse") pluck(i);
+                    }}
+                  />
+                </g>
               );
             })}
           </g>

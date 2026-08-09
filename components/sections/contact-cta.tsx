@@ -23,7 +23,12 @@ export function ContactCTA({ email, whatsappUrl, heading, description }: Contact
   const resolvedDescription = description || DEFAULT_DESCRIPTION;
 
   return (
-    <section className="relative z-[3] flex justify-center px-[22px] pt-[46px] pb-[30px]">
+    // `scroll-mt-28` keeps the section clear of the fixed navbar when the "#contact"
+    // CTA scrolls here (scrollIntoView honours scroll-margin-top).
+    <section
+      id="contact"
+      className="relative z-[3] flex scroll-mt-28 justify-center px-[22px] pt-[46px] pb-[30px] outline-none"
+    >
       <div
         className="flex w-full max-w-[1180px] flex-col items-center gap-6 px-6 py-12 text-center sm:px-10"
         style={{

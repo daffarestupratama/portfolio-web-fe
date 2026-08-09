@@ -79,8 +79,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         {/* Sidebar — FIRST in DOM so it sits to the LEFT of the content at lg, anchored
             while scrolling. Hidden below lg, where TocRail takes over and the related
             articles move to the bottom of the page. */}
-        <aside className="hidden lg:block">
-          <div className="flex flex-col gap-8 lg:sticky lg:top-28 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+        {/* `self-start` + `sticky` must be on the SAME element. A grid item stretches to
+            the row height by default, so sticky has nothing to stick within; but putting
+            self-start on the aside and sticky on its child is equally broken — the child
+            then sticks inside a box that is only as tall as itself. */}
+        <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
+          <div className="flex flex-col gap-8">
             <ArticleToc entries={toc} />
 
             {related.length > 0 && (

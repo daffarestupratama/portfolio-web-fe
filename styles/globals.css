@@ -341,25 +341,34 @@ button {
 }
 /* Network edges with a travelling dash pulse (cheap; the global reduced-motion rule
    disables the animation and leaves a static dashed line). */
-/* Each <line> carries pathLength="100", so the dash pattern is in percent of the edge
-   regardless of its real length: one 18% dash is always somewhere on every edge, and
-   short and long edges pulse identically. Duration, (negative) delay and direction come
-   from inline styles — see edgePulse() in components/hero/hero-cities.ts — so the edges
-   are desynchronised and several are always mid-pulse. `alternate` sends each pulse back
-   the other way on the next cycle, so pulses travel in both directions over time. */
+/* Network edges are solid, complete lines at rest. Hovering (or tapping) one "plucks" it
+   like a guitar string: the JS rAF loop in hero-panel.tsx bows the quadratic control
+   point perpendicular to the edge with a damped sine, settling straight in ~800ms. */
 .hero-map-edge {
+  fill: none;
   stroke: color-mix(in srgb, var(--accent) 55%, transparent);
   stroke-width: 2.6;
-  stroke-dasharray: 18 82;
-  animation: hero-pulse 3.6s linear infinite alternate;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.18s ease;
+}
+/* Wide invisible hit band over each edge — the visible stroke is far too thin to target. */
+.hero-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  pointer-events: stroke;
+  cursor: pointer;
   vector-effect: non-scaling-stroke;
 }
-@keyframes hero-pulse {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
+.hero-edge-group:hover .hero-map-edge {
+  stroke: color-mix(in srgb, var(--accent) 85%, transparent);
+}
+/* Under reduced motion nothing vibrates (the rAF loop never starts), so hover gets a
+   brief colour highlight as the sole feedback. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-edge-group:hover .hero-map-edge {
+    stroke: var(--accent);
   }
 }
 .hero-map-node {
@@ -543,6 +552,16 @@ button {
   background: rgba(0, 0, 0, 0.72);
 }
 
+/* Floating "Send Message" button (guestbook, narrow viewports only). Sits above the
+   safe-area inset so it clears iOS home indicators and doesn't cover the footer. */
+.back-to-form {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  box-shadow: var(--glass-sh-lg);
+}
+
 /* ---------------- Article TOC dot rail (narrow viewports) ---------------- */
 
 /* Pinned to the left edge, vertically centred. Collapsed it is a slim column of dots
@@ -557,6 +576,15 @@ button {
   gap: 6px;
   transform: translateY(-50%);
   max-height: 74dvh;
+}
+/* The breakpoint lives HERE (after the base rule), not on a `lg:hidden` utility:
+   `.toc-rail` and Tailwind's `.lg\:hidden` have identical specificity, and this
+   stylesheet is emitted after `@import "tailwindcss"`, so source order made the base
+   rule win — the rail rendered at every width alongside the desktop sidebar. */
+@media (min-width: 1024px) {
+  .toc-rail {
+    display: none;
+  }
 }
 .toc-rail-toggle {
   display: inline-flex;
@@ -683,6 +711,24 @@ button {
   inset: 0;
   z-index: 1;
 }
+/* Compact (2×1) tiles: progressive disclosure. Only badge + title + Details show at
+   rest; the tech tiles join the summary on hover/focus. Feature (2×2) tiles are tall
+   enough to show the tiles permanently. Chosen over marquee/scrolling text, which hurts
+   readability and is hostile to screen readers and reduced-motion users. */
+@media (hover: hover) {
+  .pcard:not([data-tall]) .pcard-tech {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.28s ease, opacity 0.28s ease;
+  }
+  .pcard:not([data-tall]):hover .pcard-tech,
+  .pcard:not([data-tall]):focus-within .pcard-tech {
+    max-height: 40px;
+    opacity: 1;
+  }
+}
+
 /* The whole card is a navigation target, so tap-to-reveal would fight tapping through.
    Hover-capable pointers get the summary on hover/focus; touch gets a permanent
    2-line clamp instead. */

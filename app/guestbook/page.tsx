@@ -4,6 +4,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { GuestbookForm } from "@/components/guestbook/guestbook-form";
 import { MessageCard } from "@/components/guestbook/message-card";
+import { BackToForm } from "@/components/guestbook/back-to-form";
 
 export const revalidate = 300;
 
@@ -33,7 +34,9 @@ export default async function GuestbookPage() {
 
       {/* Two columns: form on the left, messages on the right — stacks on narrow screens. */}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start">
-        <div className="lg:sticky lg:top-28">
+        {/* `self-start` stops the grid item stretching to the row height, which would
+            leave the sticky box nothing to stick within. */}
+        <div id="guestbook-form" className="self-start scroll-mt-28 lg:sticky lg:top-28">
           <GuestbookForm />
         </div>
 
@@ -55,6 +58,8 @@ export default async function GuestbookPage() {
           )}
         </section>
       </div>
+
+      <BackToForm targetId="guestbook-form" />
     </main>
   );
 }

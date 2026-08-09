@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Article } from "@/content/home";
-import { ArticleCard } from "@/components/cards/article-card";
+import { ArticleListItem } from "@/components/articles/article-list-item";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 interface WritingProps {
@@ -21,9 +21,11 @@ export function Writing({ articles }: WritingProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
+        {/* Same single-column list treatment as /articles, so the homepage section reads
+            like a normal blog index rather than a card grid. */}
+        <div className="flex flex-col gap-4">
           {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
+            <ArticleListItem key={article.id} article={article} />
           ))}
         </div>
       </div>

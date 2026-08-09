@@ -107,17 +107,9 @@ export function Hero({ home }: HeroProps) {
             animationPlayState: "var(--float-play)",
           }}
         >
-          <div className="pointer-events-none relative z-[3] mb-1.5 flex items-center justify-between">
+          <div className="pointer-events-none relative z-[3] mb-1.5 flex items-center">
             <span className="mono text-[11px] tracking-wide uppercase" style={{ color: "var(--ink-faint)" }}>
               geo.network
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px]" style={{ color: "var(--ink-faint)" }}>
-              <span
-                aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ background: "var(--accent)", boxShadow: "0 0 8px var(--accent)" }}
-              />
-              live
             </span>
           </div>
 

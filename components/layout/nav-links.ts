@@ -13,7 +13,7 @@ export const navLinks: NavLink[] = [
   { href: "/projects", label: "Projects" },
   { href: "/articles", label: "Articles" },
   ...(FEATURES.tours ? [{ href: "/tours", label: "Tours" }] : []),
-  { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/guestbook", label: "Guestbook" },
+  { href: "/about", label: "About" },
 ];
