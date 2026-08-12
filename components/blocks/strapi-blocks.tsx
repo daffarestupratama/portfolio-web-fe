@@ -1,17 +1,17 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { BlocksRenderer, type BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiImageUrl } from "@/lib/image";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { MediaPlaceholder } from "@/components/ui/media-placeholder";
 import { CodeBlock } from "@/components/blocks/code-block";
-import { TOC_LEVELS } from "@/components/blocks/toc";
+import { HEADING_SCROLL_OFFSET } from "@/components/blocks/toc";
 
 interface StrapiBlocksProps {
+  /** Pass `withHeadingIds(body).content` to get anchored headings for a TOC; the raw
+   *  body renders identically but without ids. */
   content: BlocksContent;
-  /** Ordered ids for the level-2/3 headings (from extractToc) — assigned positionally
-   *  so TOC anchors match. Omit on pages without a TOC (headings get no id). */
-  headingIds?: string[];
 }
 
 const HEADING_SIZES: Record<number, string> = {
@@ -26,10 +26,7 @@ const HEADING_SIZES: Record<number, string> = {
 /** Renders a Strapi `blocks` rich-text field as readable prose on the base/glass
  *  surface, styled with the design tokens. First real long-form usage: article
  *  body + project approach/result. */
-export function StrapiBlocks({ content, headingIds }: StrapiBlocksProps) {
-  // Assigns headingIds positionally to level-2/3 headings, matching extractToc's
-  // order. Reset each render; the renderer calls the heading handler in document order.
-  let headingIndex = 0;
+export function StrapiBlocks({ content }: StrapiBlocksProps) {
   return (
     <BlocksRenderer
       content={content}
@@ -39,9 +36,15 @@ export function StrapiBlocks({ content, headingIds }: StrapiBlocksProps) {
             {children}
           </p>
         ),
-        heading: ({ children, level }) => {
+        // `id` is stamped onto the node by withHeadingIds and reaches us through the
+        // renderer's prop spread (same mechanism as `language` on code blocks below).
+        heading: (props) => {
+          const { children, level, id } = props as {
+            children?: ReactNode;
+            level: 1 | 2 | 3 | 4 | 5 | 6;
+            id?: string;
+          };
           const Tag = `h${level}` as const;
-          const id = headingIds && TOC_LEVELS.includes(level) ? headingIds[headingIndex++] : undefined;
           return (
             <Tag
               id={id}
@@ -50,7 +53,7 @@ export function StrapiBlocks({ content, headingIds }: StrapiBlocksProps) {
                 letterSpacing: "-0.02em",
                 lineHeight: 1.25,
                 color: "var(--ink)",
-                ...(id ? { scrollMarginTop: "96px" } : {}),
+                ...(id ? { scrollMarginTop: `${HEADING_SCROLL_OFFSET}px` } : {}),
               }}
             >
               {children}

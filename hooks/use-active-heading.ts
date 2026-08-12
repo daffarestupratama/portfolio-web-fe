@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { TocEntry } from "@/components/blocks/toc";
+import { HEADING_SCROLL_OFFSET, type TocEntry } from "@/components/blocks/toc";
 
-/** Distance below the viewport top (clearing the fixed nav) that counts as "being read". */
-const READING_LINE = 120;
+/** Distance below the viewport top that counts as "being read". Deliberately the same
+ *  constant the headings use for `scroll-margin-top`: clicking an entry parks its heading
+ *  exactly on this line, so the click and the highlight can never disagree. A 1px slack
+ *  absorbs sub-pixel rounding after a smooth scroll. */
+const READING_LINE = HEADING_SCROLL_OFFSET + 1;
 
 /**
  * Scroll-spy for a set of TOC headings, shared by the desktop sidebar and the

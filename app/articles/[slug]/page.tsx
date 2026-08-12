@@ -6,7 +6,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata, mappedImageToOg, notFoundMetadata, SITE_NAME } from "@/lib/seo";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
-import { extractToc } from "@/components/blocks/toc";
+import { withHeadingIds } from "@/components/blocks/toc";
 import { ArticleToc } from "@/components/articles/article-toc";
 import { TocRail } from "@/components/articles/toc-rail";
 import { getRelatedArticles } from "@/components/articles/related-articles";
@@ -49,7 +49,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
   const allArticles = await getAllArticles();
   const related = getRelatedArticles(article, allArticles);
-  const toc = extractToc(article.body);
+  // One pass builds the TOC and stamps the matching ids onto the body's headings, so the
+  // anchors and the links come from the same walk by construction.
+  const { content: bodyWithIds, toc } = withHeadingIds(article.body);
 
   return (
     // Below lg the fixed TocRail occupies the left edge, so the content gets its own
@@ -83,7 +85,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             the row height by default, so sticky has nothing to stick within; but putting
             self-start on the aside and sticky on its child is equally broken — the child
             then sticks inside a box that is only as tall as itself. */}
-        <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
+        {/* `.article-aside` caps the pinned column's height and lets it scroll internally
+            — see globals.css; a no-op while the content fits. */}
+        <aside className="article-aside hidden self-start lg:sticky lg:top-28 lg:block">
           <div className="flex flex-col gap-8">
             <ArticleToc entries={toc} />
 
@@ -169,7 +173,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
           {article.body && (
             <article className="mt-8">
-              <StrapiBlocks content={article.body} headingIds={toc.map((t) => t.id)} />
+              <StrapiBlocks content={bodyWithIds} />
             </article>
           )}
 

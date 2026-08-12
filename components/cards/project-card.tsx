@@ -55,7 +55,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
       <span className="pcard-scrim" aria-hidden="true" />
 
       <div className="pcard-body relative z-[2] flex h-full flex-col justify-end p-4 sm:p-5">
-        <div className="flex items-center justify-between gap-2.5">
+        <div className="pcard-topline flex items-center justify-between gap-2.5">
           <span
             className="badge"
             style={{
@@ -77,15 +77,12 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           </Link>
         </h3>
 
-        {/* Hidden until hover on hover-capable pointers; permanently visible (2 lines) on
-            touch — see .pcard-summary in globals.css. */}
+        {/* Compact tiles take this out of flow and crossfade it with the topline/foot on
+            hover; feature tiles reveal it inline. Hidden on touch — see globals.css. */}
         <p className="pcard-summary text-[13px]" style={{ lineHeight: 1.5, color: "rgba(255,255,255,0.86)" }}>
           {project.summary}
         </p>
 
-        {/* Compact (2×1) tiles hide the tech tiles at rest and reveal them with the
-            summary on hover/tap — see .pcard-tech in globals.css. Feature (2×2) tiles
-            have the height to show them always. */}
         <div className="pcard-foot mt-3 flex items-end justify-between gap-3">
           <div className="pcard-tech min-w-0">
             {project.technologies.length > 0 ? (

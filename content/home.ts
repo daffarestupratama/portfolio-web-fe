@@ -135,9 +135,16 @@ export interface Article {
   readTime: string;
   tags: string[];
   coverImage: MappedImage | null;
-  /** Highlights the article in the /articles list. (The homepage uses the
-   *  home-page `featuredArticles` relation instead, not this flag.) */
+  /** Pins the article to the top of any list it appears in, and highlights the row. */
   isFeatured: boolean;
+}
+
+/** Featured articles float to the top of a list, everything else keeps its place.
+ *  `sort` is stable (guaranteed since ES2019), so the incoming order — newest-first from
+ *  the list query, or the editor's hand-picked relation order on the homepage — survives
+ *  inside each group. Returns a new array; the input is untouched. */
+export function featuredFirst(articles: Article[]): Article[] {
+  return [...articles].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured));
 }
 
 /** All four home-page-derived accessors read the same endpoint — cache() collapses
@@ -179,7 +186,7 @@ export async function getFeaturedTours(): Promise<TourPackage[]> {
 
 export async function getFeaturedArticles(): Promise<Article[]> {
   const raw = await getHomePageRaw();
-  return raw.featuredArticles.map(mapArticle);
+  return featuredFirst(raw.featuredArticles.map(mapArticle));
 }
 
 /** Homepage SEO component (falls back to site-setting.defaultSeo at the call site). */

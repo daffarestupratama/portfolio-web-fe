@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TocEntry } from "@/components/blocks/toc";
 import { useActiveHeading } from "@/hooks/use-active-heading";
 
@@ -15,14 +15,51 @@ import { useActiveHeading } from "@/hooks/use-active-heading";
 export function TocRail({ entries }: { entries: TocEntry[] }) {
   const [open, setOpen] = useState(false);
   const active = useActiveHeading(entries);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  // While expanded the panel is a transient overlay sitting on top of the article, so it
+  // has to dismiss the way one is expected to: a press anywhere else, or Escape. Both hand
+  // focus back to the toggle, otherwise a keyboard user is left focused on a removed node
+  // and their next Tab restarts from the top of the document.
+  useEffect(() => {
+    if (!open) return;
+    // pointerdown, not click: dismiss should feel immediate and must fire even when the
+    // press lands on something that swallows the click.
+    const onPointerDown = (e: PointerEvent) => {
+      if (rootRef.current?.contains(e.target as Node)) return;
+      const hadFocusInside = !!rootRef.current?.contains(document.activeElement);
+      setOpen(false);
+      if (!hadFocusInside) return; // focus was elsewhere already — leave it alone
+      toggleRef.current?.focus();
+      // The browser's own mousedown focus handling runs *after* this listener and hands
+      // focus to whatever was pressed, or clears it to <body> when that was dead space.
+      // Reclaim it only in the latter case, so pressing a real control still wins.
+      setTimeout(() => {
+        if (document.activeElement === document.body) toggleRef.current?.focus();
+      }, 0);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   if (entries.length === 0) return null;
 
   return (
     // Breakpoint hiding lives in the .toc-rail CSS rule, not a `lg:hidden` utility —
     // see the note in globals.css (source order made the utility a no-op here).
-    <div className="toc-rail" data-open={open || undefined}>
+    <div ref={rootRef} className="toc-rail" data-open={open || undefined}>
       <button
+        ref={toggleRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}

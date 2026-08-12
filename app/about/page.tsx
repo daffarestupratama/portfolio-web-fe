@@ -6,6 +6,7 @@ import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { SkillsSection } from "@/components/about/skills-section";
 import { Experiences } from "@/components/sections/experiences";
+import { ContactCTA } from "@/components/sections/contact-cta";
 
 export const revalidate = 86400;
 
@@ -23,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const about = await getAboutPage();
+  const [about, site] = await Promise.all([getAboutPage(), getSiteSettings()]);
 
   return (
     <main className="relative z-[3] pt-28 pb-16 sm:pt-32">
@@ -66,6 +67,11 @@ export default async function AboutPage() {
       <div className="mx-auto w-full max-w-[820px] px-[22px]">
         <SkillsSection groups={about.skillGroups} />
       </div>
+
+      {/* Outside the 820px wrapper: the component centres its own full-width card, the
+          same way it does on the homepage and /services. It renders `id="contact"` and
+          this is the page's only instance, so the anchor stays unique. */}
+      <ContactCTA email={site.email} whatsappUrl={site.whatsappUrl} />
     </main>
   );
 }

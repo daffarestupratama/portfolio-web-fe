@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IndonesiaMap } from "@/lib/geo/indonesia";
 
 const BAR_COUNT = 6;
@@ -18,6 +18,15 @@ const PLUCK_DECAY = 5.5;
 const PLUCK_DURATION_MS = 900;
 const AUTO_PLUCK_MIN_MS = 1000;
 const AUTO_PLUCK_MAX_MS = 2000;
+/** Distinct edges plucked per auto tick. */
+const AUTO_PLUCKS_PER_TICK = 2;
+/** Auto-selection ignores edges shorter than this (viewBox units). The node halos are
+ *  r=11, so ~22 units of every edge are hidden beneath its own endpoints: measured on the
+ *  current network, Semarang–Yogyakarta (17.5) and Jakarta–Bandung (22.8) are covered
+ *  end to end and plucking them reads as nothing happening. The next shortest is
+ *  Semarang–Surabaya at 51, comfortably visible, so 40 splits them cleanly. Direct
+ *  hover/tap still plucks any edge — this only constrains the random picker. */
+const MIN_AUTO_PLUCK_LENGTH = 40;
 
 /** Straight-line path: a quadratic bezier whose control point is the midpoint IS the
  *  straight segment, so the rest state is exact rather than approximated. */
@@ -125,18 +134,39 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
 
   const pluck = useCallback((index: number) => pluckRef.current(index), []);
 
-  // Auto-pluck a random edge every 1–2s so the network reads as alive. Math.random()
-  // only runs in this client timer, never during render, so hydration stays stable.
+  /** Edges long enough to be worth auto-plucking — see MIN_AUTO_PLUCK_LENGTH. */
+  const autoEdges = useMemo(() => {
+    const eligible: number[] = [];
+    map.edges.forEach(([from, to], i) => {
+      const a = map.nodes[from];
+      const b = map.nodes[to];
+      if (!a || !b) return;
+      if (Math.hypot(b.x - a.x, b.y - a.y) >= MIN_AUTO_PLUCK_LENGTH) eligible.push(i);
+    });
+    return eligible;
+  }, [map]);
+
+  // Auto-pluck two edges every 1–2s so the network reads as alive. Math.random() only
+  // runs in this client timer, never during render, so hydration stays stable.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const edgeCount = map.edges.length;
-    if (edgeCount === 0) return;
+    if (autoEdges.length === 0) return;
 
     let timer: ReturnType<typeof setTimeout>;
     const schedule = () => {
       const delay = AUTO_PLUCK_MIN_MS + Math.random() * (AUTO_PLUCK_MAX_MS - AUTO_PLUCK_MIN_MS);
       timer = setTimeout(() => {
-        if (onScreen.current) pluck(Math.floor(Math.random() * edgeCount));
+        if (onScreen.current) {
+          // Partial Fisher–Yates over a copy: draws N *distinct* edges in one pass, where
+          // independent draws could pick the same edge twice and waste half the tick.
+          const pool = autoEdges.slice();
+          const picks = Math.min(AUTO_PLUCKS_PER_TICK, pool.length);
+          for (let i = 0; i < picks; i += 1) {
+            const j = i + Math.floor(Math.random() * (pool.length - i));
+            [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+            pluck(pool[i]!);
+          }
+        }
         schedule();
       }, delay);
     };
@@ -146,7 +176,7 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
       if (frame.current) cancelAnimationFrame(frame.current);
       frame.current = 0;
     };
-  }, [map.edges.length, pluck]);
+  }, [autoEdges, pluck]);
 
   // Animate only while the panel is on screen, and never under reduced motion.
   useEffect(() => {

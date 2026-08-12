@@ -562,20 +562,43 @@ button {
   box-shadow: var(--glass-sh-lg);
 }
 
+/* ---------------- Article sidebar (lg and up) ---------------- */
+
+/* The sidebar is sticky at `top: 7rem`, so anything past the viewport bottom scrolls out
+   of reach for good — the page keeps moving but the pinned aside doesn't. Capping its
+   height turns that overflow into an internal scroll instead. Deliberately unconditional:
+   while the content fits (today's TOC + related list is well under a laptop viewport) a
+   max-height nothing reaches and an `auto` overflow that never triggers are both no-ops,
+   so this costs nothing now and simply absorbs a longer TOC later. The scrollbar is
+   hidden so no gutter appears and the column width never shifts. */
+@media (min-width: 1024px) {
+  .article-aside {
+    max-height: calc(100dvh - 8rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+  }
+  .article-aside::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* ---------------- Article TOC dot rail (narrow viewports) ---------------- */
 
 /* Pinned to the left edge, vertically centred. Collapsed it is a slim column of dots
-   that sits outside the text column; expanded it becomes a labelled panel. */
+   that sits outside the text column; expanded it becomes a labelled panel.
+   Stacked vertically (toggle ABOVE the dots) rather than side by side, so the whole rail
+   is one narrow column and can hug the viewport edge without crowding the text. */
 .toc-rail {
   position: fixed;
   top: 50%;
   left: 6px;
   z-index: 40;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 6px;
   transform: translateY(-50%);
-  max-height: 74dvh;
 }
 /* The breakpoint lives HERE (after the base rule), not on a `lg:hidden` utility:
    `.toc-rail` and Tailwind's `.lg\:hidden` have identical specificity, and this
@@ -629,7 +652,11 @@ button {
   transform: scale(1.7);
 }
 .toc-rail-panel {
-  max-height: 74dvh;
+  /* Left-aligned instead of centred under the 26px toggle, which would push a 168px+
+     panel half off the left edge of the screen. */
+  align-self: flex-start;
+  /* Leaves room for the toggle stacked above it. */
+  max-height: 70dvh;
   overflow-y: auto;
   padding: 10px 12px 10px 8px;
   border-radius: 14px;
@@ -711,32 +738,28 @@ button {
   inset: 0;
   z-index: 1;
 }
-/* Compact (2×1) tiles: progressive disclosure. Only badge + title + Details show at
-   rest; the tech tiles join the summary on hover/focus. Feature (2×2) tiles are tall
-   enough to show the tiles permanently. Chosen over marquee/scrolling text, which hurts
-   readability and is hostile to screen readers and reduced-motion users. */
-@media (hover: hover) {
-  .pcard:not([data-tall]) .pcard-tech {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.28s ease, opacity 0.28s ease;
-  }
-  .pcard:not([data-tall]):hover .pcard-tech,
-  .pcard:not([data-tall]):focus-within .pcard-tech {
-    max-height: 40px;
-    opacity: 1;
+/* Matches the body's own padding, so an absolutely positioned child can sit on the
+   content box — absolute offsets resolve against the PADDING box, which would otherwise
+   put it flush against the border. */
+.pcard-body {
+  --pcard-pad: 16px;
+}
+@media (min-width: 640px) {
+  .pcard-body {
+    --pcard-pad: 20px;
   }
 }
 
-/* The whole card is a navigation target, so tap-to-reveal would fight tapping through.
-   Hover-capable pointers get the summary on hover/focus; touch gets a permanent
-   2-line clamp instead. */
+/* The whole card is a navigation target, so tap-to-reveal would fight tapping through:
+   the summary is a hover/focus affordance only. Base = hidden (also the touch state for
+   compact tiles). */
 .pcard-summary {
   display: none;
 }
+
+/* ----- Feature (2×2) tiles: inline reveal, unchanged ----- */
 @media (hover: hover) {
-  .pcard-summary {
+  .pcard[data-tall] .pcard-summary {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -746,25 +769,64 @@ button {
     opacity: 0;
     transition: max-height 0.28s ease, opacity 0.28s ease, margin-top 0.28s ease;
   }
-  /* Short tiles only have room for ~2 lines; two-row tiles can afford the full 3. */
-  .pcard:hover .pcard-summary,
-  .pcard:focus-within .pcard-summary {
-    max-height: 3.2em;
-    margin-top: 7px;
-    opacity: 1;
-  }
   .pcard[data-tall]:hover .pcard-summary,
   .pcard[data-tall]:focus-within .pcard-summary {
     max-height: 4.8em;
+    margin-top: 7px;
+    opacity: 1;
   }
 }
 @media (hover: none) {
-  .pcard-summary {
+  .pcard[data-tall] .pcard-summary {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
     margin-top: 7px;
+    opacity: 1;
+  }
+}
+
+/* ----- Compact (2×1) tiles: rest ⇄ hover crossfade -----
+   Rest shows the metadata (badge + year, title, tech tiles, Details); hover shows the
+   title + summary. Strictly opacity — the faded elements keep their boxes and the summary
+   is taken out of flow, so nothing shifts or reflows during the swap. It lands in the
+   band the foot vacates, which is why it clamps to 2 lines: three would reach back up
+   into the title. Touch pointers get no swap at all and keep the rest state permanently
+   (the summary is one tap away on the detail page). */
+@media (hover: hover) {
+  .pcard:not([data-tall]) .pcard-topline,
+  .pcard:not([data-tall]) .pcard-foot {
+    transition: opacity 0.28s ease;
+  }
+  .pcard:not([data-tall]):hover .pcard-topline,
+  .pcard:not([data-tall]):focus-within .pcard-topline,
+  .pcard:not([data-tall]):hover .pcard-foot,
+  .pcard:not([data-tall]):focus-within .pcard-foot {
+    opacity: 0;
+  }
+  /* Keyboard focus can land on the Details link inside the foot; it must stay visible
+     when it does. Same specificity as the rule above, so source order decides — this one
+     has to come after it. */
+  .pcard:not([data-tall]) .pcard-foot:focus-within {
+    opacity: 1;
+  }
+
+  .pcard:not([data-tall]) .pcard-summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    position: absolute;
+    left: var(--pcard-pad);
+    right: var(--pcard-pad);
+    bottom: var(--pcard-pad);
+    margin: 0;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+  .pcard:not([data-tall]):hover .pcard-summary,
+  .pcard:not([data-tall]):focus-within .pcard-summary {
     opacity: 1;
   }
 }

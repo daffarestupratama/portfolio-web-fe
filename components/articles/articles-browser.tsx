@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { Article, ArticleLanguage } from "@/content/home";
+import { featuredFirst, type Article, type ArticleLanguage } from "@/content/home";
 import { ArticleListItem } from "@/components/articles/article-list-item";
 import { TerminalIcon } from "@/components/ui/icons";
 
@@ -43,11 +43,15 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
 
   const showLanguageFilter = languages.length > 1;
 
-  const filtered = articles.filter(
-    (a) =>
-      (category === ALL || a.category === category) &&
-      (language === ALL || a.language === language) &&
-      (tag === null || a.tags.includes(tag)),
+  // Featured first, applied AFTER filtering so a narrowed list still leads with whatever
+  // featured articles survived the filter (rather than dropping the pinning entirely).
+  const filtered = featuredFirst(
+    articles.filter(
+      (a) =>
+        (category === ALL || a.category === category) &&
+        (language === ALL || a.language === language) &&
+        (tag === null || a.tags.includes(tag)),
+    ),
   );
 
   return (
