@@ -14,8 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Vendored Claude Design export support scripts — not app source.
     "design-export/**",
-    // .open_next/ and .wrangler/ folders are used by Open Next to store temporary files for the app. They should not be linted.
-    ".open_next/**",
+    // .open-next/ and .wrangler/ folders are used by Open Next to store temporary files for the app. They should not be linted.
+    ".open-next/**",
     ".wrangler/**",
   ]),
 ]);
