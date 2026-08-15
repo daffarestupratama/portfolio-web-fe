@@ -17,6 +17,18 @@
       "bucket_name": "portfolio-web-fe-cache",
     },
   ],
+  // Tag cache — backs revalidatePath()/revalidateTag() (see app/api/revalidate).
+  // The binding NAME is fixed by the adapter (BINDING_NAME in
+  // overrides/tag-cache/d1-next-tag-cache.js) and is looked up by name again during
+  // `opennextjs-cloudflare deploy`, which creates the `revalidations` table itself.
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "portfolio-web-fe-tags",
+      // Only read at deploy time — `next build` does not need it.
+      "database_id": "314b90c3-f99a-4f0e-89c1-1305fac0b36b",
+    },
+  ],
   // Self-reference used by the R2 cache and by memoryQueue to trigger background
   // ISR revalidation. "service" must match this Worker's own "name" above.
   "services": [
