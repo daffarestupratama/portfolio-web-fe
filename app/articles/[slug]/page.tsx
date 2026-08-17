@@ -138,41 +138,83 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             All articles
           </Link>
 
-          <div className="mt-5 flex flex-wrap items-center gap-2.5">
-            <span
-              className="badge"
-              style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
+          {/* One coherent header block: cover → title → standfirst → byline, closed off by
+              a rule. Without the divider the metadata ran straight into the prose and the
+              page read as one undifferentiated column. */}
+          <header className="mb-8 border-b pb-6" style={{ borderColor: "var(--border)" }}>
+            <CoverImage
+              image={article.coverImage}
+              variant="article"
+              label={`${article.title} cover`}
+              className="mt-5 aspect-[16/9] w-full"
+              sizes="(max-width: 860px) 100vw, 820px"
+              priority
+            />
+
+            <h1
+              className="mt-6 font-bold"
+              style={{ fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-0.03em" }}
             >
-              {article.category}
-            </span>
-            <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
-              {article.language.toUpperCase()}
-            </span>
-            <span className="mono text-[12px]" style={{ color: "var(--ink-faint)" }}>
-              {article.publishedDate} · {article.readTime}
-            </span>
-          </div>
+              {article.title}
+            </h1>
 
-          <h1 className="mt-3 font-bold" style={{ fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-0.03em" }}>
-            {article.title}
-          </h1>
-          {article.excerpt && (
-            <p className="mt-4 text-[16px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-              {article.excerpt}
-            </p>
-          )}
+            {/* Standfirst: sits with the title rather than the body, so the header reads as
+                one unit and the divider lands after the metadata. */}
+            {article.excerpt && (
+              <p className="mt-4 text-[16px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
+                {article.excerpt}
+              </p>
+            )}
 
-          <CoverImage
-            image={article.coverImage}
-            variant="article"
-            label={`${article.title} cover`}
-            className="mt-6 aspect-[16/9] w-full"
-            sizes="(max-width: 860px) 100vw, 820px"
-            priority
-          />
+            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2.5">
+              <span className="flex items-center gap-2">
+                {/* Monogram rather than the about-page photo: that would add a third Strapi
+                    fetch to every article render and couple this page to another endpoint's
+                    availability, for a 26px decoration. */}
+                <span
+                  aria-hidden="true"
+                  className="flex h-[26px] w-[26px] shrink-0 items-center justify-center text-[12px] font-bold"
+                  style={{
+                    borderRadius: 999,
+                    background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+                    color: "#fff",
+                  }}
+                >
+                  D
+                </span>
+                {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
+                    the visible byline and the structured data cannot drift apart. */}
+                <Link
+                  href="/about"
+                  className="text-[13.5px] font-semibold underline-offset-4 transition-colors hover:text-(--accent-ink) hover:underline"
+                >
+                  {SITE_NAME}
+                </Link>
+              </span>
+
+              <span aria-hidden="true" style={{ color: "var(--ink-faint)" }}>
+                ·
+              </span>
+              <span className="mono text-[12px]" style={{ color: "var(--ink-faint)" }}>
+                {article.publishedDate} · {article.readTime}
+              </span>
+
+              <span className="ml-auto flex flex-wrap items-center gap-2">
+                <span
+                  className="badge"
+                  style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
+                >
+                  {article.category}
+                </span>
+                <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
+                  {article.language.toUpperCase()}
+                </span>
+              </span>
+            </div>
+          </header>
 
           {article.body && (
-            <article className="mt-8">
+            <article>
               <StrapiBlocks content={bodyWithIds} />
             </article>
           )}

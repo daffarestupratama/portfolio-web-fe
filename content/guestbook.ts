@@ -51,7 +51,9 @@ function mapGuestbookMessage(m: StrapiGuestbookMessage): GuestbookMessage {
     message: m.message,
     category: m.category ?? "other",
     categoryLabel: categoryLabel(m.category ?? "other"),
-    date: formatDate(m.submittedAt ?? m.createdAt),
+    // Same field the list is sorted on (see GUESTBOOK_MESSAGES_QUERY), so the displayed
+    // date and the ordering can never disagree.
+    date: formatDate(m.createdAt),
     isPinned: Boolean(m.isPinned),
     reply: m.reply || null,
   };

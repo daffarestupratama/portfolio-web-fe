@@ -351,7 +351,6 @@ export interface StrapiGuestbookMessage {
   message: string;
   displayName: string | null;
   isAnonymous: boolean | null;
-  isVisible: boolean | null;
   isPinned: boolean | null;
   category: string | null;
   submittedAt: string | null;

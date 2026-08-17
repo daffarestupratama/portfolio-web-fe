@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isGuestbookCategory } from "@/content/guestbook";
 
 export const runtime = "nodejs";
@@ -90,8 +91,8 @@ export async function POST(req: Request) {
           // Auto-publish: submissions are created visible and appear immediately.
           // (Verified live: token-created entries are published, so the public find
           // returns them right away. Honeypot + rate limit remain the spam guard.)
+          // `moderationStatus` alone governs visibility — see GUESTBOOK_MESSAGES_QUERY.
           moderationStatus: "visible",
-          isVisible: true,
           submittedAt: new Date().toISOString(),
         },
       }),
@@ -102,6 +103,12 @@ export async function POST(req: Request) {
       console.error(`Guestbook create failed: ${res.status} ${res.statusText}`);
       return bad("Could not submit your message. Please try again later.", 502);
     }
+
+    // Expire the ISR entry in THIS request, before the response is sent. The Strapi webhook
+    // would eventually do the same, but it races the browser — so the router.refresh() the
+    // client fires on success would otherwise be served the 5-minute-cached list without
+    // the message that was just written.
+    revalidatePath("/guestbook");
 
     return NextResponse.json({ ok: true });
   } catch (err) {

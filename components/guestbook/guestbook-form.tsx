@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 // UI options for the category select. Values match Strapi's `category` enum; the
@@ -38,8 +39,17 @@ export function GuestbookForm() {
   const [showValidation, setShowValidation] = useState(false);
 
   const ids = useId();
+  const router = useRouter();
   const trimmed = message.trim();
   const messageInvalid = trimmed.length < MESSAGE_MIN || trimmed.length > MESSAGE_MAX;
+
+  function resetFields() {
+    setMessage("");
+    setDisplayName("");
+    setIsAnonymous(false);
+    setCategory("feedback");
+    setShowValidation(false);
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,6 +68,12 @@ export function GuestbookForm() {
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (res.ok && data.ok) {
         setStatus("success");
+        resetFields();
+        // Re-render the server tree for this route so the new message appears in the list
+        // immediately. The route handler has already expired the ISR entry, so this gets a
+        // fresh render rather than the cached one; client state (this success card)
+        // survives, so there is no reload and no flash.
+        router.refresh();
       } else {
         setStatus("error");
         setError(data.error || "Something went wrong. Please try again.");
@@ -80,14 +96,7 @@ export function GuestbookForm() {
           </p>
           <button
             type="button"
-            onClick={() => {
-              setStatus("idle");
-              setMessage("");
-              setDisplayName("");
-              setIsAnonymous(false);
-              setCategory("feedback");
-              setShowValidation(false);
-            }}
+            onClick={() => setStatus("idle")}
             className="glass-pill mt-5 px-5 py-2.5 text-[13.5px] font-semibold"
           >
             Write another
@@ -204,8 +213,10 @@ export function GuestbookForm() {
             {status === "submitting" ? "Sending…" : "Sign the guestbook"}
             {status !== "submitting" && <ArrowRightIcon />}
           </button>
+          {/* Submissions auto-publish, so the old "Reviewed before it appears" contradicted
+              both the success card and the page header. */}
           <span className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
-            Reviewed before it appears.
+            Appears in the list right away.
           </span>
         </div>
       </div>

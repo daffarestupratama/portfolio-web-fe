@@ -87,12 +87,20 @@ export const ABOUT_PAGE_QUERY =
 
 /** Visible, approved guestbook messages: pinned first, then newest.
  *  createdAt is the reliable tiebreaker since admin-added rows can have submittedAt=null. */
+/**
+ * `moderationStatus` is the single source of truth for visibility — the old companion
+ * `isVisible` filter was redundant (the two agreed on every row) and doubled the ways to
+ * get it wrong.
+ *
+ * Sorted on `createdAt`, NOT `submittedAt`: the latter is null on older rows, and Postgres
+ * orders nulls FIRST on a DESC sort, so those floated above genuinely newer messages while
+ * the `createdAt` tiebreaker only ever applied within an equal `submittedAt`. `createdAt`
+ * is always populated and within a second of `submittedAt` wherever both exist.
+ */
 export const GUESTBOOK_MESSAGES_QUERY =
   "filters[moderationStatus][$eq]=visible" +
-  "&filters[isVisible][$eq]=true" +
   "&sort[0]=isPinned:desc" +
-  "&sort[1]=submittedAt:desc" +
-  "&sort[2]=createdAt:desc" +
+  "&sort[1]=createdAt:desc" +
   "&pagination[pageSize]=100";
 
 export const SERVICE_PAGE_QUERY =
