@@ -326,6 +326,18 @@ button {
   color: var(--ink-dim);
 }
 
+/* "Read" affordance on article cards. Shared by ArticleListItem and ArticleCard so the two
+   can't drift. Underlines on hover AND :focus-visible — a keyboard user gets the same
+   signal that this is a link, not just the focus ring. */
+.read-link {
+  text-decoration: none;
+}
+.read-link:hover,
+.read-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ---------------- Hero data-viz panel (map + decorative charts) ---------------- */
 
 /* Coastline from the real province GeoJSON — subtle in both themes. */
@@ -406,6 +418,18 @@ button {
   color: var(--bg);
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
 }
+/* Below `sm` the chart row collapses to one column and the throughput card would go
+   full-bleed. With a fixed 120×34 viewBox that takes its height from ~W/5.9 to ~W/3.5 —
+   against a map of aspect 2.72 the chart jumps from ~46% to ~77% of the map's height, i.e.
+   1.7× its intended weight, for a decorative element carrying no information.
+   61% is not a guess: it's 1.55/2.55, the card's exact share of the `[1.55fr_1fr]` row at
+   `sm` and up, so the mobile composition reproduces the desktop one. */
+@media (max-width: 639px) {
+  .hero-chart-card {
+    max-width: 61%;
+  }
+}
+
 /* Bars grow from their bottom edge via scaleY — transitioning the SVG y/height
    geometry properties is not reliable across browsers (Safari notably ignores it). */
 .hero-bar {
@@ -651,6 +675,37 @@ button {
   background: rgba(230, 237, 243, 0.45);
 }
 
+/* ---------------- /articles filter controls ---------------- */
+
+/* Below `lg` the sidebar stacked above the list, so the title was followed by category
+   buttons, a language row, every tag and a recent-articles list before the first article.
+   Same markup, two behaviours: a collapsible panel behind a Filter button on narrow
+   viewports, the always-visible right column from `lg` up.
+
+   Plain CSS rather than `lg:hidden` / `lg:block` utilities: this stylesheet is emitted
+   after `@import "tailwindcss"`, so a same-specificity utility loses on source order —
+   the exact trap that made `.toc-rail` render at every width. */
+.articles-filter-bar {
+  display: flex;
+}
+.articles-filters {
+  display: none;
+}
+.articles-filters[data-open] {
+  display: block;
+}
+@media (min-width: 1024px) {
+  .articles-filter-bar {
+    display: none;
+  }
+  /* Both selectors listed so this matches the specificity of `[data-open]` above and wins
+     on source order — no !important needed. */
+  .articles-filters,
+  .articles-filters[data-open] {
+    display: block;
+  }
+}
+
 /* ---------------- Article sidebar (lg and up) ---------------- */
 
 /* The sidebar is sticky at `top: 7rem`, so anything past the viewport bottom scrolls out
@@ -770,6 +825,15 @@ button {
   .bento .pcard {
     aspect-ratio: auto;
   }
+}
+/* The whole tile is one link target, so the overlay text must not be selectable: dragging
+   across it used to start a text selection and flicker the cursor between the I-beam and
+   the pointer. Scoped to the overlay only — article prose and code blocks stay selectable. */
+.pcard {
+  cursor: pointer;
+}
+.pcard-body {
+  user-select: none;
 }
 .pcard-cover {
   transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);

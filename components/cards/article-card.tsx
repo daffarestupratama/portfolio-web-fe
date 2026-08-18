@@ -51,7 +51,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           <span>{article.readTime}</span>
           <Link
             href={`/articles/${article.slug}`}
-            className="mono ml-auto inline-flex items-center gap-1 font-medium transition-colors hover:text-(--accent-ink)"
+            className="read-link mono ml-auto inline-flex items-center gap-1 font-medium transition-colors hover:text-(--accent-ink)"
             style={{ color: "var(--ink-dim)" }}
           >
             Read

@@ -79,52 +79,19 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
       <div className="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12">
         {/* Sidebar — FIRST in DOM so it sits to the LEFT of the content at lg, anchored
-            while scrolling. Hidden below lg, where TocRail takes over and the related
-            articles move to the bottom of the page. */}
+            while scrolling. Hidden below lg, where TocRail takes over.
+            Carries the TOC and nothing else: related articles used to live down here, in
+            the internally-scrolled region below the fold, where nobody found them — they
+            now have a full-width section after the body. */}
         {/* `self-start` + `sticky` must be on the SAME element. A grid item stretches to
             the row height by default, so sticky has nothing to stick within; but putting
             self-start on the aside and sticky on its child is equally broken — the child
             then sticks inside a box that is only as tall as itself. */}
         {/* `.article-aside` caps the pinned column's height and lets it scroll internally
-            — see globals.css; a no-op while the content fits. */}
+            — see globals.css. Inert for today's TOC lengths, but still the guard that keeps
+            a long TOC reachable on a short viewport. */}
         <aside className="article-aside hidden self-start lg:sticky lg:top-28 lg:block">
-          <div className="flex flex-col gap-8">
-            <ArticleToc entries={toc} />
-
-            {related.length > 0 && (
-              <section aria-label="Related articles">
-                <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
-                  Related articles
-                </div>
-                <ul className="flex flex-col gap-3">
-                  {related.map((a) => (
-                    <li key={a.id}>
-                      <Link href={`/articles/${a.slug}`} className="group block">
-                        <span
-                          className="block text-[13.5px] font-semibold transition-colors group-hover:text-(--accent-ink)"
-                          style={{ lineHeight: 1.35 }}
-                        >
-                          {a.title}
-                        </span>
-                        <span className="mono mt-0.5 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
-                          {a.category} · {a.publishedDate}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            <Link
-              href="/articles"
-              className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-              style={{ color: "var(--ink-dim)" }}
-            >
-              <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-              Back to all articles
-            </Link>
-          </div>
+          <ArticleToc entries={toc} />
         </aside>
 
         {/* Article content */}
@@ -245,14 +212,15 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
       </div>
 
-      {/* Narrow viewports only: related articles live at the very bottom, after the
-          article content (the lg sidebar carries them otherwise). */}
+      {/* The ONE related-articles surface, at every breakpoint: full width, outside the
+          grid, after the body and after Related projects — the point at which someone has
+          finished reading and is looking for what's next. */}
       {related.length > 0 && (
-        <section aria-label="Related articles" className="mt-12 lg:hidden">
+        <section aria-label="Related articles" className="mt-12">
           <h2 className="mb-4 text-[20px] font-bold" style={{ letterSpacing: "-0.02em" }}>
             Related articles
           </h2>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((a) => (
               <li key={a.id} className="glass-card p-4" style={{ borderRadius: 16 }}>
                 <Link href={`/articles/${a.slug}`} className="group relative z-[2] block">

@@ -185,14 +185,27 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let timer: ReturnType<typeof setInterval> | null = null;
+    let firstFrame = 0;
+    const tick = () => {
+      setBars(randomBars());
+      setSlices(randomSlices());
+    };
     const start = () => {
       if (timer) return;
-      timer = setInterval(() => {
-        setBars(randomBars());
-        setSlices(randomSlices());
-      }, TICK_MS);
+      // setInterval only fires its FIRST callback after a whole period, so with a 2.6s tick
+      // the charts sat frozen for ~3s after load while the map was already animating. Fire
+      // one tick straight away — through rAF, so the deterministic initial values have been
+      // painted and the CSS transition animates instead of snapping to the new values.
+      // `start()` early-returns while a timer exists, so this runs once per becoming-visible
+      // rather than on every observer callback.
+      firstFrame = requestAnimationFrame(tick);
+      timer = setInterval(tick, TICK_MS);
     };
     const stop = () => {
+      if (firstFrame) {
+        cancelAnimationFrame(firstFrame);
+        firstFrame = 0;
+      }
       if (!timer) return;
       clearInterval(timer);
       timer = null;
@@ -330,8 +343,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
 
       {/* ---------- Charts (decorative — deliberately unlabelled) ---------- */}
       <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1.55fr_1fr]">
+        {/* `.hero-chart-card` caps the width below sm so the chart keeps the same visual
+            weight relative to the map that it has on desktop — see globals.css. */}
         <div
-          className="px-3 py-2.5"
+          className="hero-chart-card px-3 py-2.5"
           style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
         >
           <div className="mono mb-1.5 text-[10px] tracking-[0.14em] uppercase" style={{ color: "var(--ink-faint)" }}>

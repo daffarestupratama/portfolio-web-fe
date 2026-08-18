@@ -94,21 +94,35 @@ export function StrapiBlocks({ content }: StrapiBlocksProps) {
           const width = image.width || 1200;
           const height = image.height || 675;
           const caption = image.caption?.trim();
+          // `fill` inside a box that states the intrinsic aspect ratio, rather than
+          // width/height + `height: auto`.
+          // next/image warns when exactly ONE rendered dimension differs from the declared
+          // attribute, and the 760px cap could clamp an image only a pixel or two wider —
+          // moving the width by 1px while the height's sub-pixel change snapped back to its
+          // declared value. `width:"100%"/height:"auto"` (Next's own suggested remedy)
+          // cannot fix that, because the cause is pixel rounding, not a missing style. With
+          // `fill` there are no width/height attributes at all, so the check cannot fire for
+          // any image at any width, and the ratio is declared explicitly instead of being
+          // inferred — which also removes the load-time layout shift.
           return (
             <figure className="mt-6 mb-2">
-              <div className="mx-auto overflow-hidden" style={{ borderRadius: 15, maxWidth: Math.min(width, 760) }}>
+              <div
+                className="relative mx-auto overflow-hidden"
+                style={{ borderRadius: 15, maxWidth: Math.min(width, 760), aspectRatio: `${width} / ${height}` }}
+              >
                 <StrapiImage
                   src={strapiImageUrl(image.url)}
                   alt={image.alternativeText || ""}
-                  width={width}
-                  height={height}
+                  fill
                   sizes="(max-width: 768px) 100vw, 760px"
-                  style={{ width: "100%", height: "auto", display: "block" }}
+                  // Identical to `cover` while the box carries the true ratio, but it can
+                  // never crop if a CMS record's stored dimensions are slightly off.
+                  style={{ objectFit: "contain" }}
                   fallback={
                     <MediaPlaceholder
                       variant="article"
                       label={image.alternativeText || "image"}
-                      className="aspect-video w-full"
+                      className="absolute inset-0 h-full w-full"
                     />
                   }
                 />
