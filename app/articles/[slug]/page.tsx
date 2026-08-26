@@ -53,10 +53,79 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   // anchors and the links come from the same walk by construction.
   const { content: bodyWithIds, toc } = withHeadingIds(article.body);
 
+  // Most articles have no headings at all (4 of 5 at the time of writing), which left the
+  // sidebar rendering as an empty 260px column that shoved the body off-centre. When there
+  // is no TOC to put there, the related content moves INTO the sidebar to fill it — and out
+  // of its usual place below the body, so neither block is ever rendered twice.
+  const hasToc = toc.length > 0;
+  const hasRelated = article.relatedProjects.length > 0 || related.length > 0;
+  const relatedInSidebar = !hasToc && hasRelated;
+  const hasSidebar = hasToc || relatedInSidebar;
+
+  // Built once each and rendered in exactly ONE place — either the sidebar or the usual
+  // spot below the body — so there is structurally no duplicate to CSS-hide.
+  const relatedProjectsBlock =
+    article.relatedProjects.length > 0 ? (
+      <section aria-label="Related projects">
+        <h2
+          className={`mb-3 font-bold ${relatedInSidebar ? "text-[20px]" : "mt-10 text-[22px]"}`}
+          style={{ letterSpacing: "-0.02em" }}
+        >
+          Related projects
+        </h2>
+        {/* One column in the narrow sidebar; outside a .bento grid ProjectCard keeps its
+            16/10 ratio, so it becomes a compact ~260×162 cover tile there. */}
+        <div className={`grid grid-cols-1 gap-[18px] sm:grid-cols-2 ${relatedInSidebar ? "lg:grid-cols-1" : ""}`}>
+          {article.relatedProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      </section>
+    ) : null;
+
+  const relatedArticlesBlock =
+    related.length > 0 ? (
+      <section aria-label="Related articles" className={relatedInSidebar ? undefined : "mt-12"}>
+        <h2 className="mb-4 text-[20px] font-bold" style={{ letterSpacing: "-0.02em" }}>
+          Related articles
+        </h2>
+        <ul className={`grid grid-cols-1 gap-3 sm:grid-cols-2 ${relatedInSidebar ? "lg:grid-cols-1" : "lg:grid-cols-4"}`}>
+          {related.map((a) => (
+            <li key={a.id} className="glass-card p-4" style={{ borderRadius: 16 }}>
+              <Link href={`/articles/${a.slug}`} className="group relative z-[2] block">
+                <span
+                  className="block text-[14px] font-semibold transition-colors group-hover:text-(--accent-ink)"
+                  style={{ lineHeight: 1.35 }}
+                >
+                  {a.title}
+                </span>
+                <span className="mono mt-1 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
+                  {a.category} · {a.publishedDate}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Link
+          href="/articles"
+          className="mono mt-5 inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
+          style={{ color: "var(--ink-dim)" }}
+        >
+          <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+          Back to all articles
+        </Link>
+      </section>
+    ) : null;
+
   return (
-    // Below lg the fixed TocRail occupies the left edge, so the content gets its own
-    // gutter there — the rail sits in that space and never overlaps the text.
-    <main className="relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 max-lg:pl-[58px] sm:pt-32">
+    // The left gutter exists only to clear the fixed TocRail, so it is applied only when
+    // that rail actually renders. 44px puts the text ~22px from the dots' right edge,
+    // matching the right margin, while still clearing the wider toggle box by 12px.
+    <main
+      className={`relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 sm:pt-32 ${
+        hasToc ? "max-lg:pl-[44px]" : ""
+      }`}
+    >
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
@@ -77,22 +146,39 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       {/* Narrow viewports: the sidebar is replaced by a fixed dot rail on the left edge. */}
       <TocRail entries={toc} />
 
-      <div className="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12">
-        {/* Sidebar — FIRST in DOM so it sits to the LEFT of the content at lg, anchored
-            while scrolling. Hidden below lg, where TocRail takes over.
-            Carries the TOC and nothing else: related articles used to live down here, in
-            the internally-scrolled region below the fold, where nobody found them — they
-            now have a full-width section after the body. */}
+      {/* Flex below lg so the aside can be ordered AFTER the content when it carries the
+          related blocks; grid from lg up, where `lg:order-first` puts it back in column 1.
+          With no sidebar at all the wrapper stays a plain block so the body centres. */}
+      <div
+        className={
+          hasSidebar ? "flex flex-col gap-12 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12" : undefined
+        }
+      >
+        {/* Sidebar — anchored while scrolling. With a TOC it is hidden below lg, where
+            TocRail takes over; carrying the related blocks instead it stays visible at every
+            width, sitting below the body when stacked. */}
         {/* `self-start` + `sticky` must be on the SAME element. A grid item stretches to
             the row height by default, so sticky has nothing to stick within; but putting
             self-start on the aside and sticky on its child is equally broken — the child
             then sticks inside a box that is only as tall as itself. */}
         {/* `.article-aside` caps the pinned column's height and lets it scroll internally
-            — see globals.css. Inert for today's TOC lengths, but still the guard that keeps
-            a long TOC reachable on a short viewport. */}
-        <aside className="article-aside hidden self-start lg:sticky lg:top-28 lg:block">
-          <ArticleToc entries={toc} />
-        </aside>
+            — see globals.css. Load-bearing for the 31-entry TOC on the Odoo article. */}
+        {hasSidebar && (
+          <aside
+            className={`article-aside self-start lg:sticky lg:top-28 ${
+              relatedInSidebar ? "order-last flex flex-col gap-8 lg:order-first" : "hidden lg:block"
+            }`}
+          >
+            {hasToc ? (
+              <ArticleToc entries={toc} />
+            ) : (
+              <>
+                {relatedProjectsBlock}
+                {relatedArticlesBlock}
+              </>
+            )}
+          </aside>
+        )}
 
         {/* Article content */}
         <div className="min-w-0">
@@ -196,57 +282,14 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
-          {article.relatedProjects.length > 0 && (
-            <section>
-              <h2 className="mt-10 mb-3 text-[22px] font-bold" style={{ letterSpacing: "-0.02em" }}>
-                Related projects
-              </h2>
-              <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2">
-                {article.relatedProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-            </section>
-          )}
+          {!relatedInSidebar && relatedProjectsBlock}
         </div>
 
       </div>
 
-      {/* The ONE related-articles surface, at every breakpoint: full width, outside the
-          grid, after the body and after Related projects — the point at which someone has
-          finished reading and is looking for what's next. */}
-      {related.length > 0 && (
-        <section aria-label="Related articles" className="mt-12">
-          <h2 className="mb-4 text-[20px] font-bold" style={{ letterSpacing: "-0.02em" }}>
-            Related articles
-          </h2>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((a) => (
-              <li key={a.id} className="glass-card p-4" style={{ borderRadius: 16 }}>
-                <Link href={`/articles/${a.slug}`} className="group relative z-[2] block">
-                  <span
-                    className="block text-[14px] font-semibold transition-colors group-hover:text-(--accent-ink)"
-                    style={{ lineHeight: 1.35 }}
-                  >
-                    {a.title}
-                  </span>
-                  <span className="mono mt-1 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
-                    {a.category} · {a.publishedDate}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <Link
-            href="/articles"
-            className="mono mt-5 inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-            style={{ color: "var(--ink-dim)" }}
-          >
-            <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-            Back to all articles
-          </Link>
-        </section>
-      )}
+      {/* Full width, outside the grid, after the body and after Related projects — the point
+          at which someone has finished reading. Suppressed when the sidebar carries it. */}
+      {!relatedInSidebar && relatedArticlesBlock}
     </main>
   );
 }
