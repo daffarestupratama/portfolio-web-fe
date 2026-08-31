@@ -106,7 +106,7 @@ body {
 /* Component recipes — the export drives hover/active state via per-element */
 /* `style-hover`/`style-active` props (a Claude-Design-only mechanism).     */
 /* These classes port the same values to real CSS so :hover/:active work.  */
-/* One-off, single-instance surfaces (eyebrow badge, footer bar, stat      */
+/* One-off, single-instance surfaces (footer bar, stat                     */
 /* mini-cards, the hero graph card) are styled inline at their call site   */
 /* instead of going through a shared class.                                */
 /* ---------------------------------------------------------------------- */
@@ -418,16 +418,15 @@ button {
   color: var(--bg);
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
 }
-/* Below `sm` the chart row collapses to one column and the throughput card would go
-   full-bleed. With a fixed 120×34 viewBox that takes its height from ~W/5.9 to ~W/3.5 —
-   against a map of aspect 2.72 the chart jumps from ~46% to ~77% of the map's height, i.e.
-   1.7× its intended weight, for a decorative element carrying no information.
-   61% is not a guess: it's 1.55/2.55, the card's exact share of the `[1.55fr_1fr]` row at
-   `sm` and up, so the mobile composition reproduces the desktop one. */
-@media (max-width: 639px) {
-  .hero-chart-card {
-    max-width: 61%;
-  }
+/* The donut is fixed at 76px on desktop, which is comfortable inside its ~211px card but
+   would nearly fill the ~105px card at 320px. A percentage of the card makes it shrink with
+   the panel exactly as the bar chart does, and the cap holds it at the previous desktop
+   size from ~510px viewport upward — so wide layouts are pixel-identical to before.
+   (The bar card's 60.8% share now comes from the grid track itself, so the max-width cap
+   that used to live here is gone: it would have compounded to ~37% of the panel.) */
+.hero-donut {
+  width: 46%;
+  max-width: 76px;
 }
 
 /* Bars grow from their bottom edge via scaleY — transitioning the SVG y/height

@@ -71,7 +71,12 @@ export default async function AboutPage() {
       {/* Outside the 820px wrapper: the component centres its own full-width card, the
           same way it does on the homepage and /services. It renders `id="contact"` and
           this is the page's only instance, so the anchor stays unique. */}
-      <ContactCTA email={site.email} whatsappUrl={site.whatsappUrl} />
+      <ContactCTA
+        email={site.email}
+        whatsappUrl={site.whatsappUrl}
+        heading={site.contactCta.heading}
+        description={site.contactCta.text}
+      />
     </main>
   );
 }

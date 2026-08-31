@@ -45,7 +45,14 @@ export default async function Home() {
       <Projects projects={projects} />
       {FEATURES.tours && <Tours tours={tours} />}
       <Writing articles={articles} />
-      <ContactCTA email={site.email} whatsappUrl={site.whatsappUrl} />
+      {/* Copy from site-setting.contactCta; ContactCTA falls back to its own defaults when
+          a field is blank. `site` is already loaded here, so this costs no extra request. */}
+      <ContactCTA
+        email={site.email}
+        whatsappUrl={site.whatsappUrl}
+        heading={site.contactCta.heading}
+        description={site.contactCta.text}
+      />
     </>
   );
 }

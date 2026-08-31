@@ -11,10 +11,27 @@ import { ArticleToc } from "@/components/articles/article-toc";
 import { TocRail } from "@/components/articles/toc-rail";
 import { getRelatedArticles } from "@/components/articles/related-articles";
 import { CoverImage } from "@/components/ui/cover-image";
+import { StrapiImage } from "@/components/ui/strapi-image";
 import { ProjectCard } from "@/components/cards/project-card";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 export const revalidate = 3600;
+
+/** Byline stand-in when no avatar is set, or when the image fails to load. */
+function AuthorMonogram() {
+  return (
+    <span
+      className="flex h-full w-full items-center justify-center text-[12px] font-bold"
+      style={{
+        borderRadius: 999,
+        background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+        color: "#fff",
+      }}
+    >
+      D
+    </span>
+  );
+}
 
 export async function generateStaticParams() {
   const slugs = await getArticleSlugs();
@@ -48,6 +65,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   if (!article) notFound();
 
   const allArticles = await getAllArticles();
+  // Deduped with the identical call in generateMetadata above by React cache(), so this
+  // adds no Strapi request — measured, see the byline note below.
+  const site = await getSiteSettings();
   const related = getRelatedArticles(article, allArticles);
   // One pass builds the TOC and stamps the matching ids onto the body's headings, so the
   // anchors and the links come from the same walk by construction.
@@ -221,19 +241,30 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
             <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2.5">
               <span className="flex items-center gap-2">
-                {/* Monogram rather than the about-page photo: that would add a third Strapi
-                    fetch to every article render and couple this page to another endpoint's
-                    availability, for a 26px decoration. */}
-                <span
-                  aria-hidden="true"
-                  className="flex h-[26px] w-[26px] shrink-0 items-center justify-center text-[12px] font-bold"
-                  style={{
-                    borderRadius: 999,
-                    background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
-                    color: "#fff",
-                  }}
-                >
-                  D
+                {/* The real photo from site-setting.authorAvatar — free, because
+                    generateMetadata above already loads site-setting and React cache()
+                    dedupes the two calls into one request. The monogram stays as the
+                    fallback: StrapiImage swaps to it on load error as well as when the
+                    field is empty.
+                    aria-hidden because the author's name sits immediately beside it — the
+                    byline should be announced once, not twice. */}
+                <span aria-hidden="true" className="flex h-[26px] w-[26px] shrink-0">
+                  {site.authorAvatar ? (
+                    <StrapiImage
+                      src={site.authorAvatar.url}
+                      alt=""
+                      // Declared 26×26 rather than the intrinsic size: the rendered box then
+                      // matches the attributes on both axes, so next/image's
+                      // "one dimension modified" warning cannot fire whatever the source
+                      // ratio, and reserving the exact box means no layout shift.
+                      width={26}
+                      height={26}
+                      style={{ borderRadius: 999, objectFit: "cover" }}
+                      fallback={<AuthorMonogram />}
+                    />
+                  ) : (
+                    <AuthorMonogram />
+                  )}
                 </span>
                 {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
                     the visible byline and the structured data cannot drift apart. */}

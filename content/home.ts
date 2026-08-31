@@ -34,8 +34,6 @@ export interface Cta {
 }
 
 export interface HomePage {
-  /** Hero tagline pill text. No Strapi field for this — hardcoded. */
-  eyebrow: string;
   fullName: string;
   headline: string;
   subheadline: string;
@@ -154,7 +152,6 @@ const getHomePageRaw = cache(() => strapiFindOne<StrapiHomePage>("home-page", HO
 export async function getHomePage(): Promise<HomePage> {
   const raw = await getHomePageRaw();
   return {
-    eyebrow: "Data · Business · Finance · Maps · Technology",
     fullName: raw.fullName,
     headline: raw.headline,
     subheadline: raw.subheadline,

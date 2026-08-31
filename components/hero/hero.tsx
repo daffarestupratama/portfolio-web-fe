@@ -20,27 +20,12 @@ export function Hero({ home }: HeroProps) {
     <header className="relative z-[3] flex justify-center px-[22px] pt-24 pb-[34px] sm:pt-28 lg:pt-[132px]">
       <div className="grid w-full max-w-[1180px] grid-cols-1 items-center gap-11 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <div
-            className="inline-flex items-center gap-[9px] rounded-full px-[15px] py-[7px] text-[12.5px] font-medium"
-            style={{
-              background: "var(--glass-bg)",
-              backgroundImage: "var(--glass-tint)",
-              backdropFilter: "blur(var(--glass-blur)) saturate(180%)",
-              border: "1px solid var(--glass-brd)",
-              boxShadow: "inset 0 1px 0 var(--glass-hi)",
-              color: "var(--ink-dim)",
-            }}
-          >
-            <span
-              aria-hidden="true"
-              className="h-[7px] w-[7px] shrink-0 rounded-full"
-              style={{ background: "var(--accent)", boxShadow: "0 0 0 4px var(--chip)" }}
-            />
-            {home.eyebrow}
-          </div>
-
+          {/* The h1 is the first element in this column, so it carries no top margin —
+              the old `mt-5` was the gap below the tagline pill, and grid items are BFC
+              roots, so leaving it would have held 20px of dead space against the
+              `items-center` panel rather than collapsing away. */}
           <h1
-            className="mt-5 font-bold"
+            className="font-bold"
             style={{ fontSize: "clamp(34px,4.7vw,60px)", lineHeight: 1.03, letterSpacing: "-0.04em" }}
           >
             {/* ~2/3 of the fullName clamp below, so the name clearly dominates. */}

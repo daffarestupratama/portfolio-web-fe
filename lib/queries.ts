@@ -25,7 +25,13 @@ export const FEATURED_TOUR_PACKAGES_QUERY =
   "&populate[priceOption]=*";
 
 export const SITE_SETTING_QUERY =
-  "populate[defaultSeo][populate][ogImage]=true" + "&populate[contactLinks]=*";
+  "populate[defaultSeo][populate][ogImage]=true" +
+  "&populate[contactLinks]=*" +
+  // Byline avatar + the site-wide contact CTA copy. Added to the EXISTING query rather than
+  // fetched separately: site-setting is already loaded once per render, so this costs no
+  // extra request (see the byline in app/articles/[slug]/page.tsx).
+  "&populate[authorAvatar]=true" +
+  "&populate[contactCta]=true";
 
 export const PROJECTS_LIST_QUERY =
   "populate[coverImage]=true" +

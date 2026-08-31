@@ -7,7 +7,9 @@
 import { cache } from "react";
 import { strapiFindOne } from "@/lib/strapi";
 import { strapiImageUrl } from "@/lib/image";
+import { mapImage } from "@/lib/mappers";
 import { SITE_SETTING_QUERY } from "@/lib/queries";
+import type { MappedImage } from "@/content/home";
 import type { StrapiContactLink, StrapiSeo, StrapiSiteSetting } from "@/lib/types";
 
 export interface OgImage {
@@ -61,6 +63,10 @@ export interface SiteSettings {
   whatsappUrl: string | null;
   contactLinks: SiteContactLink[];
   defaultSeo: Seo;
+  /** Byline photo for the article author. Null → the monogram fallback is used. */
+  authorAvatar: MappedImage | null;
+  /** Site-wide contact card copy. Null fields fall back to ContactCTA's own defaults. */
+  contactCta: { heading: string | null; text: string | null };
 }
 
 export function mapSeo(seo: StrapiSeo | null): Seo {
@@ -90,5 +96,12 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
     whatsappUrl: raw.whatsappUrl,
     contactLinks: mapContactLinks(raw.contactLinks ?? []),
     defaultSeo: mapSeo(raw.defaultSeo),
+    authorAvatar: mapImage(raw.authorAvatar, "Author"),
+    contactCta: {
+      // Normalised to null when blank so an empty CMS field falls through to ContactCTA's
+      // hardcoded copy — an empty string would otherwise render an empty heading.
+      heading: raw.contactCta?.heading?.trim() || null,
+      text: raw.contactCta?.text?.trim() || null,
+    },
   };
 });

@@ -257,6 +257,9 @@ export interface StrapiSiteSetting {
   whatsappUrl: string | null;
   contactLinks: StrapiContactLink[];
   defaultSeo: StrapiSeo | null;
+  authorAvatar: StrapiMedia | null;
+  /** shared.contact-cta component — site-wide contact card copy. */
+  contactCta: { heading: string | null; text: string | null } | null;
 }
 
 export interface StrapiServiceFeature {

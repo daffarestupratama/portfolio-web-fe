@@ -342,9 +342,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
       </div>
 
       {/* ---------- Charts (decorative — deliberately unlabelled) ---------- */}
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1.55fr_1fr]">
-        {/* `.hero-chart-card` caps the width below sm so the chart keeps the same visual
-            weight relative to the map that it has on desktop — see globals.css. */}
+      {/* Side by side at EVERY width, including 320px. The 1.55fr/1fr split is what keeps
+          the bar chart at 60.8% of the panel — the same share the old max-width cap
+          enforced below sm, now expressed structurally so it holds everywhere. */}
+      <div className="mt-3 grid grid-cols-[1.55fr_1fr] gap-2">
         <div
           className="hero-chart-card px-3 py-2.5"
           style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
@@ -370,9 +371,8 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
           </svg>
         </div>
 
-        {/* Hidden below 640px: map + two charts would make the hero far too tall. */}
         <div
-          className="hidden flex-col items-center px-3 py-2.5 sm:flex"
+          className="flex flex-col items-center px-3 py-2.5"
           style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
         >
           <div
@@ -381,7 +381,10 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
           >
             mix
           </div>
-          <svg viewBox="0 0 44 44" className="block h-[76px] w-[76px]" aria-hidden="true">
+          {/* `.hero-donut` scales with its card and caps at the previous fixed 76px, so the
+              donut shrinks with the panel exactly as the bar chart does instead of filling
+              its card on narrow viewports — see globals.css. */}
+          <svg viewBox="0 0 44 44" className="hero-donut block h-auto" aria-hidden="true">
             <circle cx={22} cy={22} r={DONUT_R} className="hero-donut-track" />
             {slices.map((v, i) => {
               const offset = slices.slice(0, i).reduce((a, b) => a + b, 0);
