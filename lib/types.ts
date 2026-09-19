@@ -206,6 +206,28 @@ export interface StrapiTourGuideLanding {
   seo: StrapiSeo | null;
 }
 
+export type StrapiCertificationKind = "course" | "workshop" | "event" | "bootcamp" | "organization";
+
+export interface StrapiCertification {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  issuer: string;
+  issuerLogo: StrapiMedia | null;
+  issueDate: string;
+  expiryDate: string | null;
+  credentialId: string | null;
+  credentialUrl: string | null;
+  /** A PDF in practice (verified live), NOT an image — the list query reduces it to url+mime. */
+  certificateImage: { url: string; mime: string } | null;
+  description: string | null;
+  kind: string;
+  skills: { name: string }[] | null;
+  isFeatured: boolean;
+  order: number | null;
+}
+
 export interface StrapiSkill {
   id: number;
   documentId: string;

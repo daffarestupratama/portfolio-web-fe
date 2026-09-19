@@ -74,6 +74,50 @@ export function ArticleJsonLd({
   );
 }
 
+interface CredentialItem {
+  title: string;
+  issuer: string;
+  kindLabel: string;
+  issueDateIso: string;
+  expiryDateIso: string | null;
+  credentialId: string | null;
+  credentialUrl: string | null;
+}
+
+/**
+ * ItemList of EducationalOccupationalCredential — schema.org's type for exactly this, so
+ * every field maps without stretching: recognizedBy → the issuing Organization,
+ * credentialCategory → our `kind`, dateCreated/expires → the issue and expiry dates.
+ */
+export function CertificationsJsonLd({ items }: { items: CredentialItem[] }) {
+  return (
+    <JsonLdScript
+      data={{
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Certifications",
+        url: `${SITE_URL}/certifications`,
+        numberOfItems: items.length,
+        itemListElement: items.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "EducationalOccupationalCredential",
+            name: c.title,
+            credentialCategory: c.kindLabel,
+            recognizedBy: { "@type": "Organization", name: c.issuer },
+            dateCreated: c.issueDateIso,
+            ...(c.expiryDateIso ? { expires: c.expiryDateIso } : {}),
+            ...(c.credentialUrl ? { url: c.credentialUrl } : {}),
+            ...(c.credentialId ? { identifier: c.credentialId } : {}),
+            about: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
+          },
+        })),
+      }}
+    />
+  );
+}
+
 interface HomeJsonLdProps {
   fullName: string;
   siteName: string;

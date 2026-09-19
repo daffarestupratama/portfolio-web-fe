@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/hero/hero";
 import { Experiences } from "@/components/sections/experiences";
+import { getTopCertifications } from "@/content/certifications";
 import { Projects } from "@/components/sections/projects";
 import { Tours } from "@/components/sections/tours";
 import { Writing } from "@/components/sections/writing";
@@ -26,13 +27,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [home, experiences, projects, tours, articles, site] = await Promise.all([
+  const [home, experiences, projects, tours, articles, site, certifications] = await Promise.all([
     getHomePage(),
     getFeaturedExperiences(),
     getFeaturedProjects(),
     FEATURES.tours ? getFeaturedTours() : Promise.resolve([]),
     getFeaturedArticles(),
     getSiteSettings(),
+    getTopCertifications(),
   ]);
 
   const sameAs = site.contactLinks.map((l) => l.url).filter((url) => /^https?:\/\//.test(url));
@@ -41,7 +43,7 @@ export default async function Home() {
     <>
       <HomeJsonLd fullName={home.fullName} siteName={site.siteName || home.fullName} sameAs={sameAs} />
       <Hero home={home} />
-      <Experiences experiences={experiences} />
+      <Experiences experiences={experiences} certifications={certifications} />
       <Projects projects={projects} />
       {FEATURES.tours && <Tours tours={tours} />}
       <Writing articles={articles} />

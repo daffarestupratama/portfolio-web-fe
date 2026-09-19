@@ -24,6 +24,23 @@ export const FEATURED_TOUR_PACKAGES_QUERY =
   "&populate[route]=true" +
   "&populate[priceOption]=*";
 
+/**
+ * Certifications list. `certificateImage` is deliberately reduced to url + mime: the file is a
+ * ~155KB PDF, and a URL string in the payload downloads nothing until the viewer mounts it —
+ * so the list stays light (measured +1.5KB across 30 entries) without needing a second
+ * round trip when someone opens one. Sorting is done in the mapper, not here, because it is
+ * a three-key comparator with null handling that Strapi's `sort` can't express.
+ */
+export const CERTIFICATIONS_QUERY =
+  "populate[issuerLogo][fields][0]=url" +
+  "&populate[issuerLogo][fields][1]=width" +
+  "&populate[issuerLogo][fields][2]=height" +
+  "&populate[issuerLogo][fields][3]=alternativeText" +
+  "&populate[skills][fields][0]=name" +
+  "&populate[certificateImage][fields][0]=url" +
+  "&populate[certificateImage][fields][1]=mime" +
+  "&pagination[pageSize]=100";
+
 export const SITE_SETTING_QUERY =
   "populate[defaultSeo][populate][ogImage]=true" +
   "&populate[contactLinks]=*" +

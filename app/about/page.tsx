@@ -6,6 +6,7 @@ import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { CoverImage } from "@/components/ui/cover-image";
 import { SkillsSection } from "@/components/about/skills-section";
 import { Experiences } from "@/components/sections/experiences";
+import { getTopCertifications } from "@/content/certifications";
 import { ContactCTA } from "@/components/sections/contact-cta";
 
 export const revalidate = 86400;
@@ -24,7 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [about, site] = await Promise.all([getAboutPage(), getSiteSettings()]);
+  const [about, site, certifications] = await Promise.all([
+    getAboutPage(),
+    getSiteSettings(),
+    getTopCertifications(),
+  ]);
 
   return (
     <main className="relative z-[3] pt-28 pb-16 sm:pt-32">
@@ -62,7 +67,7 @@ export default async function AboutPage() {
         </div>
       </div>
 
-      <Experiences experiences={about.experiences} />
+      <Experiences experiences={about.experiences} certifications={certifications} />
 
       <div className="mx-auto w-full max-w-[820px] px-[22px]">
         <SkillsSection groups={about.skillGroups} />

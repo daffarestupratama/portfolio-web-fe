@@ -1,9 +1,10 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { GalleryImage } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
+import { useLightbox } from "@/components/ui/use-lightbox";
 import { ArrowRightIcon, CloseIcon } from "@/components/ui/icons";
 
 const imgFallback = <span className="absolute inset-0" style={{ background: "var(--glass-bg-2)" }} aria-hidden="true" />;
@@ -39,45 +40,22 @@ export function Gallery({ images }: GalleryProps) {
     [images.length],
   );
 
-  useEffect(() => {
-    if (openIndex === null) return;
-
-    // Focus the dialog on open, lock body scroll.
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    requestAnimationFrame(() => dialogRef.current?.focus());
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-      } else if (e.key === "ArrowRight") {
+  // Escape, focus trap, scroll lock and focus-on-open come from the shared hook; only the
+  // arrow navigation is specific to this carousel.
+  const onArrowKeys = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
         e.preventDefault();
         go(1);
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         go(-1);
-      } else if (e.key === "Tab") {
-        // Focus trap within the dialog.
-        const focusables = dialogRef.current?.querySelectorAll<HTMLElement>("button");
-        if (!focusables || focusables.length === 0) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
       }
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [openIndex, close, go]);
+    },
+    [go],
+  );
+
+  useLightbox({ open: openIndex !== null, onClose: close, dialogRef, onKeyDown: onArrowKeys });
 
   if (images.length === 0) return null;
 
