@@ -79,7 +79,6 @@ interface CredentialItem {
   issuer: string;
   kindLabel: string;
   issueDateIso: string;
-  expiryDateIso: string | null;
   credentialId: string | null;
   credentialUrl: string | null;
 }
@@ -87,7 +86,7 @@ interface CredentialItem {
 /**
  * ItemList of EducationalOccupationalCredential — schema.org's type for exactly this, so
  * every field maps without stretching: recognizedBy → the issuing Organization,
- * credentialCategory → our `kind`, dateCreated/expires → the issue and expiry dates.
+ * credentialCategory → our `kind`, dateCreated → the issue date.
  */
 export function CertificationsJsonLd({ items }: { items: CredentialItem[] }) {
   return (
@@ -107,7 +106,6 @@ export function CertificationsJsonLd({ items }: { items: CredentialItem[] }) {
             credentialCategory: c.kindLabel,
             recognizedBy: { "@type": "Organization", name: c.issuer },
             dateCreated: c.issueDateIso,
-            ...(c.expiryDateIso ? { expires: c.expiryDateIso } : {}),
             ...(c.credentialUrl ? { url: c.credentialUrl } : {}),
             ...(c.credentialId ? { identifier: c.credentialId } : {}),
             about: { "@type": "Person", name: SITE_NAME, url: SITE_URL },

@@ -10,7 +10,7 @@ import { CertificationsList } from "@/components/certifications/certifications-l
 export const revalidate = 3600;
 
 const CERTIFICATIONS_DESCRIPTION =
-  "Courses, workshops, and programmes completed by Daffa Ilham Restupratama — issuer, date, and verifiable credential for each.";
+  "A record of completed courses, workshops, and programmes, each listed with its issuer, date, and a verifiable credential where one exists.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
@@ -40,8 +40,8 @@ export default async function CertificationsPage() {
           Certifications
         </h1>
         <p className="mt-3 max-w-[52ch] text-[15px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-          Courses, workshops, and programmes I&apos;ve completed — each with its issuer, date, and a verifiable
-          credential where one exists.
+          A record of completed courses, workshops, and programmes, each listed with its issuer, date, and a
+          verifiable credential where one exists.
         </p>
       </header>
 

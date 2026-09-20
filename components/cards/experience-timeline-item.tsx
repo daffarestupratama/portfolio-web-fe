@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTilt } from "@/hooks/use-tilt";
 import type { Experience } from "@/content/home";
 import { ChevronDownIcon } from "@/components/ui/icons";
+import { shouldIgnoreCardClick } from "@/components/ui/card-toggle";
 import { Gallery } from "@/components/ui/gallery";
 
 const LOGO_GRADIENTS = [
@@ -41,7 +42,19 @@ export function ExperienceTimelineItem({ experience, index }: ExperienceTimeline
         <span className="absolute inset-[3px] rounded-full" style={{ background: "var(--accent)" }} />
       </span>
 
-      <div ref={ref} data-tilt className="glass-card px-5 py-[18px]" style={{ borderRadius: 20 }}>
+      <div
+        ref={ref}
+        data-tilt
+        className="glass-card cursor-pointer px-5 py-[18px]"
+        style={{ borderRadius: 20 }}
+        // Convenience only: the header button below is the real control. Clicks from anything
+        // interactive — notably the Gallery thumbnails in the expanded body — are left alone,
+        // as are clicks that end a text selection.
+        onClick={(e) => {
+          if (shouldIgnoreCardClick(e.target)) return;
+          setOpen((v) => !v);
+        }}
+      >
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}

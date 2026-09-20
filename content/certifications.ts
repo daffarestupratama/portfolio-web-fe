@@ -19,9 +19,6 @@ export interface Certification {
   issueDate: string;
   /** Raw ISO, kept for sorting and the JSON-LD `dateCreated`. */
   issueDateIso: string;
-  expiryDateIso: string | null;
-  /** True only when expiryDate is set AND already past. */
-  isExpired: boolean;
   credentialId: string | null;
   credentialUrl: string | null;
   /** PDF (or image) URL, present only when the entry has one. */
@@ -47,7 +44,6 @@ function clean(value: string | null | undefined): string | null {
 }
 
 function mapCertification(c: StrapiCertification): Certification {
-  const expiryDateIso = clean(c.expiryDate);
   return {
     id: c.documentId,
     slug: c.slug,
@@ -63,10 +59,6 @@ function mapCertification(c: StrapiCertification): Certification {
       : null,
     issueDate: formatIssueDate(c.issueDate),
     issueDateIso: c.issueDate,
-    expiryDateIso,
-    // Compared as ISO date strings (YYYY-MM-DD compares lexically = chronologically), which
-    // avoids a timezone-dependent Date roundtrip on the server.
-    isExpired: expiryDateIso !== null && expiryDateIso < new Date().toISOString().slice(0, 10),
     credentialId: clean(c.credentialId),
     credentialUrl: clean(c.credentialUrl),
     certificateUrl: c.certificateImage?.url ? strapiImageUrl(c.certificateImage.url) : null,
@@ -99,7 +91,11 @@ export const getAllCertifications = cache(async (): Promise<Certification[]> => 
   return rows.map(mapCertification).sort(byCertification);
 });
 
-/** Top N for the Experiences tab — same ordering as the page, so the two never disagree. */
-export async function getTopCertifications(limit = 3): Promise<Certification[]> {
-  return (await getAllCertifications()).slice(0, limit);
+/**
+ * Featured only, uncapped, for the Experiences tab. The source list is already sorted by
+ * byCertification, and filtering preserves relative order, so within an all-featured subset
+ * this is exactly `order` ascending (nulls last) with newer `issueDate` breaking ties.
+ */
+export async function getFeaturedCertifications(): Promise<Certification[]> {
+  return (await getAllCertifications()).filter((c) => c.isFeatured);
 }

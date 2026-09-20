@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Certification } from "@/content/certifications";
-import { CertificationCard } from "@/components/certifications/certification-card";
+import { CertificationCard, EXPANDED_BY_DEFAULT_MAX } from "@/components/certifications/certification-card";
 
 const ALL = "__all__";
 
@@ -25,6 +25,9 @@ export function CertificationsList({ certifications }: { certifications: Certifi
 
   const showFilter = kinds.length > 1;
   const visible = kind === ALL ? certifications : certifications.filter((c) => c.kind === kind);
+  // Short lists read better fully open; long ones are easier to scan collapsed. Derived from
+  // the unfiltered total so filtering doesn't change how existing cards are presented.
+  const defaultExpanded = certifications.length <= EXPANDED_BY_DEFAULT_MAX;
 
   return (
     <>
@@ -61,7 +64,7 @@ export function CertificationsList({ certifications }: { certifications: Certifi
       ) : (
         <div className="flex flex-col gap-4">
           {visible.map((c) => (
-            <CertificationCard key={c.id} certification={c} />
+            <CertificationCard key={c.id} certification={c} defaultExpanded={defaultExpanded} headingLevel="h2" />
           ))}
         </div>
       )}

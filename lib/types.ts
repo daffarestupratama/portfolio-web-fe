@@ -216,7 +216,6 @@ export interface StrapiCertification {
   issuer: string;
   issuerLogo: StrapiMedia | null;
   issueDate: string;
-  expiryDate: string | null;
   credentialId: string | null;
   credentialUrl: string | null;
   /** A PDF in practice (verified live), NOT an image — the list query reduces it to url+mime. */

@@ -170,6 +170,9 @@ button {
 .glass-pill {
   display: inline-flex;
   align-items: center;
+  /* Every .glass-pill is interactive. Links get a pointer from the UA default but buttons do
+     not, which is why the certificate button felt dead next to the credential link. */
+  cursor: pointer;
   border-radius: 999px;
   background: var(--glass-bg);
   background-image: var(--glass-tint);
@@ -186,6 +189,21 @@ button {
 }
 .glass-pill:active {
   transform: translateY(0) scale(0.97);
+}
+
+/* Pill sitting on a lightbox's always-dark backdrop.
+   `.glass-pill` alone is theme-dependent: in light mode --glass-bg is rgba(255,255,255,0.55)
+   plus a white --glass-tint, so white label text landed at roughly 2.2:1 over the dark
+   overlay and was barely readable. These values are fixed in both themes, the same
+   "always-dark surface" approach the code block chrome and mkdir terminal use, taking light
+   mode to roughly 8:1 while leaving dark mode where it already was. */
+.lightbox-pill {
+  background: rgba(255, 255, 255, 0.12);
+  background-image: none;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.lightbox-pill:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Circular glass icon button (social links, theme toggle, hamburger, card icon actions). */

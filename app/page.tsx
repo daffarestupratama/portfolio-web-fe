@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/hero/hero";
 import { Experiences } from "@/components/sections/experiences";
-import { getTopCertifications } from "@/content/certifications";
+import { getFeaturedCertifications } from "@/content/certifications";
 import { Projects } from "@/components/sections/projects";
 import { Tours } from "@/components/sections/tours";
 import { Writing } from "@/components/sections/writing";
@@ -34,7 +34,7 @@ export default async function Home() {
     FEATURES.tours ? getFeaturedTours() : Promise.resolve([]),
     getFeaturedArticles(),
     getSiteSettings(),
-    getTopCertifications(),
+    getFeaturedCertifications(),
   ]);
 
   const sameAs = site.contactLinks.map((l) => l.url).filter((url) => /^https?:\/\//.test(url));

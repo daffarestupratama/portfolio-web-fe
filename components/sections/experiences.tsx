@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import type { Experience, ExperienceCategory } from "@/content/home";
 import type { Certification } from "@/content/certifications";
 import { ExperienceTimelineItem } from "@/components/cards/experience-timeline-item";
+import { CertificationCard } from "@/components/certifications/certification-card";
 import { ArrowRightIcon } from "@/components/ui/icons";
-import { deriveInitials } from "@/lib/mappers";
 
 /** Certifications aren't Experience entries in Strapi; they borrow this section's space
  *  rather than adding another one to the page. */
@@ -16,13 +15,15 @@ type TabKey = ExperienceCategory | typeof CERTIFICATIONS_TAB;
 
 interface ExperiencesProps {
   experiences: Record<ExperienceCategory, Experience[]>;
-  /** Top few, already ordered by the same comparator /certifications uses. */
+  /** Featured only, uncapped, already ordered by the same comparator /certifications uses. */
   certifications?: Certification[];
 }
 
-const TABS: { key: ExperienceCategory; label: string }[] = [
+/** Order is declared here and nowhere else — Certifications sits third, before Others. */
+const TABS: { key: TabKey; label: string }[] = [
   { key: "education", label: "Education" },
   { key: "organization", label: "Organization" },
+  { key: CERTIFICATIONS_TAB, label: "Certifications" },
   { key: "others", label: "Others" },
 ];
 
@@ -67,7 +68,7 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
               boxShadow: "inset 0 1px 0 var(--glass-hi), var(--glass-sh)",
             }}
           >
-            {TABS.map((t) => (
+            {TABS.filter((t) => t.key !== CERTIFICATIONS_TAB || hasCertifications).map((t) => (
               <button
                 key={t.key}
                 type="button"
@@ -80,68 +81,19 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
                 {t.label}
               </button>
             ))}
-            {hasCertifications && (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={showingCertifications}
-                data-active={showingCertifications}
-                onClick={() => selectTab(CERTIFICATIONS_TAB)}
-                className="tab-btn"
-              >
-                Certifications
-              </button>
-            )}
           </div>
         </div>
 
         {showingCertifications ? (
-          /* Compact, non-expanding rows. The experience items expand to reveal a description
-             AND a gallery; a certification has no gallery and often no description, so the
-             same disclosure would open onto nothing. A link to the full page beats expanding
-             dozens of rows inside a tab. */
+          /* Same CertificationCard the /certifications page uses, so the two surfaces cannot
+             drift. Always collapsed here: the tab is a summary, and the full detail is one
+             click away on the page. */
           <>
-            <ul className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
               {certifications.map((c) => (
-                <li key={c.id} className="glass-card flex items-center gap-4 px-5 py-4" style={{ borderRadius: 18 }}>
-                  <span
-                    aria-hidden="true"
-                    className="relative z-[2] flex h-[42px] w-[42px] shrink-0 items-center justify-center overflow-hidden p-1.5"
-                    style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
-                  >
-                    {c.issuerLogo ? (
-                      <Image
-                        src={c.issuerLogo.url}
-                        alt=""
-                        width={30}
-                        height={30}
-                        style={{ width: 30, height: 30, objectFit: "contain" }}
-                      />
-                    ) : (
-                      <span className="mono text-[12px] font-bold" style={{ color: "var(--accent-ink)" }}>
-                        {deriveInitials(c.issuer)}
-                      </span>
-                    )}
-                  </span>
-
-                  <div className="relative z-[2] min-w-0 flex-1">
-                    <p className="truncate text-[14.5px] font-semibold" style={{ letterSpacing: "-0.02em" }}>
-                      {c.title}
-                    </p>
-                    <p className="mono mt-0.5 text-[11.5px]" style={{ color: "var(--ink-faint)" }}>
-                      {c.issuer} · {c.issueDate}
-                    </p>
-                  </div>
-
-                  <span
-                    className="badge relative z-[2] hidden shrink-0 sm:inline-flex"
-                    style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
-                  >
-                    {c.kindLabel}
-                  </span>
-                </li>
+                <CertificationCard key={c.id} certification={c} defaultExpanded={false} headingLevel="h3" />
               ))}
-            </ul>
+            </div>
 
             <div className="mt-4 flex justify-center">
               <Link

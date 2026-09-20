@@ -93,7 +93,7 @@ export function CertificateViewer({ url, title }: CertificateViewerProps) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-pill mono gap-2 px-4 py-2 text-[13px] font-semibold"
+              className="glass-pill lightbox-pill mono gap-2 px-4 py-2 text-[13px] font-semibold"
               style={{ color: "#fff" }}
             >
               Open in new tab
