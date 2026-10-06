@@ -47,3 +47,6 @@ dist/
 
 # claude
 .claude/
+
+# claude design handoff (reference only, re-downloadable from Claude Design)
+design-export/redesign-v2/
