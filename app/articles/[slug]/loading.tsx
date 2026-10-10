@@ -1,20 +1,22 @@
 import { Delayed } from "@/components/ui/delayed";
+import { Sk, SkLines } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[820px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
+    <main className="ad" data-wide>
       <Delayed>
-        <div className="skeleton" style={{ height: 14, width: 110, borderRadius: 7 }} />
-        <div className="mt-5 flex gap-2.5">
-          <div className="skeleton" style={{ height: 24, width: 80, borderRadius: 999 }} />
-          <div className="skeleton" style={{ height: 24, width: 44, borderRadius: 999 }} />
-        </div>
-        <div className="skeleton mt-4" style={{ height: 44, width: "90%", borderRadius: 12 }} />
-        <div className="skeleton mt-6" style={{ aspectRatio: "16 / 9", borderRadius: 15 }} />
-        <div className="mt-8 flex flex-col gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 15, width: i % 3 === 2 ? "70%" : "100%", borderRadius: 6 }} />
-          ))}
+        <div className="ad-grid" data-aside>
+          <Sk r={24} className="ad-aside sk-ad-aside" />
+          <div className="ad-content">
+            <Sk h={32} w={130} r={999} />
+            <Sk h={44} r={12} style={{ marginTop: 26, width: "88%" }} />
+            <div className="ad-cover-well" style={{ marginTop: 26 }}>
+              <Sk r={21} style={{ aspectRatio: "16 / 9" }} />
+            </div>
+            <div style={{ marginTop: 32 }}>
+              <SkLines count={6} />
+            </div>
+          </div>
         </div>
       </Delayed>
     </main>

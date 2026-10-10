@@ -2,7 +2,6 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRightIcon } from "@/components/ui/icons";
 
 // UI options for the category select. Values match Strapi's `category` enum; the
 // route handler re-validates against the authoritative list in content/guestbook.
@@ -18,13 +17,6 @@ const CATEGORY_OPTIONS = [
 
 const MESSAGE_MIN = 3;
 const MESSAGE_MAX = 1000;
-
-const fieldStyle = {
-  background: "var(--glass-bg-2)",
-  border: "1px solid var(--glass-brd)",
-  borderRadius: 12,
-  color: "var(--ink)",
-} as const;
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -86,139 +78,124 @@ export function GuestbookForm() {
 
   if (status === "success") {
     return (
-      <div className="glass-card p-6 text-center sm:p-8" style={{ borderRadius: 22 }}>
-        <div className="relative z-[2]">
-          <h2 className="text-[18px] font-bold" style={{ letterSpacing: "-0.02em" }}>
-            Thanks for signing! 🎉
-          </h2>
-          <p className="mx-auto mt-2 max-w-[42ch] text-[14px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-            Your message is live — it should appear in the list right away.
-          </p>
-          <button
-            type="button"
-            onClick={() => setStatus("idle")}
-            className="glass-pill mt-5 px-5 py-2.5 text-[13.5px] font-semibold"
-          >
-            Write another
-          </button>
-        </div>
+      <div className="gb-card gb-sent">
+        <h2 className="gb-sent-title">Thanks for signing! 🎉</h2>
+        <p className="gb-sent-text">Your message is live — it should appear in the list right away.</p>
+        <button type="button" onClick={() => setStatus("idle")} className="nm-pill gb-again">
+          Write another
+        </button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="glass-card p-5 sm:p-6" style={{ borderRadius: 22 }} noValidate>
-      <div className="relative z-[2] flex flex-col gap-4">
-        <div>
-          <label htmlFor={`${ids}-msg`} className="mb-1.5 block text-[13px] font-semibold">
-            Message <span style={{ color: "var(--accent-ink)" }}>*</span>
-          </label>
-          <textarea
-            id={`${ids}-msg`}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-            rows={4}
-            maxLength={MESSAGE_MAX}
-            aria-invalid={showValidation && messageInvalid}
-            placeholder="Leave a note, a question, or a bit of feedback…"
-            className="w-full resize-y px-3.5 py-2.5 text-[14px] outline-none"
-            style={{ ...fieldStyle, lineHeight: 1.55 }}
-          />
-          <div className="mt-1 flex items-center justify-between text-[11.5px]">
-            <span style={{ color: showValidation && messageInvalid ? "#d9534f" : "transparent" }}>
-              Message must be {MESSAGE_MIN}–{MESSAGE_MAX} characters.
-            </span>
-            <span className="mono" style={{ color: "var(--ink-faint)" }}>
-              {trimmed.length}/{MESSAGE_MAX}
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor={`${ids}-name`} className="mb-1.5 block text-[13px] font-semibold">
-              Name <span style={{ color: "var(--ink-faint)" }}>(optional)</span>
-            </label>
-            <input
-              id={`${ids}-name`}
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              disabled={isAnonymous}
-              maxLength={80}
-              autoComplete="name"
-              placeholder={isAnonymous ? "Anonymous" : "Your name"}
-              className="w-full px-3.5 py-2.5 text-[14px] outline-none disabled:opacity-50"
-              style={fieldStyle}
-            />
-          </div>
-
-          <div>
-            <label htmlFor={`${ids}-cat`} className="mb-1.5 block text-[13px] font-semibold">
-              Category
-            </label>
-            <select
-              id={`${ids}-cat`}
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-[14px] outline-none"
-              style={fieldStyle}
-            >
-              {CATEGORY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <label className="inline-flex cursor-pointer items-center gap-2.5 text-[13.5px]" style={{ color: "var(--ink-dim)" }}>
-          <input
-            type="checkbox"
-            checked={isAnonymous}
-            onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="h-4 w-4"
-            style={{ accentColor: "var(--accent)" }}
-          />
-          Post as anonymous
+    <form onSubmit={onSubmit} className="gb-card gb-form" noValidate>
+      <div>
+        <label htmlFor={`${ids}-msg`} className="gb-label">
+          Message <span className="gb-req">*</span>
         </label>
-
-        {/* Honeypot — hidden from users, catches bots that fill every field. */}
-        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-          <label htmlFor={`${ids}-website`}>Website</label>
-          <input
-            id={`${ids}-website`}
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-          />
-        </div>
-
-        {error && (
-          <p className="text-[13px]" role="alert" style={{ color: "#d9534f" }}>
-            {error}
-          </p>
-        )}
-
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={status === "submitting"}
-            className="btn-gradient gap-2 px-[21px] py-3 text-[14px] disabled:opacity-60"
-          >
-            {status === "submitting" ? "Sending…" : "Sign the guestbook"}
-            {status !== "submitting" && <ArrowRightIcon />}
-          </button>
-          {/* Submissions auto-publish, so the old "Reviewed before it appears" contradicted
-              both the success card and the page header. */}
-          <span className="text-[12px]" style={{ color: "var(--ink-faint)" }}>
-            Appears in the list right away.
+        <textarea
+          id={`${ids}-msg`}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          required
+          rows={4}
+          maxLength={MESSAGE_MAX}
+          aria-invalid={showValidation && messageInvalid}
+          placeholder="Leave a note, a question, or a bit of feedback…"
+          className="gb-field gb-textarea"
+        />
+        <div className="gb-help">
+          <span data-show={(showValidation && messageInvalid) || undefined} className="gb-err-line">
+            Message must be {MESSAGE_MIN}–{MESSAGE_MAX} characters.
+          </span>
+          <span className="mono gb-count">
+            {trimmed.length}/{MESSAGE_MAX}
           </span>
         </div>
+      </div>
+
+      <div className="gb-pair">
+        <div>
+          <label htmlFor={`${ids}-name`} className="gb-label">
+            Name <span className="gb-opt">(optional)</span>
+          </label>
+          <input
+            id={`${ids}-name`}
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            disabled={isAnonymous}
+            maxLength={80}
+            autoComplete="name"
+            placeholder={isAnonymous ? "Anonymous" : "Your name"}
+            className="gb-field"
+          />
+        </div>
+
+        <div>
+          <label htmlFor={`${ids}-cat`} className="gb-label">
+            Category
+          </label>
+          <select
+            id={`${ids}-cat`}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="gb-field gb-select"
+          >
+            {CATEGORY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* The real checkbox stays in the label (keyboard, form semantics); 2a's 22px box is
+          drawn beside it. */}
+      <label className="gb-check">
+        <input type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} />
+        <span className="gb-box" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+        Post as anonymous
+      </label>
+
+      {/* Honeypot — hidden from users, catches bots that fill every field. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor={`${ids}-website`}>Website</label>
+        <input
+          id={`${ids}-website`}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      {error && (
+        <p className="gb-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      <div className="gb-submit-row">
+        <button type="submit" disabled={status === "submitting"} className="nm-btn-accent gb-submit">
+          {status === "submitting" ? (
+            "Sending…"
+          ) : (
+            <>
+              Sign the guestbook <span aria-hidden="true">→</span>
+            </>
+          )}
+        </button>
+        {/* Submissions auto-publish, so the old "Reviewed before it appears" contradicted
+            both the success card and the page header. */}
+        <span className="gb-hint">Appears in the list right away.</span>
       </div>
     </form>
   );

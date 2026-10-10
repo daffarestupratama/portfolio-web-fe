@@ -19,12 +19,21 @@ const EDGE_PAD = 8;
 const GAP = 8;
 
 /** `default`: the legacy square tile. `card`: 2a's 26px white tile on project cards.
- *  `tile46`: 2a's 46px raised tile on the project page. */
-export type TechTileVariant = "default" | "card" | "tile46";
+ *  `tile46`: 2a's 46px raised tile on the project page. `skill`: 2a's 52px tile in the about
+ *  page's Skills groups. */
+export type TechTileVariant = "default" | "card" | "tile46" | "skill";
+
+const VARIANT_CLASS: Record<TechTileVariant, string> = {
+  default: "tech-tile",
+  card: "pc-logo",
+  tile46: "pj-logo",
+  skill: "sk-logo",
+};
 
 function TextChip({ label, variant }: { label: string; variant: TechTileVariant }) {
   if (variant === "card") return <span className="pc-chip mono">{label}</span>;
   if (variant === "tile46") return <span className="pj-chip mono">{label}</span>;
+  if (variant === "skill") return <span className="sk-pill">{label}</span>;
   return (
     <span className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
       {label}
@@ -134,7 +143,7 @@ export function TechTile({ item, size = 44, variant = "default", href }: TechTil
         }}
         onBlur={() => setVisible(false)}
         aria-label={label}
-        className={variant === "card" ? "pc-logo" : variant === "tile46" ? "pj-logo" : "tech-tile"}
+        className={VARIANT_CLASS[variant]}
         // Padding in px (not %) so it scales with the tile instead of the container.
         style={variant === "default" ? { width: size, height: size, padding: Math.round(size * 0.18) } : undefined}
       >

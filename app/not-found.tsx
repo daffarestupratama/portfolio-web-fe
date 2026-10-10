@@ -5,22 +5,26 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 
 export const metadata: Metadata = notFoundMetadata();
 
+/** Not in Portfolio 2a: built from its contact-CTA nest (two concave rings around a raised
+ *  panel) and its accent button. */
 export default function NotFound() {
   return (
-    <main className="relative z-[3] mx-auto flex w-full max-w-[560px] flex-col items-center px-[22px] pt-[86px] pb-24 text-center sm:pt-[118px]">
-      <span className="mono text-[13px]" style={{ color: "var(--accent-ink)" }}>
-        404
-      </span>
-      <h1 className="mt-3 font-bold" style={{ fontSize: "clamp(28px,4vw,42px)", letterSpacing: "-0.03em" }}>
-        Page not found
-      </h1>
-      <p className="mt-4 max-w-[42ch] text-[15px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-        The page you&apos;re looking for doesn&apos;t exist or may have moved.
-      </p>
-      <Link href="/" className="btn-gradient mt-7 gap-2 px-[21px] py-3 text-[14px]">
-        Back to home
-        <ArrowRightIcon />
-      </Link>
+    <main className="nf nm-root">
+      <div className="cta-ring">
+        <div className="cta-ring">
+          <div className="cta-panel nf-panel">
+            <div>
+              <span className="nf-code mono">404</span>
+              <h1 className="nf-title">Page not found</h1>
+              <p className="cta-text">The page you&apos;re looking for doesn&apos;t exist or may have moved.</p>
+            </div>
+            <Link href="/" className="nm-btn-accent nf-btn">
+              Back to home
+              <ArrowRightIcon />
+            </Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

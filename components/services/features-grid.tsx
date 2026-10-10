@@ -1,18 +1,16 @@
 import type { ServiceFeature } from "@/content/services";
 
+/** Portfolio 2a's feature cards, numbered 01, 02… in an inset well. */
 export function FeaturesGrid({ features }: { features: ServiceFeature[] }) {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="sv-ft-grid">
       {features.map((f, i) => (
-        <div key={i} className="glass-card p-5">
-          <div className="relative z-[2]">
-            <h3 className="text-[15.5px] font-bold" style={{ letterSpacing: "-0.01em" }}>
-              {f.title}
-            </h3>
-            <p className="mt-2 text-[13.5px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-              {f.description}
-            </p>
-          </div>
+        <div key={i} className="sv-ft">
+          <span className="sv-ft-n mono" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <h3 className="sv-ft-title">{f.title}</h3>
+          <p className="sv-ft-desc">{f.description}</p>
         </div>
       ))}
     </div>

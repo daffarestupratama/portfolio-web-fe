@@ -1,17 +1,24 @@
 import { Delayed } from "@/components/ui/delayed";
+import { Sk, SkPageHeader } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[760px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
+    <main className="relative z-[3]">
       <Delayed>
-        <div className="skeleton" style={{ height: 40, width: 220, borderRadius: 10 }} />
-        <div className="skeleton mt-4" style={{ height: 16, maxWidth: 460, borderRadius: 8 }} />
-        <div className="skeleton mt-8" style={{ height: 260, borderRadius: 22 }} />
-        <div className="mt-12 flex flex-col gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 120, borderRadius: 18 }} />
-          ))}
-        </div>
+        <SkPageHeader titleWidth={240} />
+        <section className="gb">
+          <div className="gb-grid">
+            <Sk h={420} r={28} />
+            <div>
+              <Sk h={26} w={170} r={8} />
+              <div className="gb-list" style={{ marginTop: 20 }}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Sk key={i} h={130} r={24} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
       </Delayed>
     </main>
   );

@@ -1,21 +1,27 @@
 import { Delayed } from "@/components/ui/delayed";
+import { Sk, SkLines } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
+    <main className="relative z-[3]">
       <Delayed>
-        <div className="skeleton" style={{ height: 14, width: 110, borderRadius: 7 }} />
-        <div className="mt-5 flex gap-2.5">
-          <div className="skeleton" style={{ height: 24, width: 120, borderRadius: 999 }} />
-          <div className="skeleton" style={{ height: 24, width: 90, borderRadius: 999 }} />
-        </div>
-        <div className="skeleton mt-4" style={{ height: 44, width: "85%", borderRadius: 12 }} />
-        <div className="skeleton mt-5" style={{ height: 320, borderRadius: 15 }} />
-        <div className="mt-8 flex flex-col gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 15, width: `${90 - i * 8}%`, borderRadius: 6 }} />
-          ))}
-        </div>
+        <header className="pj-head">
+          <Sk h={32} w={130} r={999} />
+          <div className="pj-badges">
+            <Sk h={26} w={120} r={999} />
+            <Sk h={26} w={90} r={999} />
+          </div>
+          <Sk h={46} r={12} style={{ marginTop: 14, width: "85%" }} />
+          <Sk h={18} r={9} style={{ marginTop: 16, width: "70%" }} />
+        </header>
+        <section className="pj-body">
+          <div className="pj-cover-well">
+            <Sk r={22} style={{ aspectRatio: "16 / 9" }} />
+          </div>
+          <div style={{ marginTop: 40 }}>
+            <SkLines count={5} widths={(i) => `${90 - i * 8}%`} />
+          </div>
+        </section>
       </Delayed>
     </main>
   );
