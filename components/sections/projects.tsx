@@ -1,8 +1,6 @@
-import Link from "next/link";
 import type { Project } from "@/content/home";
 import { ProjectCard } from "@/components/cards/project-card";
-import { BENTO_GRID_CLASS } from "@/components/cards/bento";
-import { ArrowRightIcon } from "@/components/ui/icons";
+import { SectionHeader } from "@/components/sections/section-header";
 
 interface ProjectsProps {
   projects: Project[];
@@ -10,21 +8,12 @@ interface ProjectsProps {
 
 export function Projects({ projects }: ProjectsProps) {
   return (
-    <section className="relative z-[3] flex justify-center px-[22px] pt-[46px] pb-2.5">
-      <div className="w-full max-w-[1180px]">
-        <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-            Selected projects
-          </h2>
-          <Link href="/projects" className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold">
-            All projects
-            <ArrowRightIcon />
-          </Link>
-        </div>
-
-        <div className={BENTO_GRID_CLASS}>
+    <section className="home-sec home-sec-projects nm-root">
+      <div className="home-sec-inner">
+        <SectionHeader title="Selected projects" href="/projects" linkLabel="All projects" />
+        <div className="bento" data-layout="home">
           {projects.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} />
+            <ProjectCard key={project.id} project={project} index={i} layout="home" />
           ))}
         </div>
       </div>

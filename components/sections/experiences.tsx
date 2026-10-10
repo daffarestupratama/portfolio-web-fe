@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import Link from "next/link";
 import type { Experience, ExperienceCategory } from "@/content/home";
 import type { Certification } from "@/content/certifications";
@@ -29,54 +29,84 @@ const TABS: { key: TabKey; label: string }[] = [
 
 const TOP_N = 3;
 
+/**
+ * Portfolio 2a's Experiences: an inset tab track with a raised thumb that springs between
+ * tabs, then either the experience timeline or the featured certification cards.
+ *
+ * A tab with nothing in it is not offered at all (the existing rule for Certifications,
+ * now applied to every tab), so the strip never shows a dead tab. 2a instead keeps an empty
+ * "Others" tab with "No entries yet."
+ */
 export function Experiences({ experiences, certifications = [] }: ExperiencesProps) {
-  const [tab, setTab] = useState<TabKey>("education");
+  const tabs = TABS.filter((t) =>
+    t.key === CERTIFICATIONS_TAB ? certifications.length > 0 : experiences[t.key].length > 0,
+  );
+  const [selected, setSelected] = useState<TabKey | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Only offered when there is something to show, so the tab strip never gains a dead tab.
-  const hasCertifications = certifications.length > 0;
+  if (tabs.length === 0) return null;
+
+  // Fall back to the first offered tab (also covers a selection whose tab disappeared).
+  const tab = tabs.some((t) => t.key === selected) ? selected! : tabs[0]!.key;
+  const index = tabs.findIndex((t) => t.key === tab);
   const showingCertifications = tab === CERTIFICATIONS_TAB;
-
   const items = showingCertifications ? [] : experiences[tab as ExperienceCategory];
   const visible = showAll ? items : items.slice(0, TOP_N);
 
   const selectTab = (key: TabKey) => {
-    setTab(key);
+    setSelected(key);
     setShowAll(false);
   };
 
-  return (
-    <section className="relative z-[3] flex justify-center px-[22px] pt-[38px] pb-2.5">
-      <div className="w-full max-w-[820px]">
-        <div className="mb-6 text-center">
-          <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-            Experiences
-          </h2>
-        </div>
+  // WAI-ARIA tabs pattern: arrows move between tabs (with wrap), Home/End jump to the ends.
+  const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const last = tabs.length - 1;
+    const next =
+      e.key === "ArrowRight" ? (index === last ? 0 : index + 1)
+      : e.key === "ArrowLeft" ? (index === 0 ? last : index - 1)
+      : e.key === "Home" ? 0
+      : e.key === "End" ? last
+      : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    selectTab(tabs[next]!.key);
+    tabRefs.current[next]?.focus();
+  };
 
-        <div className="mb-[30px] flex justify-center">
+  return (
+    <section className="xp nm-root">
+      <div className="xp-inner">
+        <h2 className="xp-title">Experiences</h2>
+
+        <div className="xp-tabs-wrap">
           <div
             role="tablist"
             aria-label="Experience category"
-            className="inline-flex gap-1 p-[5px]"
-            style={{
-              borderRadius: 999,
-              background: "var(--glass-bg)",
-              backgroundImage: "var(--glass-tint)",
-              backdropFilter: "blur(var(--glass-blur)) saturate(180%)",
-              border: "1px solid var(--glass-brd)",
-              boxShadow: "inset 0 1px 0 var(--glass-hi), var(--glass-sh)",
-            }}
+            className="xp-tabs"
+            style={{ "--xp-tabs": tabs.length } as CSSProperties}
+            onKeyDown={onTabKey}
           >
-            {TABS.filter((t) => t.key !== CERTIFICATIONS_TAB || hasCertifications).map((t) => (
+            <span
+              aria-hidden="true"
+              className="xp-thumb"
+              style={{ transform: `translateX(${index * 100}%)` }}
+            />
+            {tabs.map((t, i) => (
               <button
                 key={t.key}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
                 type="button"
                 role="tab"
+                id={`xp-tab-${t.key}`}
                 aria-selected={tab === t.key}
-                data-active={tab === t.key}
+                aria-controls="xp-panel"
+                tabIndex={tab === t.key ? 0 : -1}
+                data-active={tab === t.key || undefined}
                 onClick={() => selectTab(t.key)}
-                className="tab-btn"
+                className="xp-tab"
               >
                 {t.label}
               </button>
@@ -84,61 +114,38 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
           </div>
         </div>
 
-        {showingCertifications ? (
-          /* Same CertificationCard the /certifications page uses, so the two surfaces cannot
-             drift. Always collapsed here: the tab is a summary, and the full detail is one
-             click away on the page. */
-          <>
-            <div className="flex flex-col gap-3">
+        <div id="xp-panel" role="tabpanel" aria-labelledby={`xp-tab-${tab}`}>
+          {showingCertifications ? (
+            /* Same CertificationCard the /certifications page uses, so the two surfaces cannot
+               drift. Always collapsed here: the tab is a summary, and the full detail is one
+               click away on the page. */
+            <div className="xp-certs">
               {certifications.map((c) => (
                 <CertificationCard key={c.id} certification={c} defaultExpanded={false} headingLevel="h3" />
               ))}
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <Link
-                href="/certifications"
-                className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold"
-              >
-                View all certifications
-                <ArrowRightIcon />
-              </Link>
-            </div>
-          </>
-        ) : items.length === 0 ? (
-          <p className="py-6 text-center text-sm" style={{ color: "var(--ink-faint)" }}>
-            No entries yet.
-          </p>
-        ) : (
-          <>
-            <div className="relative pl-1">
-              <div
-                aria-hidden="true"
-                className="absolute top-2 bottom-2 left-[19px] w-0.5"
-                style={{
-                  borderRadius: 2,
-                  background: "linear-gradient(var(--sky), var(--teal), var(--green))",
-                  opacity: 0.5,
-                }}
-              />
-              {visible.map((experience, index) => (
-                <ExperienceTimelineItem key={experience.id} experience={experience} index={index} />
-              ))}
-            </div>
-
-            {items.length > TOP_N && (
-              <div className="mt-2 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowAll((v) => !v)}
-                  className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold"
-                >
-                  {showAll ? "Show less" : `Show all (${items.length})`}
-                </button>
+              <div className="xp-center">
+                <Link href="/certifications" className="xp-pill">
+                  View all certifications
+                  <ArrowRightIcon width={15} height={15} />
+                </Link>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          ) : (
+            <div className="xp-timeline">
+              <div aria-hidden="true" className="xp-rail" />
+              {visible.map((experience) => (
+                <ExperienceTimelineItem key={experience.id} experience={experience} />
+              ))}
+              {items.length > TOP_N && (
+                <div className="xp-more-wrap">
+                  <button type="button" onClick={() => setShowAll((v) => !v)} className="xp-more">
+                    {showAll ? "Show less" : `Show all (${items.length})`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

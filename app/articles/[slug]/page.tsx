@@ -93,8 +93,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         >
           Related projects
         </h2>
-        {/* One column in the narrow sidebar; outside a .bento grid ProjectCard keeps its
-            16/10 ratio, so it becomes a compact ~260×162 cover tile there. */}
+        {/* One column in the narrow sidebar; outside a bento grid ProjectCard is a 16:9
+            "standalone" tile (restyled as 2a's related cards in Phase 3). */}
         <div className={`grid grid-cols-1 gap-[18px] sm:grid-cols-2 ${relatedInSidebar ? "lg:grid-cols-1" : ""}`}>
           {article.relatedProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />

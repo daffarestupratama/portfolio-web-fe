@@ -1,87 +1,72 @@
+// A client component so the contour placeholder is built from the slug on each side instead of
+// being serialised into the RSC payload as a second ~14 KB copy (the HTML already carries one).
+"use client";
+
 import Link from "next/link";
 import type { Article } from "@/content/home";
-import { CoverImage } from "@/components/ui/cover-image";
-import { ArrowRightIcon } from "@/components/ui/icons";
+import { StrapiImage } from "@/components/ui/strapi-image";
+import { contourMarkup } from "@/lib/contour";
 
 interface ArticleListItemProps {
   article: Article;
 }
 
-/** Horizontal article row for the /articles list (distinct from the vertical
- *  ArticleCard used on the homepage + related sections).
+/**
+ * Portfolio 2a's article row, the same on the homepage and /articles: a left column with the
+ * category, language and featured pills over a 4:3 inset thumbnail (the cover, or a seeded
+ * contour when there is none), and the date, title and excerpt on the right.
  *
- *  `isFeatured` highlights the row inline (accent ring + badge) rather than lifting it
- *  into a separate pinned block: the list is filterable by category/language/tag and
- *  ordered by date, and a pinned block would fight both. */
+ * The whole row is one link: the title's stretched `::after` covers it, so a click anywhere
+ * navigates and keyboard users get a single, properly named stop.
+ */
 export function ArticleListItem({ article }: ArticleListItemProps) {
   const href = `/articles/${article.slug}`;
+  // Built once per slug and cached; identical on server and client (see lib/contour.ts).
+  const contour = (
+    <span className="ar-contour" dangerouslySetInnerHTML={{ __html: contourMarkup(article.slug, false) }} />
+  );
+
   return (
-    <article
-      className="glass-card flex gap-4 p-3.5 sm:gap-5 sm:p-4"
-      style={{
-        borderRadius: 18,
-        ...(article.isFeatured
-          ? { boxShadow: "0 0 0 1.5px var(--accent), var(--glass-sh)" }
-          : null),
-      }}
-    >
-      <Link href={href} aria-label={article.title} className="relative z-[2] block w-[104px] shrink-0 sm:w-[150px]">
-        <CoverImage
-          image={article.coverImage}
-          variant="article"
-          label={`${article.title} cover`}
-          className="aspect-[4/3] w-full"
-          sizes="150px"
-        />
-      </Link>
-
-      <div className="relative z-[2] flex min-w-0 flex-1 flex-col">
-        <div className="flex flex-wrap items-center gap-2">
-          <span
-            className="badge"
-            style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
-          >
-            {article.category}
-          </span>
-          <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
-            {article.language.toUpperCase()}
-          </span>
-          {article.isFeatured && (
-            <span
-              className="badge"
-              style={{ background: "var(--accent)", borderColor: "var(--accent)", color: "var(--bg)" }}
-            >
-              Featured
-            </span>
-          )}
+    <article className="ar">
+      <div className="ar-side">
+        <div className="ar-pills">
+          <span className="ar-cat">{article.category}</span>
+          <span className="ar-lang mono">{article.language.toUpperCase()}</span>
+          {article.isFeatured && <span className="ar-feat">Featured</span>}
         </div>
+        <div className="ar-thumb" aria-hidden="true">
+          <div className="ar-thumb-in">
+            {article.coverImage ? (
+              <StrapiImage
+                src={article.coverImage.url}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, 200px"
+                style={{ objectFit: "cover" }}
+                fallback={contour}
+              />
+            ) : (
+              contour
+            )}
+          </div>
+        </div>
+      </div>
 
-        <h3 className="mt-2 text-[16.5px] font-semibold" style={{ lineHeight: 1.3, letterSpacing: "-0.02em" }}>
-          <Link href={href} className="transition-colors hover:text-(--accent-ink)">
-            {article.title}
-          </Link>
-        </h3>
-
-        <p
-          className="mt-1.5 line-clamp-2 text-[13px] sm:line-clamp-3"
-          style={{ lineHeight: 1.55, color: "var(--ink-dim)" }}
-        >
-          {article.excerpt}
-        </p>
-
-        <div className="mt-auto flex items-center gap-2 pt-3 text-[11.5px]" style={{ color: "var(--ink-faint)" }}>
+      <div className="ar-main">
+        <div className="ar-meta">
           <span>{article.publishedDate}</span>
           <span>·</span>
           <span>{article.readTime}</span>
-          <Link
-            href={href}
-            className="read-link mono ml-auto inline-flex items-center gap-1 font-medium transition-colors hover:text-(--accent-ink)"
-            style={{ color: "var(--ink-dim)" }}
-          >
-            Read
-            <ArrowRightIcon width={13} height={13} />
-          </Link>
+          <span aria-hidden="true" className="ar-read mono">
+            Read →
+          </span>
         </div>
+        <h3 className="ar-title">
+          <Link href={href} className="ar-link">
+            {article.title}
+          </Link>
+        </h3>
+        <p className="ar-excerpt">{article.excerpt}</p>
       </div>
     </article>
   );

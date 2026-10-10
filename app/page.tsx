@@ -16,6 +16,7 @@ import {
   getHomePageSeo,
 } from "@/content/home";
 import { getSiteSettings } from "@/content/site";
+import { mapHeroContactLinks } from "@/lib/mappers";
 import { buildPageMetadata } from "@/lib/seo";
 import { FEATURES } from "@/lib/features";
 
@@ -42,7 +43,8 @@ export default async function Home() {
   return (
     <>
       <HomeJsonLd fullName={home.fullName} siteName={site.siteName || home.fullName} sameAs={sameAs} />
-      <Hero home={home} />
+      {/* Socials come from site-setting.contactLinks: home-page.contactLinks is empty. */}
+      <Hero home={home} links={mapHeroContactLinks(site.contactLinks)} />
       <Experiences experiences={experiences} certifications={certifications} />
       <Projects projects={projects} />
       {FEATURES.tours && <Tours tours={tours} />}

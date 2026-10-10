@@ -10,11 +10,14 @@ const imgFallback = <span className="absolute inset-0" style={{ background: "var
 
 interface GalleryProps {
   images: GalleryImage[];
+  /** `grid`: 2a's experience gallery, 4:3 inset tiles. `strip`: the horizontal scroller the
+   *  project and tour detail pages still use until their redesign. */
+  variant?: "strip" | "grid";
 }
 
 /** Reusable image carousel + accessible lightbox. Renders nothing when empty.
  *  Used by expandable experience items and the project/tour detail pages. */
-export function Gallery({ images }: GalleryProps) {
+export function Gallery({ images, variant = "strip" }: GalleryProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -67,6 +70,34 @@ export function Gallery({ images }: GalleryProps) {
 
   return (
     <>
+      {variant === "grid" ? (
+        <ul className="xp-gallery">
+          {images.map((img, i) => (
+            <li key={`${img.url}-${i}`}>
+              <button
+                ref={(el) => {
+                  triggerRefs.current[i] = el;
+                }}
+                type="button"
+                onClick={() => openAt(i)}
+                aria-label={`Open image${img.alt ? `: ${img.alt}` : ` ${i + 1}`}`}
+                className="xp-gallery-btn"
+              >
+                <span className="xp-gallery-img">
+                  <StrapiImage
+                    src={img.url}
+                    alt={img.alt}
+                    fill
+                    sizes="160px"
+                    style={{ objectFit: "cover" }}
+                    fallback={null}
+                  />
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
       <ul className="mt-3 flex snap-x gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
         {images.map((img, i) => (
           <li key={`${img.url}-${i}`} className="snap-start">
@@ -92,6 +123,7 @@ export function Gallery({ images }: GalleryProps) {
           </li>
         ))}
       </ul>
+      )}
 
       {current &&
         openIndex !== null &&

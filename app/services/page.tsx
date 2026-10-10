@@ -6,7 +6,6 @@ import { waLink } from "@/lib/whatsapp";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { ContactCTA } from "@/components/sections/contact-cta";
 import { ProjectCard } from "@/components/cards/project-card";
-import { BENTO_GRID_CLASS } from "@/components/cards/bento";
 import { MailIcon, WhatsappIcon } from "@/components/ui/icons";
 import { FeaturesGrid } from "@/components/services/features-grid";
 import { PackageCard } from "@/components/services/package-card";
@@ -122,13 +121,10 @@ export default async function ServicesPage() {
         {page.featuredProjects.length > 0 && (
           <section className="mt-16">
             <SectionHeading title="Portofolio" subtitle="Beberapa proyek yang pernah saya kerjakan." />
-            {/* The shared bento class, not a lookalike: `.bento` is also what opts the
-                cards into the `.bento .pcard` rule that releases their aspect ratio at lg,
-                so the row/col spans drive the height. Without it the spans would fight a
-                fixed 16/10 ratio. */}
-            <div className={BENTO_GRID_CLASS}>
+            {/* 2a's services portfolio grid: every tile 2x1, no "Details" (see bento.ts). */}
+            <div className="bento" data-layout="services">
               {page.featuredProjects.map((project, i) => (
-                <ProjectCard key={project.id} project={project} index={i} />
+                <ProjectCard key={project.id} project={project} index={i} layout="services" />
               ))}
             </div>
           </section>
@@ -201,6 +197,7 @@ export default async function ServicesPage() {
         whatsappUrl={site.whatsappUrl}
         heading={page.ctaHeading}
         description={page.ctaText}
+        variant="services"
       />
 
       <ServicesJsonLd packages={allPackages} faqs={page.faqs} providerName={site.siteName || "Daffa Ilham Restupratama"} />

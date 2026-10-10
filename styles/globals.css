@@ -100,9 +100,6 @@ textarea::placeholder {
   --card-bg: var(--bg);
   --card-tint: none;
   --card-hi: var(--edge);
-  /* The current hero's float animation, until Phase 2 replaces the hero. */
-  --float: 9s;
-  --float-play: running;
 }
 
 /* 2a scrollbars: thin and themed. `toc` tints the thumb with the accent, `dark` is for
@@ -127,7 +124,6 @@ textarea::placeholder {
 @keyframes decoDrift { 0%, 100% { transform: translate(0,0) rotate(var(--r0)); } 50% { transform: translate(var(--dx),var(--dy)) rotate(var(--r1)); } }
 @keyframes decoBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(var(--s)); } }
 @keyframes blink { 0%, 45% { opacity: .9; } 50%, 100% { opacity: 0; } }
-@keyframes floaty { 0% { transform: translateY(0); } 50% { transform: translateY(-9px); } 100% { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   [data-deco] * {
     animation: none !important;
@@ -687,31 +683,167 @@ button.cv-btn:active {
   text-underline-offset: 3px;
 }
 
-/* ---------------- Hero data-viz panel (map + decorative charts) ---------------- */
+/* ====================================================================== */
+/* Phase 2 — homepage sections, Portfolio 2a values verbatim.              */
+/* ====================================================================== */
 
-/* Coastline from the real province GeoJSON — subtle in both themes. */
+/* ---------------- Hero ---------------- */
+
+.hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: clamp(40px,7vw,88px) clamp(10px,2.5vw,20px) 40px;
+}
+.hero-grid {
+  display: grid;
+  width: 100%;
+  max-width: 1180px;
+  grid-template-columns: minmax(0,1fr);
+  gap: clamp(36px,5vw,56px);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1.05fr .95fr;
+  }
+}
+.hero-copy {
+  min-width: 0;
+  padding: 0 clamp(4px,1vw,12px);
+}
+.hero-h1 {
+  font-weight: 700;
+  font-size: clamp(36px,6.4vw,60px);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+.hero-headline {
+  display: block;
+  font-size: clamp(24px,4vw,40px);
+}
+.hero-fullname {
+  display: block;
+  color: var(--accent-ink);
+}
+.hero-sub {
+  margin-top: 22px;
+  max-width: 31em;
+  font-size: clamp(16px,1.6vw,18px);
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.hero-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.hero-cta {
+  flex-shrink: 0;
+  white-space: nowrap;
+  gap: 9px;
+  padding: 13px 23px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.hero-divider {
+  margin: 0 4px;
+  height: 30px;
+  width: 4px;
+  border-radius: 4px;
+  box-shadow: var(--in-sm);
+}
+.hero-socials {
+  display: flex;
+  gap: 12px;
+}
+.hero-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  color: var(--ink-dim);
+  transition: transform .45s var(--spring), color .2s;
+}
+.hero-social:hover {
+  transform: translateY(-3px);
+  color: var(--accent-ink);
+}
+.hero-social:active {
+  transform: scale(.92);
+  box-shadow: var(--in-sm);
+}
+
+/* The panel sits in 2a's "dish": two concave rings, 26px proud of it (12px on phones). */
+.hero-panel-wrap {
+  position: relative;
+  margin: 26px;
+}
+.hero-dish {
+  position: absolute;
+  inset: -26px;
+  border-radius: 52px;
+  padding: 13px;
+  box-shadow: var(--in-deco);
+}
+.hero-dish > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 42px;
+  box-shadow: var(--in-deco);
+}
+@media (max-width: 719px) {
+  .hero-panel-wrap {
+    margin: 12px;
+  }
+  .hero-dish {
+    inset: -12px;
+  }
+}
+.hero-panel {
+  position: relative;
+  z-index: 2;
+  padding: 18px;
+  border-radius: 32px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.hero-label {
+  margin: 2px 6px 12px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-well {
+  padding: 14px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+
+/* Map: the pre-serialised coastline (MAP_MARKUP), recoloured to 2a's mapVars. */
+/* 2a sets `vector-effect` on the <g>, where it does not inherit, so its coastline strokes
+   scale with the map (0.8 viewBox units). Matching that means no non-scaling-stroke here. */
 .hero-map-land path {
-  fill: color-mix(in srgb, var(--accent) 13%, transparent);
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
   stroke: color-mix(in srgb, var(--accent) 42%, transparent);
   stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
 }
-[data-theme="dark"] .hero-map-land path {
-  fill: color-mix(in srgb, var(--accent) 17%, transparent);
-  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
-}
-/* Network edges with a travelling dash pulse (cheap; the global reduced-motion rule
-   disables the animation and leaves a static dashed line). */
-/* Network edges are solid, complete lines at rest. Hovering (or tapping) one "plucks" it
-   like a guitar string: the JS rAF loop in hero-panel.tsx bows the quadratic control
-   point perpendicular to the edge with a damped sine, settling straight in ~800ms. */
+/* Edges are solid lines at rest. Hovering (or tapping) one "plucks" it like a guitar string:
+   the rAF loop in hero-panel.tsx bows the quadratic control point with a damped sine. */
 .hero-map-edge {
   fill: none;
-  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 62%, transparent);
   stroke-width: 2.6;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  transition: stroke 0.18s ease;
 }
 /* Wide invisible hit band over each edge — the visible stroke is far too thin to target. */
 .hero-edge-hit {
@@ -722,33 +854,23 @@ button.cv-btn:active {
   cursor: pointer;
   vector-effect: non-scaling-stroke;
 }
-.hero-edge-group:hover .hero-map-edge {
-  stroke: color-mix(in srgb, var(--accent) 85%, transparent);
-}
-/* Under reduced motion nothing vibrates (the rAF loop never starts), so hover gets a
-   brief colour highlight as the sole feedback. */
-@media (prefers-reduced-motion: reduce) {
-  .hero-edge-group:hover .hero-map-edge {
-    stroke: var(--accent);
-  }
-}
 .hero-map-node {
   cursor: pointer;
   outline: none;
 }
 .hero-node-halo {
   fill: color-mix(in srgb, var(--accent) 26%, transparent);
-  transition: fill 0.18s ease;
+  transition: fill .18s;
 }
 .hero-node-dot {
-  fill: var(--accent-ink);
-  transition: fill 0.18s ease;
+  fill: var(--accent-b-ink);
 }
 .hero-map-node:hover .hero-node-halo,
 .hero-map-node[data-active] .hero-node-halo,
 .hero-map-node:focus-visible .hero-node-halo {
-  fill: color-mix(in srgb, var(--accent) 58%, transparent);
+  fill: color-mix(in srgb, var(--accent) 60%, transparent);
 }
+/* Keyboard focus only (2a defines none): the dot darkens so the focused city is findable. */
 .hero-map-node:focus-visible .hero-node-dot {
   fill: var(--ink);
 }
@@ -767,23 +889,60 @@ button.cv-btn:active {
   color: var(--bg);
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
 }
-/* The donut is fixed at 76px on desktop, which is comfortable inside its ~211px card but
-   would nearly fill the ~105px card at 320px. A percentage of the card makes it shrink with
-   the panel exactly as the bar chart does, and the cap holds it at the previous desktop
-   size from ~510px viewport upward — so wide layouts are pixel-identical to before.
-   (The bar card's 60.8% share now comes from the grid track itself, so the max-width cap
-   that used to live here is gone: it would have compounded to ~37% of the panel.) */
-.hero-donut {
-  width: 46%;
-  max-width: 76px;
-}
 
+/* Charts */
+.hero-charts {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 14px;
+}
+.hero-chart {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.hero-chart-label {
+  margin-bottom: 8px;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-chart-mix {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 10px 8px 26px;
+}
+.hero-chart-label-abs {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  margin: 0;
+}
+/* The donut takes whatever height the bar card gives the row, as 2a's absolute SVG does. */
+.hero-donut-box {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  align-self: stretch;
+}
+.hero-donut {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* Bars grow from their bottom edge via scaleY — transitioning the SVG y/height
    geometry properties is not reliable across browsers (Safari notably ignores it). */
 .hero-bar {
   transform-box: fill-box;
   transform-origin: bottom;
-  transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 1.1s cubic-bezier(.34,1.4,.64,1);
 }
 .hero-donut-track {
   fill: none;
@@ -793,10 +952,991 @@ button.cv-btn:active {
 .hero-donut-slice {
   fill: none;
   stroke-width: 9;
-  stroke-linecap: butt;
   transform: rotate(-90deg);
   transform-origin: center;
-  transition: stroke-dasharray 1.1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dasharray 1.1s, stroke-dashoffset 1.1s;
+}
+
+/* ---------------- Hero name (hero-name.tsx) ---------------- */
+
+/* One box, three layers: sr-only text, an invisible sizer, and the typed overlay. */
+.hn {
+  position: relative;
+  display: block;
+}
+.hn-sizer {
+  visibility: hidden;
+}
+.hn-type {
+  position: absolute;
+  inset: 0;
+}
+.hn-word {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+.hn-mark {
+  position: absolute;
+  left: -0.08em;
+  top: 0.14em;
+  width: calc(100% + 0.16em);
+  height: 0.86em;
+  z-index: -1;
+  overflow: visible;
+}
+.hn-caret {
+  display: inline-block;
+  width: 0.07em;
+  height: 0.8em;
+  margin-left: 0.05em;
+  vertical-align: -0.04em;
+  border-radius: 2px;
+  background: var(--accent-b);
+  animation: blink 1.05s steps(1) infinite;
+}
+.hn-caret-static {
+  display: none;
+}
+/* Reduced motion: no typing at all. The sizer becomes the visible name (with a still caret,
+   as 2a leaves it) from the very first paint, before any script has run. */
+@media (prefers-reduced-motion: reduce) {
+  .hn-sizer {
+    visibility: visible;
+  }
+  .hn-caret-static {
+    display: inline-block;
+  }
+  .hn-type {
+    display: none;
+  }
+}
+
+/* ---------------- Shared chevron circle (experience + certification cards) ---------------- */
+
+.nm-chev {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  color: var(--ink-faint);
+}
+.nm-chev[data-open] {
+  box-shadow: var(--in-sm);
+}
+.nm-chev svg {
+  transition: transform .45s var(--spring);
+}
+.nm-chev[data-open] svg {
+  transform: rotate(180deg);
+}
+
+/* ---------------- Experiences ---------------- */
+
+.xp {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 64px clamp(16px,4vw,40px) 10px;
+}
+.xp-inner {
+  width: 100%;
+  max-width: 820px;
+}
+.xp-title {
+  margin-bottom: 26px;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.xp-tabs-wrap {
+  margin-bottom: 34px;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+}
+.xp-tabs {
+  --xp-tab-w: 136px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--xp-tabs), var(--xp-tab-w));
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+@media (max-width: 639px) {
+  .xp-tabs-wrap {
+    justify-content: flex-start;
+  }
+  .xp-tabs {
+    --xp-tab-w: 118px;
+  }
+}
+.xp-thumb {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: var(--xp-tab-w);
+  height: calc(100% - 12px);
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .55s var(--spring);
+}
+.xp-tab {
+  position: relative;
+  z-index: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-dim);
+  transition: color .3s;
+}
+.xp-tab[data-active] {
+  color: var(--accent-ink);
+}
+.xp-timeline {
+  position: relative;
+}
+.xp-rail {
+  position: absolute;
+  top: 10px;
+  bottom: 24px;
+  left: 21px;
+  width: 6px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.xp-item {
+  position: relative;
+  padding: 0 0 20px 60px;
+}
+.xp-dot {
+  position: absolute;
+  top: 28px;
+  left: 14px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.xp-dot > span {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.xp-card {
+  cursor: pointer;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .5s var(--spring);
+}
+.xp-card:hover {
+  transform: translateY(-3px);
+}
+.xp-card:active {
+  transform: scale(.99);
+}
+.xp-head,
+.cc-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.xp-logo {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.xp-text {
+  flex: 1;
+  min-width: 0;
+}
+.xp-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+.xp-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.xp-date {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.xp-role {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+.xp-body {
+  padding-left: 68px;
+}
+.xp-loc {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.xp-desc {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.xp-gallery {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+.xp-gallery-btn {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  padding: 5px;
+  border: none;
+  border-radius: 14px;
+  cursor: zoom-in;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+  transition: transform .4s var(--spring);
+}
+.xp-gallery-btn:hover {
+  transform: translateY(-2px);
+}
+.xp-gallery-img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+.xp-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 0 60px;
+}
+.xp-more,
+.xp-pill {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .45s var(--spring);
+}
+.xp-more {
+  padding: 10px 19px;
+  font-size: 13.5px;
+}
+.xp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  font-size: 14px;
+}
+.xp-more:hover,
+.xp-pill:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.xp-more:active,
+.xp-pill:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+.xp-certs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.xp-center {
+  display: flex;
+  justify-content: center;
+  padding-top: 6px;
+}
+
+/* ---------------- Certification card (tab + /certifications) ---------------- */
+
+.cc {
+  cursor: pointer;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .5s var(--spring);
+}
+.cc:hover {
+  transform: translateY(-2px);
+}
+.cc-logo {
+  display: flex;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.cc-text {
+  flex: 1;
+  min-width: 0;
+}
+.cc-title {
+  font-size: 16.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.cc-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+.cc-kind {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.cc-body {
+  padding-left: 66px;
+}
+.cc-desc {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.cc-skills {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.cc-skill {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.cc-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.cc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: inherit;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.cc-btn:hover {
+  color: var(--accent-ink);
+}
+.cc-btn:active {
+  box-shadow: var(--in-sm);
+}
+.cc-cred-text {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+/* The Experiences tab card is a step smaller than the /certifications card (2a). */
+.cc[data-size="tab"] .cc-title {
+  font-size: 16px;
+}
+.cc[data-size="tab"] .cc-sub,
+.cc[data-size="tab"] .cc-desc {
+  font-size: 13.5px;
+}
+.cc[data-size="tab"] .cc-skill {
+  font-size: 11px;
+}
+.cc[data-size="tab"] .cc-actions {
+  margin-top: 12px;
+}
+
+/* ---------------- Section heading row (Selected projects, Articles) ---------------- */
+
+.home-sec {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 56px clamp(16px,4vw,40px) 10px;
+}
+.home-sec-articles {
+  padding-bottom: 20px;
+}
+.home-sec-inner {
+  width: 100%;
+  max-width: 1180px;
+}
+.sec-head {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sec-title {
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.sec-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .45s var(--spring);
+}
+.sec-link:hover {
+  transform: translateY(-2px);
+}
+.sec-link:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- Bento grids (cards/bento.ts) ---------------- */
+
+.bento {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 22px;
+}
+/* home + services: one column of 16:9 tiles below 900px, 4 × 204px tracks above. */
+@media (min-width: 900px) {
+  .bento:is([data-layout="home"], [data-layout="services"]) {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    grid-auto-rows: 204px;
+    grid-auto-flow: dense;
+  }
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc {
+    aspect-ratio: auto;
+    grid-column: span 2;
+  }
+  .bento[data-layout="home"] .pc[data-rows="2"] {
+    grid-row: span 2;
+  }
+}
+/* projects: 204px rows at every width; four columns and the six-step pattern from 720px. */
+.bento[data-layout="projects"] {
+  grid-auto-rows: 204px;
+}
+.bento[data-layout="projects"] .pc {
+  aspect-ratio: auto;
+}
+@media (min-width: 720px) {
+  .bento[data-layout="projects"] {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    grid-auto-flow: dense;
+  }
+  .bento[data-layout="projects"] .pc {
+    grid-column: span 2;
+  }
+  .bento[data-layout="projects"] .pc[data-rows="2"] {
+    grid-row: span 2;
+  }
+}
+
+/* ---------------- Project tile (cards/project-card.tsx) ---------------- */
+
+.pc {
+  position: relative;
+  aspect-ratio: 16/9;
+  padding: 8px;
+  border-radius: 26px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  cursor: pointer;
+  transition: transform .55s var(--spring), box-shadow .3s;
+}
+.pc:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.pc:active {
+  transform: scale(.985);
+}
+.pc-frame {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 19px;
+}
+.pc-base {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: #14171C;
+}
+.pc-contour,
+.ar-contour {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+/* Fixed dark scrim — theme-independent, so the white overlay text holds in both themes. */
+.pc-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(10,13,20,.86) 0%, rgba(10,13,20,.5) 38%, rgba(10,13,20,0) 74%);
+}
+.pc-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px 20px;
+  /* The whole tile is a link target; dragging across it must not start a text selection. */
+  user-select: none;
+}
+/* 2a's reveal: each foldable row is a 0fr/1fr grid track, so it opens to its own height. */
+.pc-fold {
+  display: grid;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1), opacity .3s;
+}
+.pc-fold > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.pc-meta,
+.pc-tech {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pc-sum {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.pc-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+.pc-type {
+  white-space: nowrap;
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(10,13,20,.55);
+}
+.pc-year {
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+}
+.pc-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.22;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Full-tile hit target for the title link, while keeping it a real <a>. */
+.pc-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.pc-sum p {
+  padding-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pc-tech-row {
+  padding-top: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pc-skills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  /* One row only. 2a's logo tiles always fit; the legacy text-chip fallback (not in 2a) can
+     wrap to three rows on a 375px tile and push the title out of the frame, so chips that do
+     not fit on the first row are dropped whole. */
+  max-height: 26px;
+  overflow: hidden;
+}
+.pc-logo {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.92);
+}
+.pc-logo > span {
+  width: 17px;
+  height: 17px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.pc-chip {
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 26px;
+  white-space: nowrap;
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.92);
+}
+.pc-details {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+}
+/* Hover (or keyboard focus): the summary opens; on small tiles the type and technology rows
+   fold away to make room. */
+.pc:is(:hover, :focus-within) .pc-sum {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pc:is(:hover, :focus-within) :is(.pc-meta, .pc-tech) {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+/* "Big" tiles keep both rows and allow six summary lines. Which tiles are big follows 2a:
+   the two-row tiles in a multi-column grid, and every home/services tile at 560–899px. */
+@media (min-width: 900px) {
+  .bento[data-layout="home"] .pc[data-rows="2"]:is(:hover, :focus-within) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento[data-layout="home"] .pc[data-rows="2"] .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+@media (min-width: 560px) and (max-width: 899px) {
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc:is(:hover, :focus-within) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+@media (min-width: 720px) {
+  .bento[data-layout="projects"] .pc[data-rows="2"]:is(:hover, :focus-within) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento[data-layout="projects"] .pc[data-rows="2"] .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+
+/* ---------------- Article row (articles/article-list-item.tsx) ---------------- */
+
+.ar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px,2vw,22px);
+  padding: 14px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  cursor: pointer;
+  transition: transform .55s var(--spring);
+}
+.ar:hover {
+  transform: translateY(-3px);
+}
+.ar:active {
+  transform: scale(.99);
+}
+.ar-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 200px;
+  flex-shrink: 0;
+}
+@media (max-width: 639px) {
+  .ar-side {
+    width: 100%;
+  }
+}
+.ar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+}
+.ar-cat,
+.ar-feat {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--out-sm);
+}
+.ar-cat {
+  color: var(--accent-ink);
+  background: var(--bg);
+}
+.ar-feat {
+  background: var(--accent-b);
+  color: var(--on-b);
+}
+.ar-lang {
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.ar-thumb {
+  aspect-ratio: 4/3;
+  padding: 7px;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.ar-thumb-in {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ar-main {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 200px;
+  flex-direction: column;
+  padding: 0 8px 4px 0;
+}
+.ar-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.ar-read {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+.ar-title {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+/* Full-row hit target for the title link, while keeping it a real <a>. */
+.ar-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.ar-excerpt {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------------- Contact CTA (sections/contact-cta.tsx) ---------------- */
+
+.cta {
+  position: relative;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 64px clamp(12px,3vw,40px) 24px;
+}
+.cta-ring {
+  padding: clamp(8px,1.4vw,14px);
+  border-radius: 48px;
+  box-shadow: var(--in-deco);
+}
+.cta-ring .cta-ring {
+  border-radius: 40px;
+}
+.cta-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: clamp(36px,5vw,56px) clamp(18px,4vw,40px);
+  text-align: center;
+  border-radius: 32px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.cta-title {
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.cta-text {
+  margin: 12px auto 0;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.cta[data-variant="services"] .cta-title {
+  text-wrap: balance;
+}
+.cta[data-variant="services"] .cta-text {
+  max-width: 46ch;
+}
+.cta-well {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px;
+  border-radius: 32px;
+  box-shadow: var(--in);
+}
+.cta .cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: transform .45s var(--spring);
+}
+.cta .cta-btn:hover {
+  transform: translateY(-2px);
+}
+/* Pressing wins over hovering, as in 2a. */
+.cta .nm-btn-accent:active {
+  transform: translateY(1px) scale(.97);
+}
+.cta-btn-email {
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.cta .cta-btn-email:active {
+  transform: scale(.97);
+  box-shadow: var(--in-sm);
 }
 
 /* ---------------- /services device mockups ---------------- */
@@ -1158,177 +2298,6 @@ button.cv-btn:active {
   box-shadow: var(--glass-sh-lg);
   min-width: 168px;
   max-width: 62vw;
-}
-
-/* ---------------- Project bento card (cover-filled) ---------------- */
-
-/* Uniform ratio by default. Inside a bento grid the row/col spans drive the height from
-   `lg` up instead, so the ratio is released only there — cards used in ordinary grids
-   (services portfolio, related projects) keep their aspect ratio at every width. */
-.pcard {
-  aspect-ratio: 16 / 10;
-}
-@media (min-width: 1024px) {
-  .bento .pcard {
-    aspect-ratio: auto;
-  }
-}
-/* The whole tile is one link target, so the overlay text must not be selectable: dragging
-   across it used to start a text selection and flicker the cursor between the I-beam and
-   the pointer. Scoped to the overlay only — article prose and code blocks stay selectable. */
-.pcard {
-  cursor: pointer;
-}
-.pcard-body {
-  user-select: none;
-}
-.pcard-cover {
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.pcard:hover .pcard-cover {
-  transform: scale(1.04);
-}
-/* Type-hue panel for projects without a cover yet, plus a faint grain so it doesn't
-   read as a flat colour block. */
-.pcard-fallback {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(120% 90% at 20% 10%, color-mix(in srgb, var(--pcard-hue) 55%, transparent), transparent 60%),
-    linear-gradient(150deg, color-mix(in srgb, var(--pcard-hue) 42%, #0d1c21), #0d1c21 70%);
-}
-.pcard-fallback::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.16;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px);
-  background-size: 5px 5px;
-}
-/* Fixed dark scrim — theme-independent, so white overlay text keeps contrast over any
-   image in both light and dark mode. */
-.pcard-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    to top,
-    rgba(6, 16, 20, 0.88) 0%,
-    rgba(6, 16, 20, 0.62) 34%,
-    rgba(6, 16, 20, 0.16) 66%,
-    rgba(6, 16, 20, 0.04) 100%
-  );
-}
-/* Clamp the title so a long project name can't push the badge out of the top of a
-   short (single-row) tile, which overflow:hidden would then clip. */
-.pcard-heading {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  line-height: 1.22;
-}
-.pcard[data-tall] .pcard-heading {
-  -webkit-line-clamp: 3;
-}
-.pcard-title::after {
-  /* Full-card hit target for the title link, while keeping it a real <a>. */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-/* Matches the body's own padding, so an absolutely positioned child can sit on the
-   content box — absolute offsets resolve against the PADDING box, which would otherwise
-   put it flush against the border. */
-.pcard-body {
-  --pcard-pad: 16px;
-}
-@media (min-width: 640px) {
-  .pcard-body {
-    --pcard-pad: 20px;
-  }
-}
-
-/* The whole card is a navigation target, so tap-to-reveal would fight tapping through:
-   the summary is a hover/focus affordance only. Base = hidden (also the touch state for
-   compact tiles). */
-.pcard-summary {
-  display: none;
-}
-
-/* ----- Feature (2×2) tiles: inline reveal, unchanged ----- */
-@media (hover: hover) {
-  .pcard[data-tall] .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    max-height: 0;
-    margin-top: 0;
-    opacity: 0;
-    transition: max-height 0.28s ease, opacity 0.28s ease, margin-top 0.28s ease;
-  }
-  .pcard[data-tall]:hover .pcard-summary,
-  .pcard[data-tall]:focus-within .pcard-summary {
-    max-height: 4.8em;
-    margin-top: 7px;
-    opacity: 1;
-  }
-}
-@media (hover: none) {
-  .pcard[data-tall] .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    margin-top: 7px;
-    opacity: 1;
-  }
-}
-
-/* ----- Compact (2×1) tiles: rest ⇄ hover crossfade -----
-   Rest shows the metadata (badge + year, title, tech tiles, Details); hover shows the
-   title + summary. Strictly opacity — the faded elements keep their boxes and the summary
-   is taken out of flow, so nothing shifts or reflows during the swap. It lands in the
-   band the foot vacates, which is why it clamps to 2 lines: three would reach back up
-   into the title. Touch pointers get no swap at all and keep the rest state permanently
-   (the summary is one tap away on the detail page). */
-@media (hover: hover) {
-  .pcard:not([data-tall]) .pcard-topline,
-  .pcard:not([data-tall]) .pcard-foot {
-    transition: opacity 0.28s ease;
-  }
-  .pcard:not([data-tall]):hover .pcard-topline,
-  .pcard:not([data-tall]):focus-within .pcard-topline,
-  .pcard:not([data-tall]):hover .pcard-foot,
-  .pcard:not([data-tall]):focus-within .pcard-foot {
-    opacity: 0;
-  }
-  /* Keyboard focus can land on the Details link inside the foot; it must stay visible
-     when it does. Same specificity as the rule above, so source order decides — this one
-     has to come after it. */
-  .pcard:not([data-tall]) .pcard-foot:focus-within {
-    opacity: 1;
-  }
-
-  .pcard:not([data-tall]) .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    position: absolute;
-    left: var(--pcard-pad);
-    right: var(--pcard-pad);
-    bottom: var(--pcard-pad);
-    margin: 0;
-    opacity: 0;
-    transition: opacity 0.28s ease;
-  }
-  .pcard:not([data-tall]):hover .pcard-summary,
-  .pcard:not([data-tall]):focus-within .pcard-summary {
-    opacity: 1;
-  }
 }
 
 /* Technology logo tile. The surface is a FIXED off-white in both themes (not

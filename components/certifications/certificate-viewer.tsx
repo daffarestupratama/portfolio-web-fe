@@ -3,7 +3,6 @@
 import { createPortal } from "react-dom";
 import { useCallback, useRef, useState } from "react";
 import { useLightbox } from "@/components/ui/use-lightbox";
-import { FileTextIcon } from "@/components/ui/icons";
 
 interface CertificateViewerProps {
   /** Absolute URL of the certificate file. */
@@ -43,9 +42,8 @@ export function CertificateViewer({ url, title }: CertificateViewerProps) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`View certificate: ${title}`}
-        className="glass-pill mono gap-1.5 px-3 py-1.5 text-[12px] font-medium"
+        className="cc-btn mono"
       >
-        <FileTextIcon width={13} height={13} />
         Certificate
       </button>
 
