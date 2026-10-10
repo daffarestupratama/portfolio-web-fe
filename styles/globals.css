@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
+/* The Claude Design handoff is reference material only. Never scan it for class names. */
+@source not "../design-export";
+
 /* ---------------------------------------------------------------------- */
-/* Design tokens — copied verbatim from design-export/Daffa Portfolio.dc.html */
-/* Only change from the export: body font-family swapped from Space Grotesk */
-/* to var(--font-sans) (Inter), per kickoff-brief.md §3.                    */
+/* Design tokens: Portfolio 2a (design-export/redesign-v2), copied verbatim */
+/* for the single shipped combination Denim & Ochre / Soft / Smooth /       */
+/* Terraces on. 2a scopes them to [data-pal] / [data-th] / [data-depth];    */
+/* with one combination they sit on :root and on next-themes'              */
+/* [data-theme="dark"]. Smooth texture means no grain layer at all.         */
 /* ---------------------------------------------------------------------- */
 
 * {
@@ -21,98 +26,126 @@ body {
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.012em;
 }
+a {
+  color: inherit;
+  text-decoration: none;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-faint);
+}
 
 :root {
-  --bg: #EFF5F1; --surface: #FFFFFF;
-  --ink: #1B2E33; --ink-dim: #4E6569; --ink-faint: #86A09B;
-  --border: #D8E6E0;
-  /* hue anchors (light) */
-  --sky: #5AA9D6; --green: #5FB98A; --teal: #46B3AE;
-  --set-sky-a: #5AA9D6; --set-sky-2: #7FC0E2; --set-sky-ink: #2E7CA8;
-  --set-teal-a: #46B3AE; --set-teal-2: #79CDC8; --set-teal-ink: #2E8783;
-  --set-green-a: #5FB98A; --set-green-2: #86CFA6; --set-green-ink: #3C8E63;
-  /* default accent = sky */
-  --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink);
-  --chip: color-mix(in srgb, var(--accent) 12%, transparent);
-  --chip-brd: color-mix(in srgb, var(--accent) 26%, transparent);
-  /* liquid-glass material — base (light) */
-  --g-op-base: 0.55; --g-blur-base: 18px; --g-spec-base: 0.85; --g-hi-base: 0.92; --g-brd-base: 0.66;
-  --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1;
-  --glass-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult)));
-  --glass-bg-2: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.55));
-  --glass-brd: rgba(255,255,255, var(--g-brd-base));
-  --glass-hi: rgba(255,255,255, calc(var(--g-hi-base) * var(--g-spec-mult)));
-  --glass-spec: calc(var(--g-spec-base) * var(--g-spec-mult));
-  --glass-blur: calc(var(--g-blur-base) * var(--g-blur-mult));
-  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 60%);
-  /* cards — cleaner, more restrained glass (nav keeps the fuller --glass-* recipe) */
-  --card-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.48));
-  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.12), rgba(255,255,255,0.015) 55%);
-  --card-hi: rgba(255,255,255,0.4);
-  --glass-sh: 0 18px 40px -22px rgba(27,46,51,0.30);
-  --glass-sh-lg: 0 40px 80px -30px rgba(27,46,51,0.42);
-  /* ambient blobs — subtle, recessive */
-  --blob-green: rgba(191,227,207,0.55); --blob-sky: rgba(195,228,241,0.55); --blob-lum: rgba(255,255,255,0.75);
-  --blob-op: 0.22;
-  /* motion */
-  --drift: 64s; --float: 9s; --float-play: running; --lift: -8px;
+  /* Denim & Ochre, light */
+  --bg: #ECE7DD;
+  --ink: #22252B; --ink-dim: #4C4E55; --ink-faint: #615F63;
+  --sd: rgba(158,146,126,.5); --hl: rgba(255,253,247,.9); --edge: rgba(255,253,247,.65);
+  --accent: #3D5A80; --accent-2: #A9B8CC; --accent-ink: #34507A; --on-accent: #FFFFFF;
+  --accent-b: #B7832F; --accent-b-ink: #87601C; --on-b: #1F1708;
+  --term: #1B1C1F;
+
+  /* Soft depth */
+  --out-sm: 3px 3px 7px var(--sd), -3px -3px 7px var(--hl);
+  --out: 7px 7px 16px var(--sd), -7px -7px 16px var(--hl);
+  --out-lg: 15px 15px 34px var(--sd), -13px -13px 30px var(--hl);
+  --in-sm: inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--hl);
+  --in: inset 5px 5px 12px var(--sd), inset -5px -5px 12px var(--hl);
+  --in-deco: inset 5px 5px 11px var(--sd), inset -5px -5px 11px var(--hl);
+  --press: inset 2px 3px 7px rgba(0,0,0,.28), inset -1px -1px 2px rgba(255,255,255,.08);
+  --rim: inset 0 1px 0 var(--edge);
+
+  /* Motion: the spring every 2a hover/press uses. */
+  --spring: cubic-bezier(.34,1.56,.64,1);
+
+  /* Offsets tied to the nav. The stuck nav is 60px tall (10px padding + 40px controls),
+     measured in the 2a render at all four widths. The values below are the ones 2a itself
+     uses against that bar: sticky asides and the guestbook form at 100, the #contact
+     anchor at 90. Article headings use HEADING_SCROLL_OFFSET (components/blocks/toc.ts). */
+  --nav-stuck-h: 60px;
+  --sticky-top: 100px;
+  --anchor-contact: 90px;
 }
 [data-theme="dark"] {
-  --bg: #0F1E20; --surface: #15282A;
-  --ink: #E7F1ED; --ink-dim: #9DB4B0; --ink-faint: #6E8783;
-  --border: rgba(255,255,255,0.12);
-  --sky: #74C2EA; --green: #72D3A0; --teal: #4FCFC6;
-  --set-sky-a: #74C2EA; --set-sky-2: #A5DAF2; --set-sky-ink: #B7E4FA;
-  --set-teal-a: #4FCFC6; --set-teal-2: #8AE0DA; --set-teal-ink: #B4EEEA;
-  --set-green-a: #72D3A0; --set-green-2: #9BE1BE; --set-green-ink: #C0EED5;
-  --g-op-base: 0.075; --g-spec-base: 0.5; --g-hi-base: 0.4; --g-brd-base: 0.14;
-  --glass-bg: rgba(255,255,255,0.07);
-  --glass-bg-2: rgba(255,255,255,0.04);
-  --glass-brd: rgba(255,255,255,0.12);
-  --glass-hi: rgba(255,255,255,0.10);
-  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.05), rgba(255,255,255,0.008) 60%);
-  --card-bg: rgba(255,255,255,0.045);
-  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 55%);
-  --card-hi: rgba(255,255,255,0.10);
-  --glass-sh: 0 22px 48px -22px rgba(0,0,0,0.72);
-  --glass-sh-lg: 0 46px 92px -30px rgba(0,0,0,0.82);
-  --blob-green: rgba(114,211,160,0.9); --blob-sky: rgba(116,194,234,0.9); --blob-lum: rgba(0,0,0,0.55);
-  --blob-op: 0.09;
+  /* Denim & Ochre, dark */
+  --bg: #1C1D20;
+  --ink: #E8E5DE; --ink-dim: #B1ADA5; --ink-faint: #96928A;
+  --sd: rgba(0,0,0,.62); --hl: rgba(255,245,230,.045); --edge: rgba(255,245,230,.06);
+  --accent: #8FA8CC; --accent-2: #3F5470; --accent-ink: #B2C3DD; --on-accent: #11161E;
+  --accent-b: #D9A954; --accent-b-ink: #E6BE76; --on-b: #1E1606;
+  --term: #121315;
 }
-/* accent mood (independent of theme; hues follow theme via --set-*) */
-[data-accent="sky"] { --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink); }
-[data-accent="teal"] { --accent: var(--set-teal-a); --accent-2: var(--set-teal-2); --accent-ink: var(--set-teal-ink); }
-[data-accent="green"] { --accent: var(--set-green-a); --accent-2: var(--set-green-2); --accent-ink: var(--set-green-ink); }
-/* glass intensity */
-[data-glass="subtle"] { --g-op-mult: 0.72; --g-blur-mult: 0.62; --g-spec-mult: 0.58; }
-[data-glass="balanced"] { --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1; }
-[data-glass="vivid"] { --g-op-mult: 1.22; --g-blur-mult: 1.55; --g-spec-mult: 1.28; }
-/* motion */
-[data-motion="calm"] { --drift: 130s; --float-play: paused; --lift: -3px; }
 
-@keyframes driftA { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(3vw,2vh) scale(1.08); } 100% { transform: translate(0,0) scale(1); } }
-@keyframes driftB { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-2.5vw,3vh) scale(1.06); } 100% { transform: translate(0,0) scale(1); } }
-@keyframes driftC { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(2vw,-2.5vh) scale(1.1); } 100% { transform: translate(0,0) scale(1); } }
+/* ---------------------------------------------------------------------- */
+/* LEGACY BRIDGE (removed in Phase 4). Pages not yet migrated to 2a still   */
+/* reference the old glass/hue tokens inline. Aliasing them to the          */
+/* neumorphic tokens keeps every route coherent in the new palette until    */
+/* its phase replaces the markup. Nothing new should use these.            */
+/* ---------------------------------------------------------------------- */
+:root {
+  --surface: var(--bg);
+  --border: color-mix(in srgb, var(--ink) 12%, transparent);
+  --sky: var(--accent);
+  --teal: var(--accent-2);
+  --green: var(--accent-b);
+  --chip: color-mix(in srgb, var(--accent) 10%, transparent);
+  --chip-brd: color-mix(in srgb, var(--accent) 24%, transparent);
+  --glass-bg: var(--bg);
+  --glass-bg-2: var(--bg);
+  --glass-brd: transparent;
+  --glass-hi: var(--edge);
+  --glass-tint: none;
+  --glass-blur: 0px;
+  --glass-sh: var(--out);
+  --glass-sh-lg: var(--out-lg);
+  --card-bg: var(--bg);
+  --card-tint: none;
+  --card-hi: var(--edge);
+  /* The current hero's float animation, until Phase 2 replaces the hero. */
+  --float: 9s;
+  --float-play: running;
+}
+
+/* 2a scrollbars: thin and themed. `toc` tints the thumb with the accent, `dark` is for
+   surfaces that stay dark in both themes (code, terminal). */
+[data-sb] {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink) 24%, transparent) transparent;
+}
+[data-sb]::-webkit-scrollbar { width: 10px; height: 10px; }
+[data-sb]::-webkit-scrollbar-track { background: transparent; }
+[data-sb]::-webkit-scrollbar-corner { background: transparent; }
+[data-sb]::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent) padding-box;
+}
+[data-sb="toc"] { scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent; }
+[data-sb="toc"]::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 45%, transparent) padding-box; }
+[data-sb="dark"] { scrollbar-color: rgba(255,255,255,.2) transparent; }
+[data-sb="dark"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18) padding-box; }
+
+@keyframes decoDrift { 0%, 100% { transform: translate(0,0) rotate(var(--r0)); } 50% { transform: translate(var(--dx),var(--dy)) rotate(var(--r1)); } }
+@keyframes decoBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(var(--s)); } }
+@keyframes blink { 0%, 45% { opacity: .9; } 50%, 100% { opacity: 0; } }
 @keyframes floaty { 0% { transform: translateY(0); } 50% { transform: translateY(-9px); } 100% { transform: translateY(0); } }
-@keyframes blink { 0%, 45% { opacity: 0.9; } 50%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
+  [data-deco] * {
+    animation: none !important;
+  }
   * {
     animation: none !important;
     transition: none !important;
   }
 }
 
-/* ---------------------------------------------------------------------- */
-/* Component recipes — the export drives hover/active state via per-element */
-/* `style-hover`/`style-active` props (a Claude-Design-only mechanism).     */
-/* These classes port the same values to real CSS so :hover/:active work.  */
-/* One-off, single-instance surfaces (footer bar, stat                     */
-/* mini-cards, the hero graph card) are styled inline at their call site   */
-/* instead of going through a shared class.                                */
-/* ---------------------------------------------------------------------- */
-
 a,
 button {
+  font: inherit;
+  color: inherit;
+}
+input,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
@@ -120,53 +153,425 @@ button {
 /* Direct reference to the next/font variable — not routed through Tailwind's
    @theme (that token namespace shares the --font-mono/--font-sans names with
    the runtime variables next/font sets on <html>, which risks a self-referential
-   custom-property cycle). Use className="mono" wherever the export uses
+   custom-property cycle). Use className="mono" wherever the design uses
    JetBrains Mono. */
 .mono {
   font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
+/* 2a defines no focus style, so the existing ring stays, in the new accent. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Nav wrapper: floats from a full-width bar into a detached glass pill on
-   scroll. Base = unscrolled bar; [data-scrolled="true"] = scrolled pill. */
-.nav-shell {
+/* ---------------------------------------------------------------------- */
+/* Neumorphic recipes. 2a drives hover/press with per-element `style-hover` */
+/* and `style-active` props (a Claude Design mechanism); these port the     */
+/* exact values to real :hover / :active.                                   */
+/* ---------------------------------------------------------------------- */
+
+/* Raised pill, e.g. "← All articles", credential and certificate controls. */
+.nm-pill {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring), color .2s;
+}
+.nm-pill:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.nm-pill:active {
+  box-shadow: var(--in-sm);
+}
+
+/* Primary accent button (View Resume, WhatsApp, Sign the guestbook). */
+.nm-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.nm-btn-accent:hover {
+  transform: translateY(-3px);
+}
+.nm-btn-accent:active {
+  transform: translateY(1px) scale(.97);
+  box-shadow: var(--press);
+}
+
+/* Secondary raised button (Contact Me, Email). */
+.nm-btn {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.nm-btn:hover {
+  transform: translateY(-3px);
+}
+.nm-btn:active {
+  transform: scale(.97);
+  box-shadow: var(--in-sm);
+}
+
+/* Raised surface. Radius is set per use (22 to 28 in 2a). */
+.nm-card {
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+
+/* Inset well (chips, inputs, footer bar, code spans). */
+.nm-well {
+  box-shadow: var(--in-sm);
+}
+
+/* Filter chip: raised at rest, pressed in and accent-ink when active. */
+.nm-chip {
+  white-space: nowrap;
+  padding: 6px 13px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.nm-chip[aria-pressed="true"],
+.nm-chip[data-active="true"] {
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.nm-chip:active {
+  transform: scale(.95);
+}
+
+/* Round raised icon button (hero socials 44px, chevrons 30 to 32px). */
+.nm-icon-circle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring), color .2s;
+}
+.nm-icon-circle:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.nm-icon-circle:active {
+  box-shadow: var(--in-sm);
+}
+
+/* Section "All projects →" link pill. */
+.nm-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  padding: 8px 15px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .4s var(--spring);
+}
+.nm-link-pill:hover {
+  transform: translateX(3px);
+}
+.nm-link-pill:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Nav (2a). These are the stage-4 (burger) base rules; nav.tsx emits the   */
+/* media queries for stages 3 to 0, whose widths derive from the link count. */
+/* ---------------------------------------------------------------------- */
+
+/* Not stuck: a 1180px floating pill. Stuck (scrollY > 8): a full-bleed 60px bar. */
+/* 2a sets no line-height, so its text uses the UA's `normal`; Tailwind's preflight puts 1.5
+   on <html>. Every 2a surface therefore opts back into `normal`. It is scoped to migrated
+   surfaces (this class) so pages still on the legacy bridge keep their spacing, and moves
+   to <html> once the last page is migrated (Phase 4). */
+.nm-root {
+  line-height: normal;
+}
+
+.nv-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
+  justify-content: center;
+  padding: 14px clamp(10px,2.5vw,20px) 0px;
+  transition: padding .28s cubic-bezier(.4,0,.2,1);
+}
+.nv-wrap[data-stuck="true"] {
+  padding: 0px 0px 0px;
+}
+.nv-bar {
+  display: flex;
+  width: 100%;
+  max-width: 1180px;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  width: 100%;
-  max-width: 100%;
-  border-radius: 0;
-  padding: 18px 26px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-bottom: 1px solid var(--border);
-  box-shadow: none;
+  padding: 10px 12px 10px 22px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
   transition:
-    max-width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    padding 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    border-radius 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    background 0.3s ease,
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
+    max-width .28s cubic-bezier(.4,0,.2,1),
+    padding .28s cubic-bezier(.4,0,.2,1),
+    border-radius .28s cubic-bezier(.4,0,.2,1),
+    box-shadow .28s cubic-bezier(.4,0,.2,1);
 }
-.nav-shell[data-scrolled="true"] {
-  max-width: 1080px;
+.nv-wrap[data-stuck="true"] .nv-bar {
+  max-width: 100vw;
+  padding: 10px max(12px, calc((100% - 1180px) / 2 + 12px)) 10px max(22px, calc((100% - 1180px) / 2 + 22px));
+  border-radius: 0px;
+  box-shadow: 0 10px 22px -8px var(--sd), 0 2px 5px -3px var(--sd), var(--rim);
+}
+.nv-links {
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+.nv-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink-dim);
+  transition: color .2s, transform .4s var(--spring);
+}
+.nv-item:hover {
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+.nv-item[data-active] {
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: var(--in-sm);
+}
+.nv-ico {
+  display: block;
+  flex-shrink: 0;
+}
+.nv-txt {
+  white-space: nowrap;
+}
+.nv-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--ink);
+  box-shadow: var(--out-sm);
+  pointer-events: none;
+}
+/* Shown only where the stage hides the label (nav.tsx sets --nv-tip). 2a shows it on hover
+   and on focus. Keyboard focus is kept here; a mouse click no longer leaves it pinned. */
+.nv-item:is(:hover, :focus-visible) .nv-tip,
+.nv-mk:is(:hover, :focus-visible) .nv-tip {
+  display: var(--nv-tip, none);
+}
+.nv-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nv-mk {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform .4s var(--spring);
+}
+.nv-mk:hover {
+  transform: translateY(-2px);
+}
+.nv-mk[data-active] {
+  box-shadow: var(--in-sm);
+}
+.nv-mk:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+.nv-burger {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.nv-burger[aria-expanded="true"] {
+  box-shadow: var(--in-sm);
+}
+.nv-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: clamp(10px,2.5vw,20px);
+  right: clamp(10px,2.5vw,20px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
   border-radius: 22px;
-  padding: 10px 12px 10px 20px;
-  background: var(--glass-bg);
-  background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--glass-hi);
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.nv-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+.nv-menu-item[data-active] {
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: var(--in-sm);
 }
 
-/* Interactive glass pill (e.g. "About me", "All projects"). */
+/* Theme switch: inset track, sun left, moon right, accent knob that springs across. */
+.theme-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 68px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.theme-switch svg {
+  position: absolute;
+  top: 11px;
+  color: var(--ink-faint);
+}
+.theme-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--out-sm), var(--rim);
+  transform: translateX(0px);
+  transition: transform .5s var(--spring);
+}
+[data-theme="dark"] .theme-knob {
+  transform: translateX(32px);
+}
+
+/* Lightbox control pill buttons (2a). */
+.lb-btn {
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: box-shadow .15s;
+}
+.lb-btn:active {
+  box-shadow: var(--in-sm);
+}
+.lb-step {
+  width: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+}
+.lb-close {
+  margin-left: 4px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+/* Certificate viewer header pills (2a). */
+.cv-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 7px 13px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+a.cv-btn:hover {
+  color: var(--accent-ink);
+}
+button.cv-btn:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------------------------------------------------------------- */
+/* LEGACY BRIDGE classes (removed in Phase 4): the glass recipes re-pointed */
+/* at the neumorphic ones, so unmigrated markup renders in the new material. */
+/* ---------------------------------------------------------------------- */
+
 .glass-pill {
   display: inline-flex;
   align-items: center;
@@ -174,135 +579,70 @@ button {
      not, which is why the certificate button felt dead next to the credential link. */
   cursor: pointer;
   border-radius: 999px;
-  background: var(--glass-bg);
-  background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--glass-hi);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
   color: var(--ink);
   text-decoration: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform .4s var(--spring), color .2s;
 }
 .glass-pill:hover {
   transform: translateY(-2px);
-  box-shadow: var(--glass-sh-lg), inset 0 1px 0 var(--glass-hi), 0 0 0 1px var(--chip-brd);
+  color: var(--accent-ink);
 }
 .glass-pill:active {
-  transform: translateY(0) scale(0.97);
+  box-shadow: var(--in-sm);
 }
 
-/* Pill sitting on a lightbox's always-dark backdrop.
-   `.glass-pill` alone is theme-dependent: in light mode --glass-bg is rgba(255,255,255,0.55)
-   plus a white --glass-tint, so white label text landed at roughly 2.2:1 over the dark
-   overlay and was barely readable. These values are fixed in both themes, the same
-   "always-dark surface" approach the code block chrome and mkdir terminal use, taking light
-   mode to roughly 8:1 while leaving dark mode where it already was. */
-.lightbox-pill {
-  background: rgba(255, 255, 255, 0.12);
-  background-image: none;
-  border-color: rgba(255, 255, 255, 0.24);
-}
-.lightbox-pill:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Circular glass icon button (social links, theme toggle, hamburger, card icon actions). */
 .glass-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: none;
   border-radius: 999px;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
   color: var(--ink);
   cursor: pointer;
-  transition: transform 0.18s ease, color 0.18s ease, background 0.18s ease;
+  transition: transform .4s var(--spring), color .2s;
 }
 .glass-icon-btn:hover {
-  transform: translateY(-3px);
-  color: var(--accent);
-  background: var(--chip);
+  transform: translateY(-2px);
+  color: var(--accent-ink);
 }
 .glass-icon-btn:active {
-  transform: translateY(0) scale(0.9);
+  box-shadow: var(--in-sm);
 }
 
-/* Glass card shell (timeline items, project/tour/article cards). */
 .glass-card {
   position: relative;
   overflow: hidden;
-  background: var(--card-bg);
-  background-image: var(--card-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--card-hi);
-  border-radius: 22px;
-  transition: box-shadow 0.2s ease;
-}
-.glass-card:hover {
-  box-shadow:
-    var(--glass-sh-lg),
-    inset 0 1px 0 var(--card-hi),
-    0 0 0 1px var(--chip-brd),
-    0 0 30px -8px color-mix(in srgb, var(--accent) 42%, transparent);
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  border-radius: 24px;
 }
 
-/* Gradient pill button (Resume, Live demo, Book). */
 .btn-gradient {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  background: linear-gradient(140deg, var(--accent), var(--accent-ink));
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 10px 20px -10px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .45s var(--spring);
 }
 .btn-gradient:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 32px -12px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
 }
 .btn-gradient:active {
-  transform: translateY(0) scale(0.97);
-}
-/* Dark mode: the accent->accent-ink gradient is bright->brighter, so a white
-   label washes out. Keep the hue but reduce far-end luminance, drop the
-   accent-colored glow, and use a near-black label for solid contrast.
-   Scoped to the primary button only (light mode / secondary / tabs unchanged). */
-[data-theme="dark"] .btn-gradient {
-  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #04121a));
-  color: #06141b;
-  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-[data-theme="dark"] .btn-gradient:hover {
-  box-shadow: 0 14px 24px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(1px) scale(.97);
+  box-shadow: var(--press);
 }
 
-/* Nav / mobile-menu link pill. */
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 14px;
-  border-radius: 999px;
-  color: var(--ink-dim);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-.nav-link:hover {
-  background: var(--chip);
-  color: var(--ink);
-}
-.nav-link[data-active="true"] {
-  color: var(--ink);
-  background: var(--chip);
-}
-
-/* Segmented tab control (Professional / Education / Org). */
+/* Segmented tab control: the active tab reads as a raised thumb on an inset track. */
 .tab-btn {
   padding: 9px 20px;
   border-radius: 999px;
@@ -314,33 +654,24 @@ button {
   letter-spacing: -0.01em;
   background: transparent;
   color: var(--ink-dim);
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition: color .2s, box-shadow .2s;
 }
 .tab-btn:not([data-active="true"]):hover {
-  background: var(--chip);
   color: var(--ink);
 }
 .tab-btn[data-active="true"] {
-  background: linear-gradient(140deg, var(--accent), var(--accent-ink));
-  color: #fff;
-  box-shadow: 0 8px 18px -8px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-/* Dark mode: same fix as the primary button — the bright accent gradient
-   washes out a white label, so tone the far end and use a near-black label. */
-[data-theme="dark"] .tab-btn[data-active="true"] {
-  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #04121a));
-  color: #06141b;
-  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  background: var(--bg);
+  color: var(--accent-ink);
+  box-shadow: var(--out-sm);
 }
 
-/* Small meta/tech-stack/language chip. Padding, radius and font-size vary by
-   usage (pill meta chip vs. rect mono tech chip) so they're set per call site. */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: var(--in-sm);
   color: var(--ink-dim);
 }
 
@@ -725,7 +1056,8 @@ button {
 
 /* ---------------- Article sidebar (lg and up) ---------------- */
 
-/* The sidebar is sticky at `top: 7rem`, so anything past the viewport bottom scrolls out
+/* The sidebar is sticky at `--sticky-top` (100px, 2a's value, 40px clear of the 60px stuck
+   nav) and capped at 2a's `100vh - 124px`, so anything past the viewport bottom scrolls out
    of reach for good — the page keeps moving but the pinned aside doesn't. Capping its
    height turns that overflow into an internal scroll instead. Deliberately unconditional:
    while the content fits (today's TOC + related list is well under a laptop viewport) a
@@ -734,7 +1066,7 @@ button {
    hidden so no gutter appears and the column width never shifts. */
 @media (min-width: 1024px) {
   .article-aside {
-    max-height: calc(100dvh - 8rem);
+    max-height: calc(100vh - 124px);
     overflow-y: auto;
     scrollbar-width: none;
     overscroll-behavior: contain;
@@ -782,7 +1114,6 @@ button {
   font-size: 12px;
   line-height: 1;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   border: 1px solid var(--glass-brd);
   box-shadow: var(--glass-sh);
   color: var(--ink-dim);
@@ -823,7 +1154,6 @@ button {
   border-radius: 14px;
   background: var(--glass-bg);
   background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   border: 1px solid var(--glass-brd);
   box-shadow: var(--glass-sh-lg);
   min-width: 168px;

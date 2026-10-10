@@ -17,7 +17,7 @@ interface HeroProps {
 
 export function Hero({ home }: HeroProps) {
   return (
-    <header className="relative z-[3] flex justify-center px-[22px] pt-24 pb-[34px] sm:pt-28 lg:pt-[132px]">
+    <header className="relative z-[3] flex justify-center px-[22px] pt-[clamp(40px,7vw,88px)] pb-[34px]">
       <div className="grid w-full max-w-[1180px] grid-cols-1 items-center gap-11 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           {/* The h1 is the first element in this column, so it carries no top margin —

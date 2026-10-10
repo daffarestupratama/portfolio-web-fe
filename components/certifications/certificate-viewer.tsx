@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import { useCallback, useRef, useState } from "react";
 import { useLightbox } from "@/components/ui/use-lightbox";
-import { CloseIcon, ExternalLinkIcon, FileTextIcon } from "@/components/ui/icons";
+import { FileTextIcon } from "@/components/ui/icons";
 
 interface CertificateViewerProps {
   /** Absolute URL of the certificate file. */
@@ -17,14 +17,12 @@ interface CertificateViewerProps {
  * CMS), so this is an `<object>` rather than next/image — and nothing is downloaded until
  * the dialog mounts, which is what keeps the list page light.
  *
- * `<object>` renders the browser's native PDF viewer on desktop. Mobile Safari and several
- * Android browsers show nothing useful there, so the "Open in new tab" link is a real
- * affordance for them, not just decoration — it is the element's fallback content AND is
- * always visible below the frame.
+ * The chrome is 2a's certificate modal: a raised card with the title, an open-in-new-tab
+ * pill and Close, over an inset frame. 2a frames the file with an `<iframe>`; `<object>` is
+ * kept because its fallback content covers browsers with no inline PDF viewer (Mobile Safari,
+ * several Android browsers), where the header link is the real way in.
  *
- * Portalled to document.body: the surrounding card is a `.glass-card`, and `backdrop-filter`
- * makes it a containing block even for `position: fixed` children, so an in-card dialog
- * would be clipped at the card edge.
+ * Portalled to document.body so no ancestor's transform or filter can trap the fixed overlay.
  */
 export function CertificateViewer({ url, title }: CertificateViewerProps) {
   const [open, setOpen] = useState(false);
@@ -60,45 +58,57 @@ export function CertificateViewer({ url, title }: CertificateViewerProps) {
             aria-modal="true"
             aria-label={`Certificate: ${title}`}
             tabIndex={-1}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-3 p-4 outline-none"
-            style={{ background: "rgba(6, 16, 20, 0.82)", backdropFilter: "blur(6px)" }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) close();
-            }}
+            className="nm-root fixed inset-0 z-[200] flex items-center justify-center outline-none"
+            style={{ padding: "clamp(12px,3vw,40px)", background: "rgba(12,15,21,.8)" }}
+            onClick={close}
           >
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close certificate viewer"
-              className="glass-icon-btn absolute top-4 right-4 h-11 w-11"
-              style={{ color: "#fff" }}
+            <div
+              className="flex flex-col"
+              style={{
+                width: "min(980px,100%)",
+                height: "min(86vh,760px)",
+                padding: 12,
+                borderRadius: 26,
+                background: "var(--bg)",
+                boxShadow: "0 20px 50px rgba(0,0,0,.4), var(--rim)",
+              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <CloseIcon />
-            </button>
+              <div className="flex items-center" style={{ gap: 12, padding: "4px 6px 12px" }}>
+                <span
+                  className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ fontSize: 14.5, fontWeight: 600 }}
+                >
+                  {title}
+                </span>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cv-btn"
+                >
+                  Open in new tab ↗
+                </a>
+                <button type="button" onClick={close} aria-label="Close certificate viewer" className="cv-btn">
+                  Close
+                </button>
+              </div>
 
-            <object
-              data={url}
-              type="application/pdf"
-              aria-label={`Certificate: ${title}`}
-              className="w-full max-w-4xl rounded-xl"
-              style={{ height: "74vh", background: "rgba(255,255,255,0.06)" }}
-            >
-              {/* Fallback content, shown by browsers that can't display a PDF inline. */}
-              <p className="mono p-6 text-center text-[13px]" style={{ color: "rgba(255,255,255,0.82)" }}>
-                Your browser can&apos;t display this PDF inline. Use the link below to open it.
-              </p>
-            </object>
-
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-pill lightbox-pill mono gap-2 px-4 py-2 text-[13px] font-semibold"
-              style={{ color: "#fff" }}
-            >
-              Open in new tab
-              <ExternalLinkIcon />
-            </a>
+              <div className="flex-1" style={{ padding: 6, borderRadius: 18, boxShadow: "var(--in-sm)" }}>
+                <object
+                  data={url}
+                  type="application/pdf"
+                  aria-label={`Certificate: ${title}`}
+                  className="block h-full w-full"
+                  style={{ border: "none", borderRadius: 13, background: "#fff" }}
+                >
+                  {/* Fallback content, shown by browsers that can't display a PDF inline. */}
+                  <p className="mono p-6 text-center text-[13px]" style={{ color: "#4C4E55" }}>
+                    Your browser can&apos;t display this PDF inline. Use the link above to open it.
+                  </p>
+                </object>
+              </div>
+            </div>
           </div>,
           document.body,
         )}

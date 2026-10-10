@@ -53,7 +53,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   ].filter(Boolean) as { label: string; url: string; Icon: typeof GithubIcon }[];
 
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },

@@ -2,7 +2,7 @@ import { Delayed } from "@/components/ui/delayed";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3] mx-auto w-full max-w-[860px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
       <Delayed>
         <div className="skeleton" style={{ height: 14, width: 110, borderRadius: 7 }} />
         <div className="mt-5 flex gap-2.5">

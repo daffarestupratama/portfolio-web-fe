@@ -7,7 +7,7 @@ export const metadata: Metadata = notFoundMetadata();
 
 export default function NotFound() {
   return (
-    <main className="relative z-[3] mx-auto flex w-full max-w-[560px] flex-col items-center px-[22px] pt-40 pb-24 text-center sm:pt-48">
+    <main className="relative z-[3] mx-auto flex w-full max-w-[560px] flex-col items-center px-[22px] pt-[86px] pb-24 text-center sm:pt-[118px]">
       <span className="mono text-[13px]" style={{ color: "var(--accent-ink)" }}>
         404
       </span>

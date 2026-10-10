@@ -163,7 +163,7 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
         ref={panelRef}
         id={PANEL_ID}
         data-open={open || undefined}
-        className="articles-filters lg:order-2 lg:w-[290px] lg:shrink-0 lg:self-start lg:sticky lg:top-28"
+        className="articles-filters lg:order-2 lg:w-[290px] lg:shrink-0 lg:self-start lg:sticky lg:top-(--sticky-top)"
       >
         <div className="flex flex-col gap-6">
           <div>

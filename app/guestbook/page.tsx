@@ -22,7 +22,7 @@ export default async function GuestbookPage() {
   const messages = await getVisibleGuestbookMessages();
 
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[1100px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3] mx-auto w-full max-w-[1100px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16">
       <header className="mb-8">
         <h1 className="font-bold" style={{ fontSize: "clamp(30px,4.5vw,46px)", letterSpacing: "-0.03em" }}>
           Guestbook
@@ -36,7 +36,7 @@ export default async function GuestbookPage() {
       <div className="grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start">
         {/* `self-start` stops the grid item stretching to the row height, which would
             leave the sticky box nothing to stick within. */}
-        <div id="guestbook-form" className="self-start scroll-mt-28 lg:sticky lg:top-28">
+        <div id="guestbook-form" className="self-start scroll-mt-(--sticky-top) lg:sticky lg:top-(--sticky-top)">
           <GuestbookForm />
         </div>
 

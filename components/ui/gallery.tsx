@@ -5,7 +5,6 @@ import { useCallback, useRef, useState } from "react";
 import type { GalleryImage } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { useLightbox } from "@/components/ui/use-lightbox";
-import { ArrowRightIcon, CloseIcon } from "@/components/ui/icons";
 
 const imgFallback = <span className="absolute inset-0" style={{ background: "var(--glass-bg-2)" }} aria-hidden="true" />;
 
@@ -95,78 +94,77 @@ export function Gallery({ images }: GalleryProps) {
       </ul>
 
       {current &&
+        openIndex !== null &&
         createPortal(
+          // 2a's lightbox: a dark scrim, the image contained in a 1100 x 74vh box, and one
+          // neumorphic control pill below it. A click anywhere outside the pill and caption
+          // closes, as in 2a.
           <div
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label={current.alt || "Image viewer"}
             tabIndex={-1}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 outline-none"
-          style={{ background: "rgba(6, 16, 20, 0.82)", backdropFilter: "blur(6px)" }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) close();
-          }}
-        >
-          <button
-            type="button"
+            className="nm-root fixed inset-0 z-[200] flex flex-col items-center justify-center outline-none"
+            style={{ gap: 14, padding: "clamp(16px,4vw,48px)", background: "rgba(12,15,21,.86)" }}
             onClick={close}
-            aria-label="Close image viewer"
-            className="glass-icon-btn absolute top-4 right-4 h-11 w-11"
-            style={{ color: "#fff" }}
           >
-            <CloseIcon />
-          </button>
+            <div className="relative overflow-hidden" style={{ width: "min(1100px,100%)", height: "min(74vh,760px)", borderRadius: 16 }}>
+              <StrapiImage
+                key={current.url}
+                src={current.url}
+                alt={current.alt}
+                fill
+                sizes="(max-width: 1100px) 100vw, 1100px"
+                style={{ objectFit: "contain" }}
+                fallback={
+                  <div className="mono flex h-full w-full items-center justify-center text-[13px]" style={{ color: "rgba(255,255,255,0.7)" }}>
+                    Image unavailable
+                  </div>
+                }
+              />
+            </div>
 
-          {images.length > 1 && (
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label="Previous image"
-              className="glass-icon-btn absolute left-3 h-11 w-11 sm:left-6"
-              style={{ color: "#fff" }}
+            <div
+              className="mono flex items-center overflow-hidden"
+              style={{
+                gap: 12,
+                padding: 8,
+                borderRadius: 999,
+                color: "var(--ink-dim)",
+                background: "var(--bg)",
+                boxShadow: "0 14px 34px rgba(0,0,0,.35), var(--rim)",
+                fontSize: 12.5,
+              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <ArrowRightIcon style={{ transform: "rotate(180deg)" }} />
-            </button>
-          )}
+              {images.length > 1 && (
+                <button type="button" onClick={() => go(-1)} aria-label="Previous image" className="lb-btn lb-step">
+                  ←
+                </button>
+              )}
+              <span style={{ minWidth: 52, textAlign: "center" }}>
+                {openIndex + 1} / {images.length}
+              </span>
+              {images.length > 1 && (
+                <button type="button" onClick={() => go(1)} aria-label="Next image" className="lb-btn lb-step">
+                  →
+                </button>
+              )}
+              <button type="button" onClick={close} aria-label="Close image viewer" className="lb-btn lb-close">
+                Close
+              </button>
+            </div>
 
-          <figure className="flex max-h-full max-w-5xl flex-col items-center gap-3">
-            <StrapiImage
-              key={current.url}
-              src={current.url}
-              alt={current.alt}
-              width={current.width}
-              height={current.height}
-              sizes="(max-width: 1024px) 92vw, 1024px"
-              className="h-auto w-auto rounded-xl"
-              style={{ maxHeight: "78vh", maxWidth: "100%", objectFit: "contain" }}
-              fallback={
-                <div
-                  className="mono flex items-center justify-center rounded-xl text-[13px]"
-                  style={{ width: 360, height: 220, background: "var(--glass-bg-2)", color: "rgba(255,255,255,0.7)" }}
-                >
-                  Image unavailable
-                </div>
-              }
-            />
-            {current.caption && (
-              <figcaption className="mono max-w-[60ch] text-center text-[12.5px]" style={{ color: "rgba(255,255,255,0.82)" }}>
-                {current.caption}
-              </figcaption>
+            {(current.caption || current.alt) && (
+              <p
+                className="text-center"
+                style={{ maxWidth: "70ch", fontSize: 14, lineHeight: 1.55, color: "#C9D0DB", textWrap: "pretty" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {current.caption || current.alt}
+              </p>
             )}
-          </figure>
-
-          {images.length > 1 && (
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label="Next image"
-              className="glass-icon-btn absolute right-3 h-11 w-11 sm:right-6"
-              style={{ color: "#fff" }}
-            >
-              <ArrowRightIcon />
-            </button>
-          )}
           </div>,
           document.body,
         )}

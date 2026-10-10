@@ -142,7 +142,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
     // that rail actually renders. 44px puts the text ~22px from the dots' right edge,
     // matching the right margin, while still clearing the wider toggle box by 12px.
     <main
-      className={`relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-28 pb-16 sm:pt-32 ${
+      className={`relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16 ${
         hasToc ? "max-lg:pl-[44px]" : ""
       }`}
     >
@@ -185,7 +185,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             — see globals.css. Load-bearing for the 31-entry TOC on the Odoo article. */}
         {hasSidebar && (
           <aside
-            className={`article-aside self-start lg:sticky lg:top-28 ${
+            className={`article-aside self-start lg:sticky lg:top-(--sticky-top) ${
               relatedInSidebar ? "order-last flex flex-col gap-8 lg:order-first" : "hidden lg:block"
             }`}
           >

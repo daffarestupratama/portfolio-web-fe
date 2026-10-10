@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     // .open-next/ and .wrangler/ folders are used by Open Next to store temporary files for the app. They should not be linted.
     ".open-next/**",
     ".wrangler/**",
+    // Bundled worker output (gitignored, like the two above).
+    "dist/**",
   ]),
 ]);
 

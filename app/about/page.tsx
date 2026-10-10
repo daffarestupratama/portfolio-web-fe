@@ -32,7 +32,7 @@ export default async function AboutPage() {
   ]);
 
   return (
-    <main className="relative z-[3] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3] pt-[clamp(36px,5vw,56px)] pb-16">
       {/* Top: square profile image on the left, all text on the right (stacks on mobile). */}
       <div className="mx-auto w-full max-w-[920px] px-[22px]">
         <div className="grid gap-8 md:grid-cols-[260px_minmax(0,1fr)] md:items-start">
