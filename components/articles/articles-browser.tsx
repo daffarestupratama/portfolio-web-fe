@@ -13,24 +13,20 @@ const ALL = "__all__";
 const LANGUAGE_ORDER: ArticleLanguage[] = ["en", "id", "de"];
 const PANEL_ID = "articles-filter-panel";
 
+/** 2a shows this many tags before "Show all {n} tags". */
+const TAG_MAX = 10;
+
 function SidebarHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mono mb-2 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
-      {children}
-    </div>
-  );
+  return <div className="af-label mono">{children}</div>;
 }
 
-/** A chip summarising one active filter, with its own clear button, shown in the narrow
- *  viewport filter bar so the state stays visible while the panel is shut. */
+/** A chip summarising one active filter, with its own clear button, shown above the list on
+ *  narrow viewports so the state stays visible while the panel is shut (not in 2a, kept). */
 function ActiveChip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
-    <span
-      className="chip mono inline-flex items-center gap-1 px-2.5 py-1 text-[11px]"
-      style={{ borderRadius: 8, color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
-    >
+    <span className="af-active mono">
       {label}
-      <button type="button" onClick={onClear} aria-label={`Clear filter: ${label}`} className="-mr-0.5 cursor-pointer">
+      <button type="button" onClick={onClear} aria-label={`Clear filter: ${label}`}>
         <CloseIcon width={11} height={11} />
       </button>
     </span>
@@ -42,8 +38,9 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
   const [language, setLanguage] = useState<string>(ALL);
   const [tag, setTag] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [allTags, setAllTags] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   const categories = useMemo(() => Array.from(new Set(articles.map((a) => a.category))).sort(), [articles]);
@@ -60,6 +57,9 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
   }, [articles]);
 
   const showLanguageFilter = languages.length > 1;
+  // 2a's tag cap, keeping an active tag visible even when it falls past the cap.
+  let shownTags = allTags ? tags : tags.slice(0, TAG_MAX);
+  if (tag !== null && !shownTags.includes(tag)) shownTags = [...shownTags, tag];
 
   // Featured first, applied AFTER filtering so a narrowed list still leads with whatever
   // featured articles survived the filter (rather than dropping the pinning entirely).
@@ -109,85 +109,84 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
     };
   }, [open]);
 
+  const clearAll = () => {
+    setCategory(ALL);
+    setLanguage(ALL);
+    setTag(null);
+  };
+
   return (
-    // DOM order is filter bar → aside → list. The lg:order-* utilities put it back to
-    // list-left / aside-right from `lg` up, so the desktop layout is unchanged; below `lg`
-    // the visitor now gets the title, a single Filter button, then the articles — instead
-    // of scrolling past every control to reach the first row.
-    <div className="flex flex-col gap-8 lg:flex-row">
-      <div ref={barRef} className="articles-filter-bar flex flex-wrap items-center gap-2">
+    // Portfolio 2a: the list, and a sticky filter column on the right. From 1000px the column
+    // is the always-open 290px panel; below it, a 48px column with a vertical button that
+    // opens the same panel as an overlay. ONE instance of the controls either way.
+    <div className="af">
+      <div className="af-list">
+        {active.length > 0 && (
+          <div ref={barRef} className="af-actives">
+            {active.map((f) => (
+              <ActiveChip key={f.label} label={f.label} onClear={f.clear} />
+            ))}
+            {active.length > 1 && (
+              <button type="button" onClick={clearAll} className="af-clear mono">
+                Clear all
+              </button>
+            )}
+          </div>
+        )}
+        {filtered.length === 0 ? (
+          <p className="af-empty">No articles match these filters.</p>
+        ) : (
+          <div className="ar-list">
+            {filtered.map((article) => (
+              <ArticleListItem key={article.id} article={article} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div ref={panelRef} className="af-col">
         <button
           ref={toggleRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls={PANEL_ID}
-          className="glass-pill gap-2 px-4 py-2 text-[13px] font-semibold"
+          className="af-toggle"
         >
-          Filter
-          {active.length > 0 && (
-            <span
-              className="mono inline-flex h-[18px] min-w-[18px] items-center justify-center px-1 text-[10.5px]"
-              style={{ borderRadius: 999, background: "var(--accent)", color: "var(--bg)" }}
-            >
-              {active.length}
-            </span>
-          )}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" />
+            <circle cx="16" cy="6" r="2" />
+            <circle cx="10" cy="12" r="2" />
+            <circle cx="18" cy="18" r="2" />
+          </svg>
+          <span className="af-toggle-label mono">Filter</span>
+          {active.length > 0 && <span className="af-badge">{active.length}</span>}
         </button>
 
-        {active.map((f) => (
-          <ActiveChip key={f.label} label={f.label} onClear={f.clear} />
-        ))}
+        <aside id={PANEL_ID} data-open={open || undefined} data-sb="toc" className="af-panel">
+          <div className="af-panel-head">
+            <span>Filter</span>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                toggleRef.current?.focus();
+              }}
+              aria-label="Close filter"
+              className="af-close"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
 
-        {active.length > 1 && (
-          <button
-            type="button"
-            onClick={() => {
-              setCategory(ALL);
-              setLanguage(ALL);
-              setTag(null);
-            }}
-            className="mono cursor-pointer text-[11.5px] underline underline-offset-2"
-            style={{ color: "var(--ink-dim)" }}
-          >
-            Clear all
-          </button>
-        )}
-      </div>
-
-      {/* ONE instance of the controls. Below `lg` this element is the collapsible panel;
-          at `lg` it is the always-visible right column. Rendering a separate mobile copy
-          would put a hidden duplicate of every control in the DOM.
-          Visibility lives in globals.css, not `lg:` utilities — see the note there. */}
-      <aside
-        ref={panelRef}
-        id={PANEL_ID}
-        data-open={open || undefined}
-        className="articles-filters lg:order-2 lg:w-[290px] lg:shrink-0 lg:self-start lg:sticky lg:top-(--sticky-top)"
-      >
-        <div className="flex flex-col gap-6">
           <div>
             <SidebarHeading>Category</SidebarHeading>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => setCategory(ALL)}
-                data-active={category === ALL}
-                className="tab-btn"
-                style={{ fontSize: "12px", padding: "6px 13px" }}
-              >
-                All
-              </button>
-              {categories.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCategory(c)}
-                  data-active={category === c}
-                  className="tab-btn"
-                  style={{ fontSize: "12px", padding: "6px 13px" }}
-                >
-                  {c}
+            <div className="af-chips">
+              {[ALL, ...categories].map((c) => (
+                <button key={c} type="button" onClick={() => setCategory(c)} aria-pressed={category === c} className="af-chip">
+                  {c === ALL ? "All" : c}
                 </button>
               ))}
             </div>
@@ -196,16 +195,9 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
           {showLanguageFilter && (
             <div>
               <SidebarHeading>Language</SidebarHeading>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="af-chips">
                 {[ALL, ...languages].map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setLanguage(l)}
-                    data-active={language === l}
-                    className="tab-btn"
-                    style={{ fontSize: "12px", padding: "6px 13px" }}
-                  >
+                  <button key={l} type="button" onClick={() => setLanguage(l)} aria-pressed={language === l} className="af-chip">
                     {l === ALL ? "All" : l.toUpperCase()}
                   </button>
                 ))}
@@ -216,8 +208,8 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
           {tags.length > 0 && (
             <div>
               <SidebarHeading>Tags</SidebarHeading>
-              <div className="flex flex-wrap gap-1.5">
-                {tags.map((t) => {
+              <div className="af-tags">
+                {shownTags.map((t) => {
                   const isActive = tag === t;
                   return (
                     <button
@@ -225,37 +217,22 @@ export function ArticlesBrowser({ articles }: ArticlesBrowserProps) {
                       type="button"
                       onClick={() => setTag(isActive ? null : t)}
                       aria-pressed={isActive}
-                      className="chip mono cursor-pointer px-2.5 py-1 text-[11px]"
-                      style={{
-                        borderRadius: 8,
-                        ...(isActive
-                          ? { color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }
-                          : null),
-                      }}
+                      className="af-tag mono"
                     >
                       #{t}
                     </button>
                   );
                 })}
               </div>
+              {tags.length > TAG_MAX && (
+                <button type="button" onClick={() => setAllTags((v) => !v)} className="af-more mono">
+                  {allTags ? "Show fewer tags" : `Show all ${tags.length} tags`}
+                </button>
+              )}
             </div>
           )}
-        </div>
-      </aside>
-
-      <main className="lg:order-1 lg:flex-1">
-        {filtered.length === 0 ? (
-          <p className="text-sm" style={{ color: "var(--ink-faint)" }}>
-            No articles match these filters.
-          </p>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {filtered.map((article) => (
-              <ArticleListItem key={article.id} article={article} />
-            ))}
-          </div>
-        )}
-      </main>
+        </aside>
+      </div>
     </div>
   );
 }

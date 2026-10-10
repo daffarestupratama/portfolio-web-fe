@@ -7,30 +7,21 @@ import { buildPageMetadata, mappedImageToOg, notFoundMetadata, SITE_NAME } from 
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
 import { withHeadingIds } from "@/components/blocks/toc";
-import { ArticleToc } from "@/components/articles/article-toc";
+import { ArticleToc, ARTICLE_BODY_ID } from "@/components/articles/article-toc";
 import { TocRail } from "@/components/articles/toc-rail";
+import { BackToTop } from "@/components/articles/back-to-top";
 import { getRelatedArticles } from "@/components/articles/related-articles";
-import { CoverImage } from "@/components/ui/cover-image";
 import { StrapiImage } from "@/components/ui/strapi-image";
-import { ProjectCard } from "@/components/cards/project-card";
+import { Contour } from "@/components/ui/contour";
+import { RelatedCard } from "@/components/cards/related-card";
+import { projectTypeMeta } from "@/components/cards/project-type-meta";
 import { ArrowRightIcon } from "@/components/ui/icons";
 
 export const revalidate = 3600;
 
-/** Byline stand-in when no avatar is set, or when the image fails to load. */
+/** Byline stand-in when no avatar is set, or when the image fails to load (2a's accent disc). */
 function AuthorMonogram() {
-  return (
-    <span
-      className="flex h-full w-full items-center justify-center text-[12px] font-bold"
-      style={{
-        borderRadius: 999,
-        background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
-        color: "#fff",
-      }}
-    >
-      D
-    </span>
-  );
+  return <span className="ad-monogram">D</span>;
 }
 
 export async function generateStaticParams() {
@@ -73,79 +64,64 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   // anchors and the links come from the same walk by construction.
   const { content: bodyWithIds, toc } = withHeadingIds(article.body);
 
-  // Most articles have no headings at all (4 of 5 at the time of writing), which left the
-  // sidebar rendering as an empty 260px column that shoved the body off-centre. When there
-  // is no TOC to put there, the related content moves INTO the sidebar to fill it — and out
-  // of its usual place below the body, so neither block is ever rendered twice.
+  // Most articles have no headings at all (4 of 5 at the time of writing), which would leave
+  // the sidebar empty. When there is no TOC to put there, the related content moves INTO the
+  // sidebar instead of its usual place below the body, so the sidebar is never empty at
+  // desktop width and neither block is ever rendered twice. 2a's own rule is the same
+  // (tocAside / relAside / relBelow).
   const hasToc = toc.length > 0;
   const hasRelated = article.relatedProjects.length > 0 || related.length > 0;
   const relatedInSidebar = !hasToc && hasRelated;
   const hasSidebar = hasToc || relatedInSidebar;
+  const size = relatedInSidebar ? "aside" : "below";
 
-  // Built once each and rendered in exactly ONE place — either the sidebar or the usual
-  // spot below the body — so there is structurally no duplicate to CSS-hide.
-  const relatedProjectsBlock =
-    article.relatedProjects.length > 0 ? (
-      <section aria-label="Related projects">
-        <h2
-          className={`mb-3 font-bold ${relatedInSidebar ? "text-[20px]" : "mt-10 text-[22px]"}`}
-          style={{ letterSpacing: "-0.02em" }}
-        >
-          Related projects
-        </h2>
-        {/* One column in the narrow sidebar; outside a bento grid ProjectCard is a 16:9
-            "standalone" tile (restyled as 2a's related cards in Phase 3). */}
-        <div className={`grid grid-cols-1 gap-[18px] sm:grid-cols-2 ${relatedInSidebar ? "lg:grid-cols-1" : ""}`}>
-          {article.relatedProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-      </section>
-    ) : null;
-
-  const relatedArticlesBlock =
-    related.length > 0 ? (
-      <section aria-label="Related articles" className={relatedInSidebar ? undefined : "mt-12"}>
-        <h2 className="mb-4 text-[20px] font-bold" style={{ letterSpacing: "-0.02em" }}>
-          Related articles
-        </h2>
-        <ul className={`grid grid-cols-1 gap-3 sm:grid-cols-2 ${relatedInSidebar ? "lg:grid-cols-1" : "lg:grid-cols-4"}`}>
-          {related.map((a) => (
-            <li key={a.id} className="glass-card p-4" style={{ borderRadius: 16 }}>
-              <Link href={`/articles/${a.slug}`} className="group relative z-[2] block">
-                <span
-                  className="block text-[14px] font-semibold transition-colors group-hover:text-(--accent-ink)"
-                  style={{ lineHeight: 1.35 }}
-                >
-                  {a.title}
-                </span>
-                <span className="mono mt-1 block text-[11px]" style={{ color: "var(--ink-faint)" }}>
-                  {a.category} · {a.publishedDate}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <Link
-          href="/articles"
-          className="mono mt-5 inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-          style={{ color: "var(--ink-dim)" }}
-        >
-          <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-          Back to all articles
-        </Link>
-      </section>
-    ) : null;
+  // Related projects first, then related articles, then the way back: one block, rendered in
+  // exactly ONE place (the sidebar or below the body).
+  const relatedBlocks = hasRelated ? (
+    <>
+      {article.relatedProjects.length > 0 && (
+        <section aria-label="Related projects" className="ad-rel">
+          <h2 className="ad-rel-title">Related projects</h2>
+          <div className="ad-rel-grid">
+            {article.relatedProjects.map((p) => (
+              <RelatedCard
+                key={p.id}
+                href={`/projects/${p.slug}`}
+                title={p.title}
+                meta={`${projectTypeMeta(p.projectType).label} · ${p.year}`}
+                size={size}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      {related.length > 0 && (
+        <section aria-label="Related articles" className="ad-rel">
+          <h2 className="ad-rel-title">Related articles</h2>
+          <div className="ad-rel-grid">
+            {related.map((a) => (
+              <RelatedCard
+                key={a.id}
+                href={`/articles/${a.slug}`}
+                title={a.title}
+                meta={`${a.category} · ${a.publishedDate}`}
+                size={size}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      <Link href="/articles" className="ad-back-all mono">
+        <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+        Back to all articles
+      </Link>
+    </>
+  ) : null;
 
   return (
-    // The left gutter exists only to clear the fixed TocRail, so it is applied only when
-    // that rail actually renders. 44px puts the text ~22px from the dots' right edge,
-    // matching the right margin, while still clearing the wider toggle box by 12px.
-    <main
-      className={`relative z-[3] mx-auto w-full max-w-[1140px] px-[22px] pt-[clamp(36px,5vw,56px)] pb-16 ${
-        hasToc ? "max-lg:pl-[44px]" : ""
-      }`}
-    >
+    // 2a widens the page only when there is a sidebar or related content, and pads the left
+    // edge (50px) only when the fixed TOC rail renders below 1024px.
+    <main className="ad nm-root" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
@@ -163,164 +139,117 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         path={`/articles/${slug}`}
       />
 
-      {/* Narrow viewports: the sidebar is replaced by a fixed dot rail on the left edge. */}
+      {/* Narrow viewports: the TOC sidebar is replaced by the fixed rail on the left edge. */}
       <TocRail entries={toc} />
 
-      {/* Flex below lg so the aside can be ordered AFTER the content when it carries the
-          related blocks; grid from lg up, where `lg:order-first` puts it back in column 1.
-          With no sidebar at all the wrapper stays a plain block so the body centres. */}
-      <div
-        className={
-          hasSidebar ? "flex flex-col gap-12 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-12" : undefined
-        }
-      >
-        {/* Sidebar — anchored while scrolling. With a TOC it is hidden below lg, where
-            TocRail takes over; carrying the related blocks instead it stays visible at every
-            width, sitting below the body when stacked. */}
-        {/* `self-start` + `sticky` must be on the SAME element. A grid item stretches to
-            the row height by default, so sticky has nothing to stick within; but putting
-            self-start on the aside and sticky on its child is equally broken — the child
-            then sticks inside a box that is only as tall as itself. */}
-        {/* `.article-aside` caps the pinned column's height and lets it scroll internally
-            — see globals.css. Load-bearing for the 31-entry TOC on the Odoo article. */}
+      <div className="ad-grid" data-aside={hasSidebar || undefined}>
+        {/* The aside is sticky at --sticky-top and scrolls internally (2a's thin accent
+            scrollbar) when the TOC is taller than the viewport. `self-start` and `sticky`
+            live on the same element, or sticky has nothing to stick within. With a TOC it is
+            hidden below 1024px, where the rail takes over; carrying the related content it
+            stays at every width and sits after the body when stacked. */}
         {hasSidebar && (
-          <aside
-            className={`article-aside self-start lg:sticky lg:top-(--sticky-top) ${
-              relatedInSidebar ? "order-last flex flex-col gap-8 lg:order-first" : "hidden lg:block"
-            }`}
-          >
-            {hasToc ? (
-              <ArticleToc entries={toc} />
-            ) : (
-              <>
-                {relatedProjectsBlock}
-                {relatedArticlesBlock}
-              </>
-            )}
+          <aside className="ad-aside" data-kind={hasToc ? "toc" : "related"} data-sb="toc">
+            {hasToc ? <ArticleToc entries={toc} /> : relatedBlocks}
           </aside>
         )}
 
-        {/* Article content */}
-        <div className="min-w-0">
-          <Link
-            href="/articles"
-            className="mono inline-flex items-center gap-1.5 text-[12.5px] transition-colors hover:text-(--accent-ink)"
-            style={{ color: "var(--ink-dim)" }}
-          >
+        <div className="ad-content">
+          <Link href="/articles" className="nm-back mono">
             <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
             All articles
           </Link>
 
-          {/* One coherent header block: cover → title → standfirst → byline, closed off by
-              a rule. Without the divider the metadata ran straight into the prose and the
-              page read as one undifferentiated column. */}
-          <header className="mb-8 border-b pb-6" style={{ borderColor: "var(--border)" }}>
-            <CoverImage
-              image={article.coverImage}
-              variant="article"
-              label={`${article.title} cover`}
-              className="mt-5 aspect-[16/9] w-full"
-              sizes="(max-width: 860px) 100vw, 820px"
-              priority
-            />
+          {/* 2a's header: title, cover well, standfirst, byline, closed off by a rule. */}
+          <header className="ad-head">
+            <h1 className="ad-title">{article.title}</h1>
+            <div className="ad-cover-well">
+              <div className="ad-cover">
+                {article.coverImage ? (
+                  <StrapiImage
+                    src={article.coverImage.url}
+                    alt={article.coverImage.alt || `${article.title} cover`}
+                    fill
+                    sizes="(max-width: 860px) 100vw, 820px"
+                    style={{ objectFit: "cover" }}
+                    priority
+                    fallback={<Contour seed={article.slug} dark={false} className="ad-contour" />}
+                  />
+                ) : (
+                  <Contour seed={article.slug} dark={false} className="ad-contour" />
+                )}
+              </div>
+            </div>
 
-            <h1
-              className="mt-6 font-bold"
-              style={{ fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-0.03em" }}
-            >
-              {article.title}
-            </h1>
+            {article.excerpt && <p className="ad-excerpt">{article.excerpt}</p>}
 
-            {/* Standfirst: sits with the title rather than the body, so the header reads as
-                one unit and the divider lands after the metadata. */}
-            {article.excerpt && (
-              <p className="mt-4 text-[16px]" style={{ lineHeight: 1.6, color: "var(--ink-dim)" }}>
-                {article.excerpt}
-              </p>
-            )}
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2.5">
-              <span className="flex items-center gap-2">
+            <div className="ad-byline">
+              <span className="ad-author">
                 {/* The real photo from site-setting.authorAvatar — free, because
                     generateMetadata above already loads site-setting and React cache()
                     dedupes the two calls into one request. The monogram stays as the
                     fallback: StrapiImage swaps to it on load error as well as when the
-                    field is empty.
-                    aria-hidden because the author's name sits immediately beside it — the
-                    byline should be announced once, not twice. */}
-                <span aria-hidden="true" className="flex h-[26px] w-[26px] shrink-0">
-                  {site.authorAvatar ? (
-                    <StrapiImage
-                      src={site.authorAvatar.url}
-                      alt=""
-                      // Declared 26×26 rather than the intrinsic size: the rendered box then
-                      // matches the attributes on both axes, so next/image's
-                      // "one dimension modified" warning cannot fire whatever the source
-                      // ratio, and reserving the exact box means no layout shift.
-                      width={26}
-                      height={26}
-                      style={{ borderRadius: 999, objectFit: "cover" }}
-                      fallback={<AuthorMonogram />}
-                    />
-                  ) : (
-                    <AuthorMonogram />
-                  )}
+                    field is empty. aria-hidden because the author's name sits beside it. */}
+                <span aria-hidden="true" className="ad-avatar">
+                  <span className="ad-avatar-in">
+                    {site.authorAvatar ? (
+                      <StrapiImage
+                        src={site.authorAvatar.url}
+                        alt=""
+                        // Declared at the rendered size so next/image cannot warn about a
+                        // modified dimension, and the box is reserved (no layout shift).
+                        width={26}
+                        height={26}
+                        style={{ borderRadius: 999, objectFit: "cover", width: "100%", height: "100%" }}
+                        fallback={<AuthorMonogram />}
+                      />
+                    ) : (
+                      <AuthorMonogram />
+                    )}
+                  </span>
                 </span>
                 {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
                     the visible byline and the structured data cannot drift apart. */}
-                <Link
-                  href="/about"
-                  className="text-[13.5px] font-semibold underline-offset-4 transition-colors hover:text-(--accent-ink) hover:underline"
-                >
+                <Link href="/about" className="ad-name">
                   {SITE_NAME}
                 </Link>
               </span>
-
-              <span aria-hidden="true" style={{ color: "var(--ink-faint)" }}>
+              <span aria-hidden="true" className="ad-sep">
                 ·
               </span>
-              <span className="mono text-[12px]" style={{ color: "var(--ink-faint)" }}>
+              <span className="ad-date mono">
                 {article.publishedDate} · {article.readTime}
               </span>
-
-              <span className="ml-auto flex flex-wrap items-center gap-2">
-                <span
-                  className="badge"
-                  style={{ color: "var(--accent-ink)", background: "var(--chip)", borderColor: "var(--chip-brd)" }}
-                >
-                  {article.category}
-                </span>
-                <span className="chip mono px-2 py-1 text-[10.5px] font-medium" style={{ borderRadius: 7 }}>
-                  {article.language.toUpperCase()}
-                </span>
+              <span className="ad-pills">
+                <span className="ad-cat">{article.category}</span>
+                <span className="ad-lang mono">{article.language.toUpperCase()}</span>
               </span>
             </div>
           </header>
 
           {article.body && (
-            <article>
-              <StrapiBlocks content={bodyWithIds} />
+            <article id={ARTICLE_BODY_ID} className="ad-body">
+              <StrapiBlocks content={bodyWithIds} variant="article" />
             </article>
           )}
 
           {article.tags.length > 0 && (
-            <div className="mt-8 flex flex-wrap gap-[7px]">
+            <div className="ad-tags">
               {article.tags.map((tag) => (
-                <span key={tag} className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
+                <span key={tag} className="ad-tag mono">
                   #{tag}
                 </span>
               ))}
             </div>
           )}
-
-          {!relatedInSidebar && relatedProjectsBlock}
         </div>
-
       </div>
 
-      {/* Full width, outside the grid, after the body and after Related projects — the point
-          at which someone has finished reading. Suppressed when the sidebar carries it. */}
-      {!relatedInSidebar && relatedArticlesBlock}
+      {/* After the body: the point at which someone has finished reading. Suppressed when
+          the sidebar carries it. */}
+      {!relatedInSidebar && relatedBlocks && <div className="ad-below">{relatedBlocks}</div>}
+
+      <BackToTop />
     </main>
   );
 }

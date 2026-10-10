@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { titleCase } from "@/lib/mappers";
 import type { MappedImage } from "@/content/home";
@@ -17,7 +18,13 @@ export interface TileItem {
 const EDGE_PAD = 8;
 const GAP = 8;
 
-function TextChip({ label }: { label: string }) {
+/** `default`: the legacy square tile. `card`: 2a's 26px white tile on project cards.
+ *  `tile46`: 2a's 46px raised tile on the project page. */
+export type TechTileVariant = "default" | "card" | "tile46";
+
+function TextChip({ label, variant }: { label: string; variant: TechTileVariant }) {
+  if (variant === "card") return <span className="pc-chip mono">{label}</span>;
+  if (variant === "tile46") return <span className="pj-chip mono">{label}</span>;
   return (
     <span className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
       {label}
@@ -27,8 +34,13 @@ function TextChip({ label }: { label: string }) {
 
 interface TechTileProps {
   item: TileItem;
-  /** Square edge length in px. */
-  size: number;
+  /** Square edge length in px (the `default` variant only; the 2a variants are fixed). */
+  size?: number;
+  variant?: TechTileVariant;
+  /** When set (project cards), activating the tile with a mouse or the keyboard opens this
+   *  URL like the rest of the card; Ctrl/⌘/middle click opens it in a new tab. A touch or pen
+   *  tap still only toggles the name, so a phone user can read it. */
+  href?: string;
 }
 
 /** A technology as a uniform square logo tile. The name (plus level when given) is always
@@ -38,7 +50,8 @@ interface TechTileProps {
  *  `overflow:hidden` and `backdrop-filter`, and backdrop-filter makes the card a containing
  *  block even for fixed-position descendants — so an in-card tooltip gets clipped at the
  *  card edge (the same trap the gallery lightbox hit). */
-export function TechTile({ item, size }: TechTileProps) {
+export function TechTile({ item, size = 44, variant = "default", href }: TechTileProps) {
+  const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -79,7 +92,7 @@ export function TechTile({ item, size }: TechTileProps) {
     };
   }, [visible, place]);
 
-  if (!item.logo) return <TextChip label={item.name} />;
+  if (!item.logo) return <TextChip label={item.name} variant={variant} />;
 
   return (
     <>
@@ -98,9 +111,20 @@ export function TechTile({ item, size }: TechTileProps) {
         onPointerLeave={(e) => {
           if (e.pointerType === "mouse") setVisible(false);
         }}
-        // Tap toggles the label; this is a button (not a link) so it never navigates.
-        onClick={() => {
-          if (lastPointer.current !== "mouse") setVisible((v) => !v);
+        // Tap toggles the label. A mouse click, or Enter/Space (detail 0), follows `href` when
+        // the tile sits on a card that links somewhere; without `href` it never navigates.
+        onClick={(e) => {
+          const keyboard = e.detail === 0;
+          if (!keyboard && lastPointer.current !== "mouse") {
+            setVisible((v) => !v);
+            return;
+          }
+          if (!href) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey) window.open(href, "_blank", "noopener");
+          else router.push(href);
+        }}
+        onAuxClick={(e) => {
+          if (href && e.button === 1) window.open(href, "_blank", "noopener");
         }}
         // Only *keyboard* focus reveals the label. A tap also focuses the button, and an
         // unconditional show here would immediately be toggled back off by the click that
@@ -110,9 +134,9 @@ export function TechTile({ item, size }: TechTileProps) {
         }}
         onBlur={() => setVisible(false)}
         aria-label={label}
-        className="tech-tile"
+        className={variant === "card" ? "pc-logo" : variant === "tile46" ? "pj-logo" : "tech-tile"}
         // Padding in px (not %) so it scales with the tile instead of the container.
-        style={{ width: size, height: size, padding: Math.round(size * 0.18) }}
+        style={variant === "default" ? { width: size, height: size, padding: Math.round(size * 0.18) } : undefined}
       >
         <StrapiImage
           src={item.logo.url}

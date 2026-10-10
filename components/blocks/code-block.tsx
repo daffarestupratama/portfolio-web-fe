@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentType } from "react";
-import { CheckIcon, CopyIcon } from "@/components/ui/icons";
 import { normalizeLang, PRE_CLASS, PRE_STYLE, type CodeBlockInnerProps } from "./code-block-shared";
 
 interface CodeBlockProps {
@@ -19,7 +18,7 @@ type CopyState = "idle" | "copied" | "failed";
  *  the later swap is a pure colour change with no reflow. */
 function PlainCode({ code }: { code: string }) {
   return (
-    <pre className={PRE_CLASS} style={PRE_STYLE}>
+    <pre className={PRE_CLASS} style={PRE_STYLE} data-sb="dark">
       {code}
     </pre>
   );
@@ -50,7 +49,6 @@ function CopyButton({ code, label }: { code: string; label: string }) {
   return (
     <>
       <button type="button" onClick={copy} aria-label={`Copy ${label} code`} className="code-copy mono">
-        {state === "copied" ? <CheckIcon width={12} height={12} /> : <CopyIcon width={12} height={12} />}
         {state === "idle" ? "Copy" : state === "copied" ? "Copied" : "Failed"}
       </button>
       <span aria-live="polite" className="sr-only">
@@ -60,10 +58,9 @@ function CopyButton({ code, label }: { code: string; label: string }) {
   );
 }
 
-/** Syntax-highlighted code block, presented as a macOS-style terminal window: a header bar
- *  with traffic lights, the centred language name, and a copy button, over the code body.
- *  Uses a single dark surface in BOTH site themes (code reads better dark and it matches the
- *  mkdir terminal). Long lines scroll horizontally; whitespace is preserved in both states.
+/** Syntax-highlighted code block in Portfolio 2a's window: a raised frame with traffic lights,
+ *  the centred language name and a copy pill, over a terminal body that stays dark (`--term`)
+ *  in both site themes. Long lines scroll horizontally; whitespace is preserved in both states.
  *
  *  Prism runs in the BROWSER only: it is imported from an effect after mount, so the
  *  tokenizer never executes during server rendering (Worker CPU is scarce on the
@@ -94,17 +91,14 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
   }, []);
 
   return (
-    // `color-scheme: dark` is what actually keeps the horizontal scrollbar dark in light
-    // mode: the UA paints scrollbars from the inherited color-scheme, not from the
-    // element's own colours. The explicit rules on .code-scroll reinforce it.
-    <div className="code-window relative mt-5 overflow-hidden">
+    <div className="code-window">
       <div className="code-titlebar">
         {/* Pure decoration — one aria-hidden wrapper keeps all three dots out of the
             accessibility tree instead of announcing three anonymous shapes. */}
         <span className="code-dots" aria-hidden="true">
-          <i style={{ background: "#ff5f56" }} />
-          <i style={{ background: "#ffbd2e" }} />
-          <i style={{ background: "#27c93f" }} />
+          <i style={{ background: "#D9695C" }} />
+          <i style={{ background: "#D8A94A" }} />
+          <i style={{ background: "#5FA878" }} />
         </span>
         <span className="code-lang mono">{label}</span>
         <CopyButton code={source} label={label} />

@@ -3,14 +3,23 @@
 import { useEffect, useRef } from "react";
 import type { TocEntry } from "@/components/blocks/toc";
 import { useActiveHeading } from "@/hooks/use-active-heading";
+import { useReadingProgress } from "@/hooks/use-reading-progress";
 
 /** Keeps the highlighted entry this far from the scroll container's edges. */
 const KEEP_IN_VIEW_MARGIN = 24;
 
-/** Table of contents with scroll-spy. Highlights the heading currently in view;
- *  anchor links jump to each section (keyboard accessible). */
+/** The id of the article body the reading progress is measured over. */
+export const ARTICLE_BODY_ID = "art-body";
+
+/**
+ * Portfolio 2a's sidebar table of contents: a sticky strip with "On this page", the reading
+ * percentage and a progress bar, then the entries beside an inset rail whose accent fill grows
+ * to the current section. Entries already read are ink, the current one accent, the rest dim.
+ * Scroll-spy (useActiveHeading) and the anchors are unchanged.
+ */
 export function ArticleToc({ entries }: { entries: TocEntry[] }) {
   const active = useActiveHeading(entries);
+  const pct = useReadingProgress(ARTICLE_BODY_ID);
   const activeRef = useRef<HTMLAnchorElement>(null);
 
   // If the sidebar has had to become internally scrollable (a TOC longer than the
@@ -19,48 +28,57 @@ export function ArticleToc({ entries }: { entries: TocEntry[] }) {
   // up and scrolls the PAGE too, yanking the reader away from what they're reading.
   useEffect(() => {
     const link = activeRef.current;
-    const box = link?.closest<HTMLElement>(".article-aside");
+    const box = link?.closest<HTMLElement>(".ad-aside");
     if (!link || !box || box.scrollHeight <= box.clientHeight) return;
     const linkRect = link.getBoundingClientRect();
     const boxRect = box.getBoundingClientRect();
-    if (linkRect.top < boxRect.top + KEEP_IN_VIEW_MARGIN) {
-      box.scrollTop -= boxRect.top + KEEP_IN_VIEW_MARGIN - linkRect.top;
+    // The sticky progress strip covers the top of the box, so keep clear of it too.
+    const head = box.querySelector<HTMLElement>(".toc-head")?.offsetHeight ?? 0;
+    if (linkRect.top < boxRect.top + head + KEEP_IN_VIEW_MARGIN) {
+      box.scrollTop -= boxRect.top + head + KEEP_IN_VIEW_MARGIN - linkRect.top;
     } else if (linkRect.bottom > boxRect.bottom - KEEP_IN_VIEW_MARGIN) {
       box.scrollTop += linkRect.bottom - (boxRect.bottom - KEEP_IN_VIEW_MARGIN);
     }
   }, [active]);
 
   if (entries.length === 0) return null;
+  const activeIndex = entries.findIndex((e) => e.id === active);
+  const fill = activeIndex < 0 ? 0 : ((activeIndex + 1) / entries.length) * 100;
 
   return (
-    <nav aria-label="Table of contents">
-      <div className="mono mb-2.5 text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--ink-faint)" }}>
-        On this page
+    <nav aria-label="Table of contents" className="toc">
+      <div className="toc-head">
+        <div className="toc-head-row mono">
+          <span>On this page</span>
+          <span className="toc-pct">{pct}%</span>
+        </div>
+        <div className="toc-bar" aria-hidden="true">
+          <div style={{ width: `${pct}%` }} />
+        </div>
       </div>
-      <ul className="flex flex-col gap-1.5" style={{ borderLeft: "1px solid var(--border)" }}>
-        {entries.map((e) => {
-          const isActive = active === e.id;
-          return (
-            <li key={e.id} style={{ marginLeft: -1 }}>
-              <a
-                ref={isActive ? activeRef : undefined}
-                href={`#${e.id}`}
-                aria-current={isActive ? "true" : undefined}
-                className="block py-0.5 text-[13px] transition-colors"
-                style={{
-                  paddingLeft: e.level === 3 ? 22 : 12,
-                  borderLeft: `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
-                  color: isActive ? "var(--accent-ink)" : "var(--ink-dim)",
-                  fontWeight: isActive ? 600 : 400,
-                  lineHeight: 1.4,
-                }}
-              >
-                {e.text}
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="toc-list">
+        <span aria-hidden="true" className="toc-track" />
+        <span aria-hidden="true" className="toc-fill" style={{ height: `${fill}%` }} />
+        <ul>
+          {entries.map((e, i) => {
+            const isActive = i === activeIndex;
+            return (
+              <li key={e.id}>
+                <a
+                  ref={isActive ? activeRef : undefined}
+                  href={`#${e.id}`}
+                  aria-current={isActive ? "true" : undefined}
+                  data-state={isActive ? "on" : i < activeIndex ? "past" : undefined}
+                  data-sub={e.level === 3 || undefined}
+                  className="toc-a"
+                >
+                  {e.text}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }

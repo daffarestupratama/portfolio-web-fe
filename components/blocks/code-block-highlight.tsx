@@ -13,7 +13,7 @@ export default function CodeBlockHighlight({ code, lang }: CodeBlockInnerProps) 
   return (
     <Highlight theme={themes.nightOwl} code={code} language={lang as Language}>
       {({ tokens, getLineProps, getTokenProps }) => (
-        <pre className={PRE_CLASS} style={PRE_STYLE}>
+        <pre className={PRE_CLASS} style={PRE_STYLE} data-sb="dark">
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })}>
               {line.map((token, j) => (

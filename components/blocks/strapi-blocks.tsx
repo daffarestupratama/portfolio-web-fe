@@ -12,6 +12,12 @@ interface StrapiBlocksProps {
   /** Pass `withHeadingIds(body).content` to get anchored headings for a TOC; the raw
    *  body renders identically but without ids. */
   content: BlocksContent;
+  /**
+   * `article` / `project`: Portfolio 2a's prose (article body; project Approach & Result).
+   * Omitted: the earlier rendering, kept for the pages not yet redesigned (about, services,
+   * tours) until Phase 3b.
+   */
+  variant?: "article" | "project";
 }
 
 const HEADING_SIZES: Record<number, string> = {
@@ -23,10 +29,13 @@ const HEADING_SIZES: Record<number, string> = {
   6: "text-[14px]",
 };
 
-/** Renders a Strapi `blocks` rich-text field as readable prose on the base/glass
- *  surface, styled with the design tokens. First real long-form usage: article
- *  body + project approach/result. */
-export function StrapiBlocks({ content }: StrapiBlocksProps) {
+/** Renders a Strapi `blocks` rich-text field as prose. 2a's article and project variants are
+ *  class-based (`.sb*` in globals.css); the legacy rendering stays for the other pages. */
+export function StrapiBlocks({ content, variant }: StrapiBlocksProps) {
+  return variant ? <NmBlocks content={content} variant={variant} /> : <LegacyBlocks content={content} />;
+}
+
+function LegacyBlocks({ content }: { content: BlocksContent }) {
   return (
     <BlocksRenderer
       content={content}
@@ -160,5 +169,95 @@ export function StrapiBlocks({ content }: StrapiBlocksProps) {
         ),
       }}
     />
+  );
+}
+
+/**
+ * Portfolio 2a's prose (lines 705–724 of the design): block gap, heading scale, inset quote,
+ * accent-b bullet dots, mono accent-ink ordered numbers, inset image well with an italic
+ * caption, inset inline code. Heading ids (from withHeadingIds) and their scroll margin are
+ * the same as before, so the TOC and scroll-spy are unaffected.
+ */
+function NmBlocks({ content, variant }: { content: BlocksContent; variant: "article" | "project" }) {
+  return (
+    <div className={`sb sb-${variant}`}>
+      <BlocksRenderer
+        content={content}
+        blocks={{
+          paragraph: ({ children }) => <p className="sb-p">{children}</p>,
+          heading: (props) => {
+            const { children, level, id } = props as {
+              children?: ReactNode;
+              level: 1 | 2 | 3 | 4 | 5 | 6;
+              id?: string;
+            };
+            const Tag = `h${level}` as const;
+            return (
+              <Tag
+                id={id}
+                className={`sb-h sb-h${level <= 2 ? 2 : 3}`}
+                style={id ? { scrollMarginTop: `${HEADING_SCROLL_OFFSET}px` } : undefined}
+              >
+                {children}
+              </Tag>
+            );
+          },
+          list: ({ children, format }) =>
+            format === "ordered" ? <ol className="sb-ol">{children}</ol> : <ul className="sb-ul">{children}</ul>,
+          "list-item": ({ children }) => (
+            <li className="sb-li">
+              <span>{children}</span>
+            </li>
+          ),
+          quote: ({ children }) => <blockquote className="sb-quote">{children}</blockquote>,
+          code: (props) => {
+            const { plainText, language } = props as { plainText?: string; language?: string };
+            return <CodeBlock code={plainText ?? ""} language={language} />;
+          },
+          image: ({ image }) => {
+            const width = image.width || 1200;
+            const height = image.height || 675;
+            const caption = image.caption?.trim() || image.alternativeText?.trim();
+            // `fill` in a box that states the intrinsic ratio: no layout shift, and no
+            // next/image "one dimension modified" warning (see the legacy renderer above).
+            return (
+              <figure className="sb-fig">
+                <div className="sb-fig-well">
+                  <div className="sb-fig-img" style={{ aspectRatio: `${width} / ${height}` }}>
+                    <StrapiImage
+                      src={strapiImageUrl(image.url)}
+                      alt={image.alternativeText || ""}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 740px"
+                      style={{ objectFit: "contain" }}
+                      fallback={
+                        <MediaPlaceholder
+                          variant="article"
+                          label={image.alternativeText || "image"}
+                          className="absolute inset-0 h-full w-full"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
+                {caption && <figcaption className="sb-cap">{caption}</figcaption>}
+              </figure>
+            );
+          },
+          link: ({ children, url }) => (
+            <a href={url} className="sb-a">
+              {children}
+            </a>
+          ),
+        }}
+        modifiers={{
+          bold: ({ children }) => <strong className="sb-b">{children}</strong>,
+          italic: ({ children }) => <em>{children}</em>,
+          underline: ({ children }) => <u>{children}</u>,
+          strikethrough: ({ children }) => <s>{children}</s>,
+          code: ({ children }) => <code className="sb-code mono">{children}</code>,
+        }}
+      />
+    </div>
   );
 }

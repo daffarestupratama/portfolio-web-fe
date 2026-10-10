@@ -5,7 +5,8 @@ import type { Project } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { bentoRows, type BentoLayout } from "@/components/cards/bento";
 import { projectTypeMeta } from "@/components/cards/project-type-meta";
-import { contourMarkup } from "@/lib/contour";
+import { Contour } from "@/components/ui/contour";
+import { TechTile } from "@/components/ui/tech-tile";
 
 interface ProjectCardProps {
   project: Project;
@@ -25,14 +26,16 @@ const MAX_SKILLS = 6;
  * (`.pc*` in globals.css), so nothing re-renders on hover.
  *
  * The whole tile is one link: the title's stretched `::after` covers the card, so a pointer
- * click anywhere navigates and keyboard users get a single, properly named stop.
+ * click anywhere navigates. The technology logos are the one layer above it (TechTile, so they
+ * keep their name tooltip on hover, focus and tap); a mouse click on a logo opens the project
+ * too, so the card still behaves as one target.
  */
 export function ProjectCard({ project, index = 0, layout = "standalone" }: ProjectCardProps) {
   const meta = projectTypeMeta(project.projectType);
   const cover = project.coverImage;
   const href = `/projects/${project.slug}`;
-  // Built once per slug and cached; identical on server and client (see lib/contour.ts).
-  const contour = <span className="pc-contour" dangerouslySetInnerHTML={{ __html: contourMarkup(project.slug, true) }} />;
+  // Drawn in the browser after hydration; the server sends only its base colour.
+  const contour = <Contour seed={project.slug} dark className="pc-contour" />;
   const skills = project.technologies.slice(0, MAX_SKILLS);
 
   return (
@@ -81,17 +84,10 @@ export function ProjectCard({ project, index = 0, layout = "standalone" }: Proje
               <div className="pc-tech-row">
                 <div className="pc-skills">
                   {skills.length > 0
-                    ? skills.map((t) =>
-                        t.logo ? (
-                          <span key={t.id} role="img" aria-label={t.name} title={t.name} className="pc-logo">
-                            <span style={{ backgroundImage: `url("${t.logo.url}")` }} />
-                          </span>
-                        ) : (
-                          <span key={t.id} className="pc-chip mono">
-                            {t.name}
-                          </span>
-                        ),
-                      )
+                    ? skills.map((t) => (
+                        // Name only, as 2a's title tooltip shows (no level on cards).
+                        <TechTile key={t.id} item={{ name: t.name, logo: t.logo }} variant="card" href={href} />
+                      ))
                     : // Legacy plain-text stack, for projects with no linked technologies yet.
                       project.techStack.slice(0, MAX_SKILLS).map((name) => (
                         <span key={name} className="pc-chip mono">

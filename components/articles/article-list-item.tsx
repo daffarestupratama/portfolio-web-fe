@@ -1,11 +1,9 @@
-// A client component so the contour placeholder is built from the slug on each side instead of
-// being serialised into the RSC payload as a second ~14 KB copy (the HTML already carries one).
 "use client";
 
 import Link from "next/link";
 import type { Article } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
-import { contourMarkup } from "@/lib/contour";
+import { Contour } from "@/components/ui/contour";
 
 interface ArticleListItemProps {
   article: Article;
@@ -21,10 +19,8 @@ interface ArticleListItemProps {
  */
 export function ArticleListItem({ article }: ArticleListItemProps) {
   const href = `/articles/${article.slug}`;
-  // Built once per slug and cached; identical on server and client (see lib/contour.ts).
-  const contour = (
-    <span className="ar-contour" dangerouslySetInnerHTML={{ __html: contourMarkup(article.slug, false) }} />
-  );
+  // Drawn in the browser after hydration; the server sends only its base colour.
+  const contour = <Contour seed={article.slug} dark={false} className="ar-contour" />;
 
   return (
     <article className="ar">

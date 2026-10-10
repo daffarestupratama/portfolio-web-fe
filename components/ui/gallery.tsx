@@ -6,19 +6,25 @@ import type { GalleryImage } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { useLightbox } from "@/components/ui/use-lightbox";
 
-const imgFallback = <span className="absolute inset-0" style={{ background: "var(--glass-bg-2)" }} aria-hidden="true" />;
+const imgFallback = <span className="absolute inset-0" style={{ background: "color-mix(in srgb, var(--accent) 14%, var(--bg))" }} aria-hidden="true" />;
 
 interface GalleryProps {
   images: GalleryImage[];
-  /** `grid`: 2a's experience gallery, 4:3 inset tiles. `strip`: the horizontal scroller the
-   *  project and tour detail pages still use until their redesign. */
-  variant?: "strip" | "grid";
+  /** `grid`: 2a's experience gallery, 4:3 inset tiles. `masonry`: 2a's project gallery, a
+   *  16:9 lead image over a numbered, captioned masonry. `strip`: the horizontal scroller the
+   *  tour pages still use until Phase 3b. */
+  variant?: "strip" | "grid" | "masonry";
 }
+
+/** 2a shows this many masonry images (after the lead) before "Show all". */
+const MASONRY_MAX = 8;
+const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /** Reusable image carousel + accessible lightbox. Renders nothing when empty.
  *  Used by expandable experience items and the project/tour detail pages. */
 export function Gallery({ images, variant = "strip" }: GalleryProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
   const returnIndexRef = useRef<number>(0);
@@ -68,9 +74,54 @@ export function Gallery({ images, variant = "strip" }: GalleryProps) {
 
   const current = openIndex !== null ? images[openIndex] : null;
 
+  const label = (img: GalleryImage, i: number) => `Open image${img.alt ? `: ${img.alt}` : ` ${i + 1}`}`;
+  const rest = images.slice(1);
+  const shownRest = showAll ? rest : rest.slice(0, MASONRY_MAX);
+
   return (
     <>
-      {variant === "grid" ? (
+      {variant === "masonry" ? (
+        <>
+          <figure className="gm-lead">
+            <button ref={(el) => { triggerRefs.current[0] = el; }} type="button" onClick={() => openAt(0)} aria-label={label(images[0]!, 0)} className="gm-lead-btn">
+              <span className="gm-lead-img">
+                <StrapiImage src={images[0]!.url} alt={images[0]!.alt} fill sizes="(max-width: 908px) 100vw, 860px" style={{ objectFit: "cover" }} fallback={imgFallback} />
+              </span>
+            </button>
+            <figcaption className="gm-cap gm-cap-lead">
+              <span className="gm-num mono">01</span>
+              <span>{images[0]!.caption}</span>
+            </figcaption>
+          </figure>
+          {shownRest.length > 0 && (
+            <div className="gm-cols">
+              {shownRest.map((img, j) => {
+                const i = j + 1;
+                return (
+                  <figure key={`${img.url}-${i}`} className="gm-item">
+                    <button ref={(el) => { triggerRefs.current[i] = el; }} type="button" onClick={() => openAt(i)} aria-label={label(img, i)} className="gm-btn">
+                      <span className="gm-img" style={{ aspectRatio: img.width && img.height ? `${img.width}/${img.height}` : "4/3" }}>
+                        <StrapiImage src={img.url} alt={img.alt} fill sizes="(max-width: 700px) 100vw, 300px" style={{ objectFit: "cover" }} fallback={imgFallback} />
+                      </span>
+                    </button>
+                    <figcaption className="gm-cap">
+                      <span className="gm-num mono">{pad2(i + 1)}</span>
+                      <span className="gm-cap-text">{img.caption}</span>
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+          )}
+          {rest.length > MASONRY_MAX && (
+            <div className="gm-more-wrap">
+              <button type="button" onClick={() => setShowAll((v) => !v)} className="gm-more">
+                {showAll ? "Show fewer" : `Show all ${images.length} images`}
+              </button>
+            </div>
+          )}
+        </>
+      ) : variant === "grid" ? (
         <ul className="xp-gallery">
           {images.map((img, i) => (
             <li key={`${img.url}-${i}`}>
