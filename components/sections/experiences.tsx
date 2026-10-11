@@ -54,6 +54,11 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
   const items = showingCertifications ? [] : experiences[tab as ExperienceCategory];
   const visible = showAll ? items : items.slice(0, TOP_N);
 
+  // Below 640px (latest 2a) the track fills the width instead of scrolling: one row, or two
+  // columns once there are more than three tabs. The thumb moves by column and row there.
+  const narrowCols = tabs.length > 3 ? 2 : tabs.length;
+  const narrowRows = Math.ceil(tabs.length / narrowCols);
+
   const selectTab = (key: TabKey) => {
     setSelected(key);
     setShowAll(false);
@@ -84,14 +89,20 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
             role="tablist"
             aria-label="Experience category"
             className="xp-tabs"
-            style={{ "--xp-tabs": tabs.length } as CSSProperties}
+            data-rows={narrowRows > 1 || undefined}
+            style={
+              {
+                "--xp-tabs": tabs.length,
+                "--xp-i": index,
+                "--xp-cols": narrowCols,
+                "--xp-rows": narrowRows,
+                "--xp-col": index % narrowCols,
+                "--xp-row": Math.floor(index / narrowCols),
+              } as CSSProperties
+            }
             onKeyDown={onTabKey}
           >
-            <span
-              aria-hidden="true"
-              className="xp-thumb"
-              style={{ transform: `translateX(${index * 100}%)` }}
-            />
+            <span aria-hidden="true" className="xp-thumb" />
             {tabs.map((t, i) => (
               <button
                 key={t.key}

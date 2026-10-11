@@ -1059,7 +1059,6 @@ button.cv-btn:active {
   margin-bottom: 34px;
   display: flex;
   justify-content: center;
-  overflow-x: auto;
   padding: 4px 2px 12px;
 }
 .xp-tabs {
@@ -1072,14 +1071,6 @@ button.cv-btn:active {
   background: var(--bg);
   box-shadow: var(--in);
 }
-@media (max-width: 639px) {
-  .xp-tabs-wrap {
-    justify-content: flex-start;
-  }
-  .xp-tabs {
-    --xp-tab-w: 118px;
-  }
-}
 .xp-thumb {
   position: absolute;
   top: 6px;
@@ -1089,7 +1080,27 @@ button.cv-btn:active {
   border-radius: 999px;
   background: var(--bg);
   box-shadow: var(--out-sm), var(--rim);
+  transform: translateX(calc(var(--xp-i) * 100%));
   transition: transform .55s var(--spring);
+}
+/* Latest 2a: below 640px the track fills the width and never scrolls. One row of equal tabs,
+   or a 2-column grid once there are more than three (the thumb then moves by column and row). */
+@media (max-width: 639px) {
+  .xp-tabs {
+    width: 100%;
+    grid-template-columns: repeat(var(--xp-cols), minmax(0,1fr));
+  }
+  .xp-tabs[data-rows] {
+    border-radius: 24px;
+  }
+  .xp-thumb {
+    width: calc((100% - 12px) / var(--xp-cols));
+    height: calc((100% - 12px) / var(--xp-rows));
+    transform: translate(calc(var(--xp-col) * 100%), calc(var(--xp-row) * 100%));
+  }
+  .xp-tabs[data-rows] .xp-thumb {
+    border-radius: 18px;
+  }
 }
 .xp-tab {
   position: relative;
@@ -2729,12 +2740,18 @@ button.cv-btn:active {
   order: 1;
 }
 /* Stacked, a related-content aside follows the body; a TOC aside gives way to the rail. */
+/* Latest 2a hides the aside's scrollbar; a long TOC still scrolls inside the card. */
 .ad-aside {
   order: 2;
   padding: 20px;
   border-radius: 24px;
   background: var(--bg);
   box-shadow: var(--out), var(--rim);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ad-aside::-webkit-scrollbar {
+  display: none;
 }
 .ad-aside[data-kind="toc"] {
   display: none;
@@ -2745,8 +2762,8 @@ button.cv-btn:active {
     grid-template-columns: 250px minmax(0,1fr);
     align-items: start;
   }
-  /* Sticky and capped at the viewport: a long TOC scrolls inside the card, with 2a's thin
-     accent scrollbar ([data-sb="toc"]). */
+  /* Sticky and capped at the viewport: a long TOC scrolls inside the card, with its scrollbar
+     hidden, and the active entry is glided to the centre (articles/article-toc.tsx). */
   .ad-aside {
     order: 0;
     position: sticky;
@@ -2933,15 +2950,7 @@ button.cv-btn:active {
 }
 
 /* TOC in the aside (articles/article-toc.tsx) */
-.toc-head {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  margin: -20px -20px 0;
-  padding: 20px 20px 14px;
-  border-radius: 24px 24px 0 0;
-  background: var(--bg);
-}
+/* "On this page" + % row, used by the rail panel (articles/toc-rail.tsx). */
 .toc-head-row {
   display: flex;
   align-items: center;
@@ -2955,17 +2964,13 @@ button.cv-btn:active {
 .toc-pct {
   color: var(--accent-ink);
 }
-.toc-bar {
-  height: 8px;
-  padding: 2px;
-  border-radius: 8px;
-  box-shadow: var(--in-sm);
-}
-.toc-bar > div {
-  height: 100%;
-  border-radius: 6px;
-  background: var(--accent);
-  transition: width .25s;
+/* The sidebar's plain label (latest 2a: no reading % or progress bar in the sidebar). */
+.toc-label {
+  margin-bottom: 12px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 .toc-list {
   position: relative;

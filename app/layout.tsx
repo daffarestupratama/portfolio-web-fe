@@ -5,6 +5,7 @@ import { Terraces } from "@/components/layout/terraces";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { RouteProgress } from "@/components/layout/route-progress";
+import { NmReveal } from "@/components/layout/nm-reveal";
 import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata, FALLBACK_TITLE, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "../styles/globals.css";
@@ -58,6 +59,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <RouteProgress />
+          <NmReveal />
           {/* `overflow-x: clip`, NOT `hidden`. `overflow-x: hidden` forces the computed
               `overflow-y` to `auto`, which turns this wrapper into a scroll container —
               and `position: sticky` then resolves against this non-scrolling box instead

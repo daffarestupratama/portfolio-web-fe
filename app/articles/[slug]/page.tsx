@@ -143,8 +143,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       <TocRail entries={toc} />
 
       <div className="ad-grid" data-aside={hasSidebar || undefined}>
-        {/* The aside is sticky at --sticky-top and scrolls internally (2a's thin accent
-            scrollbar) when the TOC is taller than the viewport. `self-start` and `sticky`
+        {/* The aside is sticky at --sticky-top and scrolls internally (scrollbar hidden,
+            as in the latest 2a) when the TOC is taller than the viewport. `self-start` and `sticky`
             live on the same element, or sticky has nothing to stick within. With a TOC it is
             hidden below 1024px, where the rail takes over; carrying the related content it
             stays at every width and sits after the body when stacked. */}

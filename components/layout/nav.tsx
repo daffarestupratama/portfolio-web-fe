@@ -55,7 +55,8 @@ export function Nav() {
   }, []);
 
   return (
-    <div className="nv-wrap nm-root" data-stuck={stuck}>
+    // data-nm-keep: the nav animates its surfaces on the first load only (latest 2a).
+    <div className="nv-wrap nm-root" data-stuck={stuck} data-nm-keep="">
       <style dangerouslySetInnerHTML={{ __html: STAGE_CSS }} />
       <nav className="nv-bar">
         <Logo />

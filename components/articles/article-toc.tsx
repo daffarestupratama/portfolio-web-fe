@@ -3,43 +3,54 @@
 import { useEffect, useRef } from "react";
 import type { TocEntry } from "@/components/blocks/toc";
 import { useActiveHeading } from "@/hooks/use-active-heading";
-import { useReadingProgress } from "@/hooks/use-reading-progress";
 
-/** Keeps the highlighted entry this far from the scroll container's edges. */
-const KEEP_IN_VIEW_MARGIN = 24;
-
-/** The id of the article body the reading progress is measured over. */
+/** The id of the article body the rail's reading progress is measured over. */
 export const ARTICLE_BODY_ID = "art-body";
 
+/** Latest 2a's glide for the sidebar: 380ms, ease-out cubic. */
+const GLIDE_MS = 380;
+
 /**
- * Portfolio 2a's sidebar table of contents: a sticky strip with "On this page", the reading
- * percentage and a progress bar, then the entries beside an inset rail whose accent fill grows
- * to the current section. Entries already read are ink, the current one accent, the rest dim.
- * Scroll-spy (useActiveHeading) and the anchors are unchanged.
+ * Portfolio 2a's sidebar table of contents (latest export): an "On this page" label, then the
+ * entries beside an inset rail whose accent fill grows to the current section. Entries already
+ * read are ink, the current one accent, the rest dim. Scroll-spy (useActiveHeading) and the
+ * anchors are unchanged.
  */
 export function ArticleToc({ entries }: { entries: TocEntry[] }) {
   const active = useActiveHeading(entries);
-  const pct = useReadingProgress(ARTICLE_BODY_ID);
   const activeRef = useRef<HTMLAnchorElement>(null);
+  const glide = useRef(0);
 
-  // If the sidebar has had to become internally scrollable (a TOC longer than the
-  // viewport), the highlight can drift outside its visible band as the reader scrolls.
-  // Nudge the container's own scrollTop to follow it — never scrollIntoView, which walks
-  // up and scrolls the PAGE too, yanking the reader away from what they're reading.
+  // On a long article the sidebar scrolls internally (its scrollbar hidden). As the active
+  // heading changes, glide the box so the active entry sits in its centre, as latest 2a does.
+  // Only the box's own scrollTop moves, never the page; reduced motion jumps instead.
   useEffect(() => {
-    const link = activeRef.current;
-    const box = link?.closest<HTMLElement>(".ad-aside");
-    if (!link || !box || box.scrollHeight <= box.clientHeight) return;
-    const linkRect = link.getBoundingClientRect();
-    const boxRect = box.getBoundingClientRect();
-    // The sticky progress strip covers the top of the box, so keep clear of it too.
-    const head = box.querySelector<HTMLElement>(".toc-head")?.offsetHeight ?? 0;
-    if (linkRect.top < boxRect.top + head + KEEP_IN_VIEW_MARGIN) {
-      box.scrollTop -= boxRect.top + head + KEEP_IN_VIEW_MARGIN - linkRect.top;
-    } else if (linkRect.bottom > boxRect.bottom - KEEP_IN_VIEW_MARGIN) {
-      box.scrollTop += linkRect.bottom - (boxRect.bottom - KEEP_IN_VIEW_MARGIN);
-    }
+    const frame = requestAnimationFrame(() => {
+      const link = activeRef.current;
+      const box = link?.closest<HTMLElement>(".ad-aside");
+      if (!link || !box || box.scrollHeight <= box.clientHeight + 1) return;
+      const lr = link.getBoundingClientRect();
+      const br = box.getBoundingClientRect();
+      const max = box.scrollHeight - box.clientHeight;
+      const to = Math.max(0, Math.min(max, box.scrollTop + (lr.top + lr.height / 2) - (br.top + br.height / 2)));
+      cancelAnimationFrame(glide.current);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        box.scrollTop = to;
+        return;
+      }
+      const from = box.scrollTop;
+      const t0 = performance.now();
+      const step = (t: number) => {
+        const k = Math.min(1, (t - t0) / GLIDE_MS);
+        box.scrollTop = from + (to - from) * (1 - Math.pow(1 - k, 3));
+        if (k < 1) glide.current = requestAnimationFrame(step);
+      };
+      glide.current = requestAnimationFrame(step);
+    });
+    return () => cancelAnimationFrame(frame);
   }, [active]);
+
+  useEffect(() => () => cancelAnimationFrame(glide.current), []);
 
   if (entries.length === 0) return null;
   const activeIndex = entries.findIndex((e) => e.id === active);
@@ -47,15 +58,7 @@ export function ArticleToc({ entries }: { entries: TocEntry[] }) {
 
   return (
     <nav aria-label="Table of contents" className="toc">
-      <div className="toc-head">
-        <div className="toc-head-row mono">
-          <span>On this page</span>
-          <span className="toc-pct">{pct}%</span>
-        </div>
-        <div className="toc-bar" aria-hidden="true">
-          <div style={{ width: `${pct}%` }} />
-        </div>
-      </div>
+      <div className="toc-label mono">On this page</div>
       <div className="toc-list">
         <span aria-hidden="true" className="toc-track" />
         <span aria-hidden="true" className="toc-fill" style={{ height: `${fill}%` }} />
@@ -67,6 +70,7 @@ export function ArticleToc({ entries }: { entries: TocEntry[] }) {
                 <a
                   ref={isActive ? activeRef : undefined}
                   href={`#${e.id}`}
+                  data-toc={e.id}
                   aria-current={isActive ? "true" : undefined}
                   data-state={isActive ? "on" : i < activeIndex ? "past" : undefined}
                   data-sub={e.level === 3 || undefined}
