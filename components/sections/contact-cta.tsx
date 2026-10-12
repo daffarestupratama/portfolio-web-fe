@@ -14,58 +14,42 @@ interface ContactCTAProps {
   /** Optional overrides (e.g. /services passes service-page.ctaHeading / ctaText). */
   heading?: string | null;
   description?: string | null;
+  /** 2a sets the services CTA heading with `text-wrap: balance` and a 46ch paragraph. */
+  variant?: "default" | "services";
 }
 
-export function ContactCTA({ email, whatsappUrl, heading, description }: ContactCTAProps) {
+/**
+ * Portfolio 2a's contact block: a raised panel seated in two concave rings, with the two
+ * actions in an inset well.
+ */
+export function ContactCTA({ email, whatsappUrl, heading, description, variant = "default" }: ContactCTAProps) {
   const resolvedEmail = email || FALLBACK_EMAIL;
   const resolvedWhatsapp = whatsappUrl || FALLBACK_WHATSAPP_URL;
   const resolvedHeading = heading || DEFAULT_HEADING;
   const resolvedDescription = description || DEFAULT_DESCRIPTION;
 
   return (
-    // `scroll-mt-28` keeps the section clear of the fixed navbar when the "#contact"
-    // CTA scrolls here (scrollIntoView honours scroll-margin-top).
-    <section
-      id="contact"
-      className="relative z-[3] flex scroll-mt-28 justify-center px-[22px] pt-[46px] pb-[30px] outline-none"
-    >
-      <div
-        className="flex w-full max-w-[1180px] flex-col items-center gap-6 px-6 py-12 text-center sm:px-10"
-        style={{
-          borderRadius: 26,
-          background: "var(--card-bg)",
-          backgroundImage: "var(--card-tint)",
-          backdropFilter: "blur(var(--glass-blur)) saturate(140%)",
-          border: "1px solid var(--glass-brd)",
-          boxShadow: "var(--glass-sh), inset 0 1px 0 var(--card-hi)",
-        }}
-      >
-        <div>
-          <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-            {resolvedHeading}
-          </h2>
-          <p
-            className="mx-auto mt-3 max-w-[42ch] text-[15px]"
-            style={{ lineHeight: 1.62, color: "var(--ink-dim)" }}
-          >
-            {resolvedDescription}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-[11px]">
-          <a
-            href={resolvedWhatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-gradient gap-[9px] px-[21px] py-3 text-[14.5px]"
-          >
-            <WhatsappIcon />
-            WhatsApp
-          </a>
-          <a href={`mailto:${resolvedEmail}`} className="glass-pill gap-[9px] px-[21px] py-3 text-[14.5px] font-semibold">
-            <MailIcon />
-            Email
-          </a>
+    // `--anchor-contact` (90px, 2a's value) keeps the section 30px clear of the 60px stuck
+    // navbar when the "#contact" CTA scrolls here (scrollIntoView honours scroll-margin-top).
+    <section id="contact" className="cta scroll-mt-(--anchor-contact) outline-none" data-variant={variant}>
+      <div className="cta-ring">
+        <div className="cta-ring">
+          <div className="cta-panel">
+            <div>
+              <h2 className="cta-title">{resolvedHeading}</h2>
+              <p className="cta-text">{resolvedDescription}</p>
+            </div>
+            <div className="cta-well">
+              <a href={resolvedWhatsapp} target="_blank" rel="noopener noreferrer" className="nm-btn-accent cta-btn">
+                <WhatsappIcon width={17} height={17} />
+                WhatsApp
+              </a>
+              <a href={`mailto:${resolvedEmail}`} className="cta-btn cta-btn-email">
+                <MailIcon />
+                Email
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>

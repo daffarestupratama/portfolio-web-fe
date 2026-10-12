@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
+/* The Claude Design handoff is reference material only. Never scan it for class names. */
+@source not "../design-export";
+
 /* ---------------------------------------------------------------------- */
-/* Design tokens — copied verbatim from design-export/Daffa Portfolio.dc.html */
-/* Only change from the export: body font-family swapped from Space Grotesk */
-/* to var(--font-sans) (Inter), per kickoff-brief.md §3.                    */
+/* Design tokens: Portfolio 2a (design-export/redesign-v2), copied verbatim */
+/* for the single shipped combination Denim & Ochre / Soft / Smooth /       */
+/* Terraces on. 2a scopes them to [data-pal] / [data-th] / [data-depth];    */
+/* with one combination they sit on :root and on next-themes'              */
+/* [data-theme="dark"]. Smooth texture means no grain layer at all.         */
 /* ---------------------------------------------------------------------- */
 
 * {
@@ -14,6 +19,11 @@ body {
   margin: 0;
   padding: 0;
 }
+/* 2a sets no line-height, so its text uses the UA's `normal`; Tailwind's preflight puts 1.5
+   on <html>. Unlayered, this beats the preflight for the whole document. */
+html {
+  line-height: normal;
+}
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
   background: var(--bg);
@@ -21,98 +31,101 @@ body {
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.012em;
 }
+a {
+  color: inherit;
+  text-decoration: none;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-faint);
+}
 
 :root {
-  --bg: #EFF5F1; --surface: #FFFFFF;
-  --ink: #1B2E33; --ink-dim: #4E6569; --ink-faint: #86A09B;
-  --border: #D8E6E0;
-  /* hue anchors (light) */
-  --sky: #5AA9D6; --green: #5FB98A; --teal: #46B3AE;
-  --set-sky-a: #5AA9D6; --set-sky-2: #7FC0E2; --set-sky-ink: #2E7CA8;
-  --set-teal-a: #46B3AE; --set-teal-2: #79CDC8; --set-teal-ink: #2E8783;
-  --set-green-a: #5FB98A; --set-green-2: #86CFA6; --set-green-ink: #3C8E63;
-  /* default accent = sky */
-  --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink);
-  --chip: color-mix(in srgb, var(--accent) 12%, transparent);
-  --chip-brd: color-mix(in srgb, var(--accent) 26%, transparent);
-  /* liquid-glass material — base (light) */
-  --g-op-base: 0.55; --g-blur-base: 18px; --g-spec-base: 0.85; --g-hi-base: 0.92; --g-brd-base: 0.66;
-  --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1;
-  --glass-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult)));
-  --glass-bg-2: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.55));
-  --glass-brd: rgba(255,255,255, var(--g-brd-base));
-  --glass-hi: rgba(255,255,255, calc(var(--g-hi-base) * var(--g-spec-mult)));
-  --glass-spec: calc(var(--g-spec-base) * var(--g-spec-mult));
-  --glass-blur: calc(var(--g-blur-base) * var(--g-blur-mult));
-  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 60%);
-  /* cards — cleaner, more restrained glass (nav keeps the fuller --glass-* recipe) */
-  --card-bg: rgba(255,255,255, calc(var(--g-op-base) * var(--g-op-mult) * 0.48));
-  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.12), rgba(255,255,255,0.015) 55%);
-  --card-hi: rgba(255,255,255,0.4);
-  --glass-sh: 0 18px 40px -22px rgba(27,46,51,0.30);
-  --glass-sh-lg: 0 40px 80px -30px rgba(27,46,51,0.42);
-  /* ambient blobs — subtle, recessive */
-  --blob-green: rgba(191,227,207,0.55); --blob-sky: rgba(195,228,241,0.55); --blob-lum: rgba(255,255,255,0.75);
-  --blob-op: 0.22;
-  /* motion */
-  --drift: 64s; --float: 9s; --float-play: running; --lift: -8px;
+  /* Denim & Ochre, light */
+  --bg: #ECE7DD;
+  --ink: #22252B; --ink-dim: #4C4E55; --ink-faint: #615F63;
+  --sd: rgba(158,146,126,.5); --hl: rgba(255,253,247,.9); --edge: rgba(255,253,247,.65);
+  --accent: #3D5A80; --accent-2: #A9B8CC; --accent-ink: #34507A; --on-accent: #FFFFFF;
+  --accent-b: #B7832F; --accent-b-ink: #87601C; --on-b: #1F1708;
+  --term: #1B1C1F;
+
+  /* Soft depth */
+  --out-sm: 3px 3px 7px var(--sd), -3px -3px 7px var(--hl);
+  --out: 7px 7px 16px var(--sd), -7px -7px 16px var(--hl);
+  --out-lg: 15px 15px 34px var(--sd), -13px -13px 30px var(--hl);
+  --in-sm: inset 2px 2px 5px var(--sd), inset -2px -2px 5px var(--hl);
+  --in: inset 5px 5px 12px var(--sd), inset -5px -5px 12px var(--hl);
+  --in-deco: inset 5px 5px 11px var(--sd), inset -5px -5px 11px var(--hl);
+  --press: inset 2px 3px 7px rgba(0,0,0,.28), inset -1px -1px 2px rgba(255,255,255,.08);
+  --rim: inset 0 1px 0 var(--edge);
+
+  /* Motion: the spring every 2a hover/press uses. */
+  --spring: cubic-bezier(.34,1.56,.64,1);
+
+  /* Offsets tied to the nav. The stuck nav is 60px tall (10px padding + 40px controls),
+     measured in the 2a render at all four widths. The values below are the ones 2a itself
+     uses against that bar: sticky asides and the guestbook form at 100, the #contact
+     anchor at 90. Article headings use HEADING_SCROLL_OFFSET (components/blocks/toc.ts). */
+  --nav-stuck-h: 60px;
+  --sticky-top: 100px;
+  --anchor-contact: 90px;
 }
 [data-theme="dark"] {
-  --bg: #0F1E20; --surface: #15282A;
-  --ink: #E7F1ED; --ink-dim: #9DB4B0; --ink-faint: #6E8783;
-  --border: rgba(255,255,255,0.12);
-  --sky: #74C2EA; --green: #72D3A0; --teal: #4FCFC6;
-  --set-sky-a: #74C2EA; --set-sky-2: #A5DAF2; --set-sky-ink: #B7E4FA;
-  --set-teal-a: #4FCFC6; --set-teal-2: #8AE0DA; --set-teal-ink: #B4EEEA;
-  --set-green-a: #72D3A0; --set-green-2: #9BE1BE; --set-green-ink: #C0EED5;
-  --g-op-base: 0.075; --g-spec-base: 0.5; --g-hi-base: 0.4; --g-brd-base: 0.14;
-  --glass-bg: rgba(255,255,255,0.07);
-  --glass-bg-2: rgba(255,255,255,0.04);
-  --glass-brd: rgba(255,255,255,0.12);
-  --glass-hi: rgba(255,255,255,0.10);
-  --glass-tint: linear-gradient(140deg, rgba(255,255,255,0.05), rgba(255,255,255,0.008) 60%);
-  --card-bg: rgba(255,255,255,0.045);
-  --card-tint: linear-gradient(140deg, rgba(255,255,255,0.03), rgba(255,255,255,0) 55%);
-  --card-hi: rgba(255,255,255,0.10);
-  --glass-sh: 0 22px 48px -22px rgba(0,0,0,0.72);
-  --glass-sh-lg: 0 46px 92px -30px rgba(0,0,0,0.82);
-  --blob-green: rgba(114,211,160,0.9); --blob-sky: rgba(116,194,234,0.9); --blob-lum: rgba(0,0,0,0.55);
-  --blob-op: 0.09;
+  /* Denim & Ochre, dark */
+  --bg: #1C1D20;
+  --ink: #E8E5DE; --ink-dim: #B1ADA5; --ink-faint: #96928A;
+  --sd: rgba(0,0,0,.62); --hl: rgba(255,245,230,.045); --edge: rgba(255,245,230,.06);
+  --accent: #8FA8CC; --accent-2: #3F5470; --accent-ink: #B2C3DD; --on-accent: #11161E;
+  --accent-b: #D9A954; --accent-b-ink: #E6BE76; --on-b: #1E1606;
+  --term: #121315;
 }
-/* accent mood (independent of theme; hues follow theme via --set-*) */
-[data-accent="sky"] { --accent: var(--set-sky-a); --accent-2: var(--set-sky-2); --accent-ink: var(--set-sky-ink); }
-[data-accent="teal"] { --accent: var(--set-teal-a); --accent-2: var(--set-teal-2); --accent-ink: var(--set-teal-ink); }
-[data-accent="green"] { --accent: var(--set-green-a); --accent-2: var(--set-green-2); --accent-ink: var(--set-green-ink); }
-/* glass intensity */
-[data-glass="subtle"] { --g-op-mult: 0.72; --g-blur-mult: 0.62; --g-spec-mult: 0.58; }
-[data-glass="balanced"] { --g-op-mult: 1; --g-blur-mult: 1; --g-spec-mult: 1; }
-[data-glass="vivid"] { --g-op-mult: 1.22; --g-blur-mult: 1.55; --g-spec-mult: 1.28; }
-/* motion */
-[data-motion="calm"] { --drift: 130s; --float-play: paused; --lift: -3px; }
 
-@keyframes driftA { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(3vw,2vh) scale(1.08); } 100% { transform: translate(0,0) scale(1); } }
-@keyframes driftB { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(-2.5vw,3vh) scale(1.06); } 100% { transform: translate(0,0) scale(1); } }
-@keyframes driftC { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(2vw,-2.5vh) scale(1.1); } 100% { transform: translate(0,0) scale(1); } }
-@keyframes floaty { 0% { transform: translateY(0); } 50% { transform: translateY(-9px); } 100% { transform: translateY(0); } }
-@keyframes blink { 0%, 45% { opacity: 0.9; } 50%, 100% { opacity: 0; } }
+/* 2a scrollbars: thin and themed. `toc` tints the thumb with the accent, `dark` is for
+   surfaces that stay dark in both themes (code, terminal). */
+[data-sb] {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink) 24%, transparent) transparent;
+}
+[data-sb]::-webkit-scrollbar { width: 10px; height: 10px; }
+[data-sb]::-webkit-scrollbar-track { background: transparent; }
+[data-sb]::-webkit-scrollbar-corner { background: transparent; }
+[data-sb]::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent) padding-box;
+}
+[data-sb="toc"] { scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent; }
+[data-sb="toc"]::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 45%, transparent) padding-box; }
+[data-sb="dark"] { scrollbar-color: rgba(255,255,255,.2) transparent; }
+[data-sb="dark"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18) padding-box; }
+
+@keyframes decoDrift { 0%, 100% { transform: translate(0,0) rotate(var(--r0)); } 50% { transform: translate(var(--dx),var(--dy)) rotate(var(--r1)); } }
+/* Off-screen terrace rings pause (layout/terraces.tsx); they resume where they stopped.
+   !important because each ring sets its animation shorthand inline. */
+[data-deco] > [data-off],
+[data-deco] > [data-off] * {
+  animation-play-state: paused !important;
+}
+@keyframes decoBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(var(--s)); } }
+@keyframes blink { 0%, 45% { opacity: .9; } 50%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
+  [data-deco] * {
+    animation: none !important;
+  }
   * {
     animation: none !important;
     transition: none !important;
   }
 }
 
-/* ---------------------------------------------------------------------- */
-/* Component recipes — the export drives hover/active state via per-element */
-/* `style-hover`/`style-active` props (a Claude-Design-only mechanism).     */
-/* These classes port the same values to real CSS so :hover/:active work.  */
-/* One-off, single-instance surfaces (footer bar, stat                     */
-/* mini-cards, the hero graph card) are styled inline at their call site   */
-/* instead of going through a shared class.                                */
-/* ---------------------------------------------------------------------- */
-
 a,
 button {
+  font: inherit;
+  color: inherit;
+}
+input,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
@@ -120,267 +133,636 @@ button {
 /* Direct reference to the next/font variable — not routed through Tailwind's
    @theme (that token namespace shares the --font-mono/--font-sans names with
    the runtime variables next/font sets on <html>, which risks a self-referential
-   custom-property cycle). Use className="mono" wherever the export uses
+   custom-property cycle). Use className="mono" wherever the design uses
    JetBrains Mono. */
 .mono {
   font-family: var(--font-mono), "JetBrains Mono", monospace;
 }
 
+/* 2a defines no focus style, so the existing ring stays, in the new accent. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Nav wrapper: floats from a full-width bar into a detached glass pill on
-   scroll. Base = unscrolled bar; [data-scrolled="true"] = scrolled pill. */
-.nav-shell {
+/* ---------------------------------------------------------------------- */
+/* Neumorphic recipes. 2a drives hover/press with per-element `style-hover` */
+/* and `style-active` props (a Claude Design mechanism); these port the     */
+/* exact values to real :hover / :active.                                   */
+/* ---------------------------------------------------------------------- */
+
+/* Raised pill, e.g. "← All articles", credential and certificate controls. */
+.nm-pill {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring), color .2s;
+}
+.nm-pill:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.nm-pill:active {
+  box-shadow: var(--in-sm);
+}
+
+/* Primary accent button (View Resume, WhatsApp, Sign the guestbook). */
+.nm-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.nm-btn-accent:hover {
+  transform: translateY(-3px);
+}
+.nm-btn-accent:active {
+  transform: translateY(1px) scale(.97);
+  box-shadow: var(--press);
+}
+
+/* Secondary raised button (Contact Me, Email). */
+.nm-btn {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.nm-btn:hover {
+  transform: translateY(-3px);
+}
+.nm-btn:active {
+  transform: scale(.97);
+  box-shadow: var(--in-sm);
+}
+
+/* Raised surface. Radius is set per use (22 to 28 in 2a). */
+.nm-card {
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+
+/* Inset well (chips, inputs, footer bar, code spans). */
+.nm-well {
+  box-shadow: var(--in-sm);
+}
+
+/* Filter chip: raised at rest, pressed in and accent-ink when active. */
+.nm-chip {
+  white-space: nowrap;
+  padding: 6px 13px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.nm-chip[aria-pressed="true"],
+.nm-chip[data-active="true"] {
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.nm-chip:active {
+  transform: scale(.95);
+}
+
+/* Round raised icon button (hero socials 44px, chevrons 30 to 32px). */
+.nm-icon-circle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring), color .2s;
+}
+.nm-icon-circle:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.nm-icon-circle:active {
+  box-shadow: var(--in-sm);
+}
+
+/* Section "All projects →" link pill. */
+.nm-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  padding: 8px 15px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: transform .4s var(--spring);
+}
+.nm-link-pill:hover {
+  transform: translateX(3px);
+}
+.nm-link-pill:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Nav (2a). These are the stage-4 (burger) base rules; nav.tsx emits the   */
+/* media queries for stages 3 to 0, whose widths derive from the link count. */
+/* ---------------------------------------------------------------------- */
+
+/* Not stuck: a 1180px floating pill. Stuck (scrollY > 8): a full-bleed 60px bar.
+   The switch never moves page content or any box (no layout shift): the wrapper keeps its
+   14px top padding, so its in-flow height is constant; the bar box is always full width; the
+   two looks are fixed-geometry layers that crossfade; and the bar's vertical move and the
+   content's narrow-width inset are transforms. */
+.nv-wrap {
+  --nv-wp: clamp(10px,2.5vw,20px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-top: 14px;
+  container-type: inline-size;
+  /* The padding band under the stuck bar must not swallow clicks on the page beneath. */
+  pointer-events: none;
+}
+.nv-bar {
+  /* Resolved against the wrapper (a size container): (100cqw - 1180px) / 2 is the gutter
+     either side of a centred 1180px column. */
+  --nv-a: calc((100cqw - 1180px) / 2);
+  /* How far the floating pill sits inside the full-bleed bar's content edges below ~1220px
+     (the wrapper's old side padding): 0 on wide screens, up to --nv-wp on narrow ones. */
+  --nv-s: clamp(0px, calc(var(--nv-wp) - var(--nv-a)), var(--nv-wp));
+  position: relative;
+  isolation: isolate;
+  pointer-events: auto;
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  width: 100%;
-  max-width: 100%;
-  border-radius: 0;
-  padding: 18px 26px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-bottom: 1px solid var(--border);
-  box-shadow: none;
-  transition:
-    max-width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    padding 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    border-radius 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
-    background 0.3s ease,
-    box-shadow 0.4s ease,
-    border-color 0.4s ease;
+  padding: 10px max(12px, calc(var(--nv-a) + 12px)) 10px max(22px, calc(var(--nv-a) + 22px));
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
-.nav-shell[data-scrolled="true"] {
-  max-width: 1080px;
-  border-radius: 22px;
-  padding: 10px 12px 10px 20px;
-  background: var(--glass-bg);
-  background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--glass-hi);
+.nv-wrap[data-stuck="true"] .nv-bar {
+  transform: translateY(-14px);
 }
-
-/* Interactive glass pill (e.g. "About me", "All projects"). */
-.glass-pill {
-  display: inline-flex;
+.nv-bg {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  background: var(--bg);
+  pointer-events: none;
+  transition: opacity .28s cubic-bezier(.4,0,.2,1);
+}
+.nv-bg-pill {
+  left: max(var(--nv-wp), var(--nv-a));
+  right: max(var(--nv-wp), var(--nv-a));
+  border-radius: 24px;
+  box-shadow: var(--out), var(--rim);
+}
+.nv-bg-bar {
+  left: 0;
+  right: 0;
+  opacity: 0;
+  box-shadow: 0 10px 22px -8px var(--sd), 0 2px 5px -3px var(--sd), var(--rim);
+}
+.nv-wrap[data-stuck="true"] .nv-bg-pill {
+  opacity: 0;
+}
+.nv-wrap[data-stuck="true"] .nv-bg-bar {
+  opacity: 1;
+}
+/* Inside the floating pill the logo and the right-hand controls sit --nv-s further in; the
+   centred links need no correction (space-between keeps them centred). */
+.nv-logo,
+.nv-right {
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+/* Whole pixels, like the layout offset it replaces (layout snaps; a fractional transform would
+   re-rasterise the glyphs at a sub-pixel offset). The unrounded line is the fallback for
+   browsers without round(). */
+.nv-logo {
+  transform: translateX(var(--nv-s));
+  transform: translateX(round(var(--nv-s), 1px));
+}
+.nv-right {
+  transform: translateX(calc(-1 * var(--nv-s)));
+  transform: translateX(calc(-1 * round(var(--nv-s), 1px)));
+}
+.nv-wrap[data-stuck="true"] :is(.nv-logo, .nv-right) {
+  transform: none;
+}
+.nv-links {
+  display: none;
   align-items: center;
-  /* Every .glass-pill is interactive. Links get a pointer from the UA default but buttons do
-     not, which is why the certificate button felt dead next to the credential link. */
-  cursor: pointer;
-  border-radius: 999px;
-  background: var(--glass-bg);
-  background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--glass-hi);
-  color: var(--ink);
-  text-decoration: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  gap: 4px;
 }
-.glass-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--glass-sh-lg), inset 0 1px 0 var(--glass-hi), 0 0 0 1px var(--chip-brd);
-}
-.glass-pill:active {
-  transform: translateY(0) scale(0.97);
-}
-
-/* Pill sitting on a lightbox's always-dark backdrop.
-   `.glass-pill` alone is theme-dependent: in light mode --glass-bg is rgba(255,255,255,0.55)
-   plus a white --glass-tint, so white label text landed at roughly 2.2:1 over the dark
-   overlay and was barely readable. These values are fixed in both themes, the same
-   "always-dark surface" approach the code block chrome and mkdir terminal use, taking light
-   mode to roughly 8:1 while leaving dark mode where it already was. */
-.lightbox-pill {
-  background: rgba(255, 255, 255, 0.12);
-  background-image: none;
-  border-color: rgba(255, 255, 255, 0.24);
-}
-.lightbox-pill:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Circular glass icon button (social links, theme toggle, hamburger, card icon actions). */
-.glass-icon-btn {
+.nv-item {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 7px;
+  min-width: 38px;
+  height: 38px;
   border-radius: 999px;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform 0.18s ease, color 0.18s ease, background 0.18s ease;
-}
-.glass-icon-btn:hover {
-  transform: translateY(-3px);
-  color: var(--accent);
-  background: var(--chip);
-}
-.glass-icon-btn:active {
-  transform: translateY(0) scale(0.9);
-}
-
-/* Glass card shell (timeline items, project/tour/article cards). */
-.glass-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--card-bg);
-  background-image: var(--card-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh), inset 0 1px 0 var(--card-hi);
-  border-radius: 22px;
-  transition: box-shadow 0.2s ease;
-}
-.glass-card:hover {
-  box-shadow:
-    var(--glass-sh-lg),
-    inset 0 1px 0 var(--card-hi),
-    0 0 0 1px var(--chip-brd),
-    0 0 30px -8px color-mix(in srgb, var(--accent) 42%, transparent);
-}
-
-/* Gradient pill button (Resume, Live demo, Book). */
-.btn-gradient {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(140deg, var(--accent), var(--accent-ink));
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 10px 20px -10px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-.btn-gradient:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 32px -12px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-.btn-gradient:active {
-  transform: translateY(0) scale(0.97);
-}
-/* Dark mode: the accent->accent-ink gradient is bright->brighter, so a white
-   label washes out. Keep the hue but reduce far-end luminance, drop the
-   accent-colored glow, and use a near-black label for solid contrast.
-   Scoped to the primary button only (light mode / secondary / tabs unchanged). */
-[data-theme="dark"] .btn-gradient {
-  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #04121a));
-  color: #06141b;
-  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-[data-theme="dark"] .btn-gradient:hover {
-  box-shadow: 0 14px 24px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-/* Nav / mobile-menu link pill. */
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 14px;
-  border-radius: 999px;
-  color: var(--ink-dim);
-  text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  transition: background 0.18s ease, color 0.18s ease;
+  color: var(--ink-dim);
+  transition: color .2s, transform .4s var(--spring);
 }
-.nav-link:hover {
-  background: var(--chip);
+.nv-item:hover {
   color: var(--ink);
+  transform: translateY(-2px);
 }
-.nav-link[data-active="true"] {
+.nv-item[data-active] {
+  font-weight: 600;
   color: var(--ink);
-  background: var(--chip);
+  box-shadow: var(--in-sm);
+}
+.nv-ico {
+  display: block;
+  flex-shrink: 0;
+}
+.nv-txt {
+  white-space: nowrap;
+}
+.nv-tip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--ink);
+  box-shadow: var(--out-sm);
+  pointer-events: none;
+}
+/* Shown only where the stage hides the label (nav.tsx sets --nv-tip). 2a shows it on hover
+   and on focus. Keyboard focus is kept here; a mouse click no longer leaves it pinned. */
+.nv-item:is(:hover, :focus-visible) .nv-tip,
+.nv-mk:is(:hover, :focus-visible) .nv-tip {
+  display: var(--nv-tip, none);
+}
+.nv-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nv-mk {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform .4s var(--spring);
+}
+.nv-mk:hover {
+  transform: translateY(-2px);
+}
+.nv-mk[data-active] {
+  box-shadow: var(--in-sm);
+}
+.nv-mk:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+.nv-burger {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.nv-burger[aria-expanded="true"] {
+  box-shadow: var(--in-sm);
+}
+.nv-menu {
+  pointer-events: auto;
+}
+.nv-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: clamp(10px,2.5vw,20px);
+  right: clamp(10px,2.5vw,20px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.nv-wrap[data-stuck="true"] .nv-menu-panel {
+  transform: translateY(-14px);
+}
+.nv-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+.nv-menu-item[data-active] {
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: var(--in-sm);
 }
 
-/* Segmented tab control (Professional / Education / Org). */
-.tab-btn {
-  padding: 9px 20px;
+/* Theme switch: inset track, sun left, moon right, accent knob that springs across. */
+.theme-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 68px;
+  height: 36px;
+  padding: 0;
+  border: none;
   border-radius: 999px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.theme-switch svg {
+  position: absolute;
+  top: 11px;
+  color: var(--ink-faint);
+}
+.theme-knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--out-sm), var(--rim);
+  transform: translateX(0px);
+  transition: transform .5s var(--spring);
+}
+[data-theme="dark"] .theme-knob {
+  transform: translateX(32px);
+}
+
+/* Lightbox control pill buttons (2a). */
+.lb-btn {
+  height: 40px;
   border: none;
   cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 13.5px;
-  letter-spacing: -0.01em;
-  background: transparent;
-  color: var(--ink-dim);
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-.tab-btn:not([data-active="true"]):hover {
-  background: var(--chip);
+  background: var(--bg);
   color: var(--ink);
+  box-shadow: var(--out-sm), var(--rim);
+  transition: box-shadow .15s;
 }
-.tab-btn[data-active="true"] {
-  background: linear-gradient(140deg, var(--accent), var(--accent-ink));
-  color: #fff;
-  box-shadow: 0 8px 18px -8px var(--accent), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+.lb-btn:active {
+  box-shadow: var(--in-sm);
 }
-/* Dark mode: same fix as the primary button — the bright accent gradient
-   washes out a white label, so tone the far end and use a near-black label. */
-[data-theme="dark"] .tab-btn[data-active="true"] {
-  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #04121a));
-  color: #06141b;
-  box-shadow: 0 8px 18px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+.lb-step {
+  width: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+}
+.lb-close {
+  margin-left: 4px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 12px;
 }
 
-/* Small meta/tech-stack/language chip. Padding, radius and font-size vary by
-   usage (pill meta chip vs. rect mono tech chip) so they're set per call site. */
-.chip {
+/* Certificate viewer header pills (2a). */
+.cv-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 7px 13px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 12px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+a.cv-btn:hover {
+  color: var(--accent-ink);
+}
+button.cv-btn:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ====================================================================== */
+/* Phase 2 — homepage sections, Portfolio 2a values verbatim.              */
+/* ====================================================================== */
+
+/* ---------------- Hero ---------------- */
+
+.hero {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: clamp(40px,7vw,88px) clamp(10px,2.5vw,20px) 40px;
+}
+.hero-grid {
+  display: grid;
+  width: 100%;
+  max-width: 1180px;
+  grid-template-columns: minmax(0,1fr);
+  gap: clamp(36px,5vw,56px);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1.05fr .95fr;
+  }
+}
+.hero-copy {
+  min-width: 0;
+  padding: 0 clamp(4px,1vw,12px);
+}
+.hero-h1 {
+  font-weight: 700;
+  font-size: clamp(36px,6.4vw,60px);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+.hero-headline {
+  display: block;
+  font-size: clamp(24px,4vw,40px);
+}
+.hero-fullname {
+  display: block;
+  color: var(--accent-ink);
+}
+.hero-sub {
+  margin-top: 22px;
+  max-width: 31em;
+  font-size: clamp(16px,1.6vw,18px);
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.hero-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.hero-cta {
+  flex-shrink: 0;
+  white-space: nowrap;
+  gap: 9px;
+  padding: 13px 23px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.hero-divider {
+  margin: 0 4px;
+  height: 30px;
+  width: 4px;
+  border-radius: 4px;
+  box-shadow: var(--in-sm);
+}
+.hero-socials {
+  display: flex;
+  gap: 12px;
+}
+.hero-social {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
   color: var(--ink-dim);
+  transition: transform .45s var(--spring), color .2s;
+}
+.hero-social:hover {
+  transform: translateY(-3px);
+  color: var(--accent-ink);
+}
+.hero-social:active {
+  transform: scale(.92);
+  box-shadow: var(--in-sm);
 }
 
-/* "Read" affordance on article cards. Shared by ArticleListItem and ArticleCard so the two
-   can't drift. Underlines on hover AND :focus-visible — a keyboard user gets the same
-   signal that this is a link, not just the focus ring. */
-.read-link {
-  text-decoration: none;
+/* The panel sits in 2a's "dish": two concave rings, 26px proud of it (12px on phones). */
+.hero-panel-wrap {
+  position: relative;
+  margin: 26px;
 }
-.read-link:hover,
-.read-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.hero-dish {
+  position: absolute;
+  inset: -26px;
+  border-radius: 52px;
+  padding: 13px;
+  box-shadow: var(--in-deco);
+}
+.hero-dish > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 42px;
+  box-shadow: var(--in-deco);
+}
+@media (max-width: 719px) {
+  .hero-panel-wrap {
+    margin: 12px;
+  }
+  .hero-dish {
+    inset: -12px;
+  }
+}
+.hero-panel {
+  position: relative;
+  z-index: 2;
+  padding: 18px;
+  border-radius: 32px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.hero-label {
+  margin: 2px 6px 12px;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-well {
+  padding: 14px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--in);
 }
 
-/* ---------------- Hero data-viz panel (map + decorative charts) ---------------- */
-
-/* Coastline from the real province GeoJSON — subtle in both themes. */
+/* Map: the pre-serialised coastline (MAP_MARKUP), recoloured to 2a's mapVars. */
+/* 2a sets `vector-effect` on the <g>, where it does not inherit, so its coastline strokes
+   scale with the map (0.8 viewBox units). Matching that means no non-scaling-stroke here. */
+/* Edges and nodes, laid exactly over the land SVG (same viewBox and box). The land sits in
+   its own memoised SVG, so no panel re-render or pluck frame ever touches its ~321 paths.
+   (Promoting this layer measured no gain and shifted edge anti-aliasing, so it isn't.) */
+.hero-map-top {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .hero-map-land path {
-  fill: color-mix(in srgb, var(--accent) 13%, transparent);
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
   stroke: color-mix(in srgb, var(--accent) 42%, transparent);
   stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
 }
-[data-theme="dark"] .hero-map-land path {
-  fill: color-mix(in srgb, var(--accent) 17%, transparent);
-  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
-}
-/* Network edges with a travelling dash pulse (cheap; the global reduced-motion rule
-   disables the animation and leaves a static dashed line). */
-/* Network edges are solid, complete lines at rest. Hovering (or tapping) one "plucks" it
-   like a guitar string: the JS rAF loop in hero-panel.tsx bows the quadratic control
-   point perpendicular to the edge with a damped sine, settling straight in ~800ms. */
+/* Edges are solid lines at rest. Hovering (or tapping) one "plucks" it like a guitar string:
+   the rAF loop in hero-panel.tsx bows the quadratic control point with a damped sine. */
 .hero-map-edge {
   fill: none;
-  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 62%, transparent);
   stroke-width: 2.6;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  transition: stroke 0.18s ease;
 }
 /* Wide invisible hit band over each edge — the visible stroke is far too thin to target. */
 .hero-edge-hit {
@@ -391,33 +773,23 @@ button {
   cursor: pointer;
   vector-effect: non-scaling-stroke;
 }
-.hero-edge-group:hover .hero-map-edge {
-  stroke: color-mix(in srgb, var(--accent) 85%, transparent);
-}
-/* Under reduced motion nothing vibrates (the rAF loop never starts), so hover gets a
-   brief colour highlight as the sole feedback. */
-@media (prefers-reduced-motion: reduce) {
-  .hero-edge-group:hover .hero-map-edge {
-    stroke: var(--accent);
-  }
-}
 .hero-map-node {
   cursor: pointer;
   outline: none;
 }
 .hero-node-halo {
   fill: color-mix(in srgb, var(--accent) 26%, transparent);
-  transition: fill 0.18s ease;
+  transition: fill .18s;
 }
 .hero-node-dot {
-  fill: var(--accent-ink);
-  transition: fill 0.18s ease;
+  fill: var(--accent-b-ink);
 }
 .hero-map-node:hover .hero-node-halo,
 .hero-map-node[data-active] .hero-node-halo,
 .hero-map-node:focus-visible .hero-node-halo {
-  fill: color-mix(in srgb, var(--accent) 58%, transparent);
+  fill: color-mix(in srgb, var(--accent) 60%, transparent);
 }
+/* Keyboard focus only (2a defines none): the dot darkens so the focused city is findable. */
 .hero-map-node:focus-visible .hero-node-dot {
   fill: var(--ink);
 }
@@ -436,23 +808,60 @@ button {
   color: var(--bg);
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
 }
-/* The donut is fixed at 76px on desktop, which is comfortable inside its ~211px card but
-   would nearly fill the ~105px card at 320px. A percentage of the card makes it shrink with
-   the panel exactly as the bar chart does, and the cap holds it at the previous desktop
-   size from ~510px viewport upward — so wide layouts are pixel-identical to before.
-   (The bar card's 60.8% share now comes from the grid track itself, so the max-width cap
-   that used to live here is gone: it would have compounded to ~37% of the panel.) */
-.hero-donut {
-  width: 46%;
-  max-width: 76px;
-}
 
+/* Charts */
+.hero-charts {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 14px;
+}
+.hero-chart {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.hero-chart-label {
+  margin-bottom: 8px;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hero-chart-mix {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 10px 8px 26px;
+}
+.hero-chart-label-abs {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  margin: 0;
+}
+/* The donut takes whatever height the bar card gives the row, as 2a's absolute SVG does. */
+.hero-donut-box {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  align-self: stretch;
+}
+.hero-donut {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* Bars grow from their bottom edge via scaleY — transitioning the SVG y/height
    geometry properties is not reliable across browsers (Safari notably ignores it). */
 .hero-bar {
   transform-box: fill-box;
   transform-origin: bottom;
-  transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 1.1s cubic-bezier(.34,1.4,.64,1);
 }
 .hero-donut-track {
   fill: none;
@@ -462,577 +871,2384 @@ button {
 .hero-donut-slice {
   fill: none;
   stroke-width: 9;
-  stroke-linecap: butt;
   transform: rotate(-90deg);
   transform-origin: center;
-  transition: stroke-dasharray 1.1s cubic-bezier(0.4, 0, 0.2, 1), stroke-dashoffset 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dasharray 1.1s, stroke-dashoffset 1.1s;
 }
 
-/* ---------------- /services device mockups ---------------- */
+/* ---------------- Hero name (hero-name.tsx) ---------------- */
 
-/* Overlapping composition: monitor centre-back, laptop front-left, phone front-right.
-   Sized in % of the stage so the whole group scales as one. */
-.device-stage {
+/* One box, three layers: sr-only text, an invisible sizer, and the typed overlay. */
+.hn {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  max-width: 560px;
+  display: block;
 }
-@media (max-width: 767px) {
-  .device-stage {
-    aspect-ratio: 3 / 4;
-    max-width: 240px;
-    margin-inline: auto;
-  }
+.hn-sizer {
+  visibility: hidden;
 }
-.device-bezel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  padding: 6px;
-  background: linear-gradient(150deg, color-mix(in srgb, var(--ink) 82%, transparent), #0c1a1f);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh-lg), inset 0 1px 0 rgba(255, 255, 255, 0.16);
-}
-.device-screen {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  border-radius: 7px;
-  background: #0d1117;
-}
-/* Subtle sheen so an empty or flat screenshot still reads as glass. */
-.device-glare {
+.hn-type {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: linear-gradient(118deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 46%);
 }
-
-.device-monitor {
+.hn-word {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+.hn-mark {
   position: absolute;
-  top: 2%;
-  left: 12%;
-  width: 74%;
+  left: -0.08em;
+  top: 0.14em;
+  width: calc(100% + 0.16em);
+  height: 0.86em;
+  z-index: -1;
+  overflow: visible;
 }
-.device-monitor .device-bezel {
-  aspect-ratio: 16 / 10;
+.hn-caret {
+  display: inline-block;
+  width: 0.07em;
+  height: 0.8em;
+  margin-left: 0.05em;
+  vertical-align: -0.04em;
+  border-radius: 2px;
+  background: var(--accent-b);
+  animation: blink 1.05s steps(1) infinite;
 }
-.device-monitor-neck {
-  display: block;
-  width: 12%;
-  height: 9%;
-  margin: 0 auto;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 55%, transparent), color-mix(in srgb, var(--ink) 30%, transparent));
-}
-.device-monitor-foot {
-  display: block;
-  width: 34%;
-  height: 7px;
-  margin: 0 auto;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 42%, transparent);
-  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.6);
-}
-
-.device-laptop {
-  position: absolute;
-  bottom: 4%;
-  left: 0;
-  width: 58%;
-  z-index: 2;
-}
-.device-bezel-laptop {
-  aspect-ratio: 16 / 10;
-  border-radius: 10px;
-}
-.device-laptop-base {
-  display: block;
-  width: 118%;
-  height: 9px;
-  margin-left: -9%;
-  border-radius: 0 0 8px 8px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 58%, transparent), color-mix(in srgb, var(--ink) 34%, transparent));
-  box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.65);
-}
-
-.device-phone {
-  position: absolute;
-  right: 2%;
-  bottom: 2%;
-  width: 22%;
-  z-index: 3;
-}
-@media (max-width: 767px) {
-  /* Phone only: centre it and let it fill the stage. */
-  .device-phone {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    width: 100%;
-  }
-}
-.device-bezel-phone {
-  aspect-ratio: 9 / 19;
-  border-radius: 18px;
-  padding: 4px;
-}
-.device-screen-phone {
-  border-radius: 14px;
-}
-.device-notch {
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  z-index: 2;
-  width: 34%;
-  height: 5px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.72);
-}
-
-/* Floating "Send Message" button (guestbook, narrow viewports only). Sits above the
-   safe-area inset so it clears iOS home indicators and doesn't cover the footer. */
-.back-to-form {
-  position: fixed;
-  right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  z-index: 45;
-  box-shadow: var(--glass-sh-lg);
-}
-
-/* ---------------- Article code block (macOS terminal window) ---------------- */
-
-/* Deliberately dark in BOTH site themes, like the mkdir terminal — code reads better on a
-   dark surface and the token theme (nightOwl) is built for one.
-
-   `color-scheme: dark` is load-bearing, not decoration: the UA paints form controls and
-   SCROLLBARS from the inherited color-scheme, so in light mode the horizontal scrollbar
-   rendered as a light bar across a near-black block. Declaring the subtree dark fixes it at
-   the source; the explicit .code-scroll rules below then pin the exact colours. */
-.code-window {
-  color-scheme: dark;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0d1117;
-}
-/* Slightly lifted from the code surface, same family — reads as one window, and the
-   wrapper's overflow:hidden clips its top corners to the 12px radius so there is no seam. */
-.code-titlebar {
-  display: grid;
-  /* 1fr auto 1fr keeps the language label on the block's true centre line whatever the
-     copy button's width; the flanking tracks split the remaining space evenly. */
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  background: #161b22;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-.code-dots {
-  display: inline-flex;
-  gap: 6px;
-  justify-self: start;
-}
-.code-dots i {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-}
-.code-lang {
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(230, 237, 243, 0.5);
-  user-select: none;
-}
-.code-copy {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  justify-self: end;
-  padding: 3px 8px;
-  border-radius: 7px;
-  font-size: 10.5px;
-  line-height: 1;
-  cursor: pointer;
-  color: rgba(230, 237, 243, 0.62);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  transition: color 0.16s ease, background 0.16s ease;
-}
-.code-copy:hover {
-  color: rgba(230, 237, 243, 0.95);
-  background: rgba(255, 255, 255, 0.12);
-}
-.code-copy:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Theme-independent scrollbar, matching the dark block in light mode too. Thumb ~28% and
-   track ~5% white both sit clearly above the #0d1117 surface while staying quiet. */
-.code-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(230, 237, 243, 0.28) rgba(255, 255, 255, 0.05);
-}
-.code-scroll::-webkit-scrollbar {
-  height: 10px;
-}
-.code-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-.code-scroll::-webkit-scrollbar-thumb {
-  background: rgba(230, 237, 243, 0.28);
-  border-radius: 999px;
-}
-.code-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(230, 237, 243, 0.45);
-}
-
-/* ---------------- /articles filter controls ---------------- */
-
-/* Below `lg` the sidebar stacked above the list, so the title was followed by category
-   buttons, a language row, every tag and a recent-articles list before the first article.
-   Same markup, two behaviours: a collapsible panel behind a Filter button on narrow
-   viewports, the always-visible right column from `lg` up.
-
-   Plain CSS rather than `lg:hidden` / `lg:block` utilities: this stylesheet is emitted
-   after `@import "tailwindcss"`, so a same-specificity utility loses on source order —
-   the exact trap that made `.toc-rail` render at every width. */
-.articles-filter-bar {
-  display: flex;
-}
-.articles-filters {
+.hn-caret-static {
   display: none;
 }
-.articles-filters[data-open] {
-  display: block;
-}
-@media (min-width: 1024px) {
-  .articles-filter-bar {
-    display: none;
+/* Reduced motion: no typing at all. The sizer becomes the visible name (with a still caret,
+   as 2a leaves it) from the very first paint, before any script has run. */
+@media (prefers-reduced-motion: reduce) {
+  .hn-sizer {
+    visibility: visible;
   }
-  /* Both selectors listed so this matches the specificity of `[data-open]` above and wins
-     on source order — no !important needed. */
-  .articles-filters,
-  .articles-filters[data-open] {
-    display: block;
+  .hn-caret-static {
+    display: inline-block;
   }
-}
-
-/* ---------------- Article sidebar (lg and up) ---------------- */
-
-/* The sidebar is sticky at `top: 7rem`, so anything past the viewport bottom scrolls out
-   of reach for good — the page keeps moving but the pinned aside doesn't. Capping its
-   height turns that overflow into an internal scroll instead. Deliberately unconditional:
-   while the content fits (today's TOC + related list is well under a laptop viewport) a
-   max-height nothing reaches and an `auto` overflow that never triggers are both no-ops,
-   so this costs nothing now and simply absorbs a longer TOC later. The scrollbar is
-   hidden so no gutter appears and the column width never shifts. */
-@media (min-width: 1024px) {
-  .article-aside {
-    max-height: calc(100dvh - 8rem);
-    overflow-y: auto;
-    scrollbar-width: none;
-    overscroll-behavior: contain;
-  }
-  .article-aside::-webkit-scrollbar {
+  .hn-type {
     display: none;
   }
 }
 
-/* ---------------- Article TOC dot rail (narrow viewports) ---------------- */
+/* ---------------- Shared chevron circle (experience + certification cards) ---------------- */
 
-/* Pinned to the left edge, vertically centred. Collapsed it is a slim column of dots
-   that sits outside the text column; expanded it becomes a labelled panel.
-   Stacked vertically (toggle ABOVE the dots) rather than side by side, so the whole rail
-   is one narrow column and can hug the viewport edge without crowding the text. */
-.toc-rail {
-  position: fixed;
-  top: 50%;
-  left: 6px;
-  z-index: 40;
+.nm-chev {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transform: translateY(-50%);
-}
-/* The breakpoint lives HERE (after the base rule), not on a `lg:hidden` utility:
-   `.toc-rail` and Tailwind's `.lg\:hidden` have identical specificity, and this
-   stylesheet is emitted after `@import "tailwindcss"`, so source order made the base
-   rule win — the rail rendered at every width alongside the desktop sidebar. */
-@media (min-width: 1024px) {
-  .toc-rail {
-    display: none;
-  }
-}
-.toc-rail-toggle {
-  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  color: var(--ink-faint);
+}
+.nm-chev[data-open] {
+  box-shadow: var(--in-sm);
+}
+.nm-chev svg {
+  transition: transform .45s var(--spring);
+}
+.nm-chev[data-open] svg {
+  transform: rotate(180deg);
+}
+
+/* ---------------- Experiences ---------------- */
+
+.xp {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 64px clamp(16px,4vw,40px) 10px;
+}
+.xp-inner {
+  width: 100%;
+  max-width: 820px;
+}
+.xp-title {
+  margin-bottom: 26px;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.xp-tabs-wrap {
+  margin-bottom: 34px;
+  display: flex;
+  justify-content: center;
+  padding: 4px 2px 12px;
+}
+.xp-tabs {
+  --xp-tab-w: 136px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--xp-tabs), var(--xp-tab-w));
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.xp-thumb {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: var(--xp-tab-w);
+  height: calc(100% - 12px);
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+  transform: translateX(calc(var(--xp-i) * 100%));
+  transition: transform .55s var(--spring);
+}
+/* Latest 2a: below 640px the track fills the width and never scrolls. One row of equal tabs,
+   or a 2-column grid once there are more than three (the thumb then moves by column and row). */
+@media (max-width: 639px) {
+  .xp-tabs {
+    width: 100%;
+    grid-template-columns: repeat(var(--xp-cols), minmax(0,1fr));
+  }
+  .xp-tabs[data-rows] {
+    border-radius: 24px;
+  }
+  .xp-thumb {
+    width: calc((100% - 12px) / var(--xp-cols));
+    height: calc((100% - 12px) / var(--xp-rows));
+    transform: translate(calc(var(--xp-col) * 100%), calc(var(--xp-row) * 100%));
+  }
+  .xp-tabs[data-rows] .xp-thumb {
+    border-radius: 18px;
+  }
+}
+.xp-tab {
+  position: relative;
+  z-index: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-dim);
+  transition: color .3s;
+}
+.xp-tab[data-active] {
+  color: var(--accent-ink);
+}
+.xp-timeline {
+  position: relative;
+}
+.xp-rail {
+  position: absolute;
+  top: 10px;
+  bottom: 24px;
+  left: 21px;
+  width: 6px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.xp-item {
+  position: relative;
+  padding: 0 0 20px 60px;
+}
+.xp-dot {
+  position: absolute;
+  top: 28px;
+  left: 14px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.xp-dot > span {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.xp-card {
+  cursor: pointer;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .5s var(--spring);
+}
+.xp-card:hover {
+  transform: translateY(-3px);
+}
+.xp-card:active {
+  transform: scale(.99);
+}
+.xp-head,
+.cc-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.xp-logo {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.xp-text {
+  flex: 1;
+  min-width: 0;
+}
+.xp-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+.xp-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.xp-date {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.xp-role {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+.xp-body {
+  padding-left: 68px;
+}
+.xp-loc {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.xp-desc {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.xp-gallery {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+.xp-gallery-btn {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  padding: 5px;
+  border: none;
+  border-radius: 14px;
+  cursor: zoom-in;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+  transition: transform .4s var(--spring);
+}
+.xp-gallery-btn:hover {
+  transform: translateY(-2px);
+}
+.xp-gallery-img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+.xp-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 0 60px;
+}
+.xp-more,
+.xp-pill {
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .45s var(--spring);
+}
+.xp-more {
+  padding: 10px 19px;
+  font-size: 13.5px;
+}
+.xp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  font-size: 14px;
+}
+.xp-more:hover,
+.xp-pill:hover {
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.xp-more:active,
+.xp-pill:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+.xp-certs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.xp-center {
+  display: flex;
+  justify-content: center;
+  padding-top: 6px;
+}
+
+/* ---------------- Certification card (tab + /certifications) ---------------- */
+
+.cc {
+  cursor: pointer;
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .5s var(--spring);
+}
+.cc:hover {
+  transform: translateY(-2px);
+}
+.cc-logo {
+  display: flex;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.cc-text {
+  flex: 1;
+  min-width: 0;
+}
+.cc-title {
+  font-size: 16.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.cc-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+.cc-kind {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.cc-body {
+  padding-left: 66px;
+}
+.cc-desc {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.cc-skills {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.cc-skill {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.cc-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.cc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
   border-radius: 999px;
   cursor: pointer;
   font-size: 12px;
-  line-height: 1;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh);
-  color: var(--ink-dim);
+  font-weight: 500;
+  color: inherit;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
 }
-.toc-rail-dots {
+.cc-btn:hover {
+  color: var(--accent-ink);
+}
+.cc-btn:active {
+  box-shadow: var(--in-sm);
+}
+.cc-cred-text {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+/* The Experiences tab card is a step smaller than the /certifications card (2a). */
+.cc[data-size="tab"] .cc-title {
+  font-size: 16px;
+}
+.cc[data-size="tab"] .cc-sub,
+.cc[data-size="tab"] .cc-desc {
+  font-size: 13.5px;
+}
+.cc[data-size="tab"] .cc-skill {
+  font-size: 11px;
+}
+.cc[data-size="tab"] .cc-actions {
+  margin-top: 12px;
+}
+
+/* ---------------- Section heading row (Selected projects, Articles) ---------------- */
+
+.home-sec {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 56px clamp(16px,4vw,40px) 10px;
+}
+.home-sec-articles {
+  padding-bottom: 20px;
+}
+.home-sec-inner {
+  width: 100%;
+  max-width: 1180px;
+}
+.sec-head {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sec-title {
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.sec-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .45s var(--spring);
+}
+.sec-link:hover {
+  transform: translateY(-2px);
+}
+.sec-link:active {
+  transform: scale(.96);
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- Bento grids (cards/bento.ts) ---------------- */
+
+.bento {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 22px;
+}
+/* home + services: one column of 16:9 tiles below 900px, 4 × 204px tracks above. */
+@media (min-width: 900px) {
+  .bento:is([data-layout="home"], [data-layout="services"]) {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    grid-auto-rows: 204px;
+    grid-auto-flow: dense;
+  }
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc {
+    aspect-ratio: auto;
+    grid-column: span 2;
+  }
+  .bento[data-layout="home"] .pc[data-rows="2"] {
+    grid-row: span 2;
+  }
+}
+/* projects: 204px rows at every width; four columns and the six-step pattern from 720px. */
+.bento[data-layout="projects"] {
+  grid-auto-rows: 204px;
+}
+.bento[data-layout="projects"] .pc {
+  aspect-ratio: auto;
+}
+@media (min-width: 720px) {
+  .bento[data-layout="projects"] {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    grid-auto-flow: dense;
+  }
+  .bento[data-layout="projects"] .pc {
+    grid-column: span 2;
+  }
+  .bento[data-layout="projects"] .pc[data-rows="2"] {
+    grid-row: span 2;
+  }
+}
+
+/* ---------------- Project tile (cards/project-card.tsx) ---------------- */
+
+.pc {
+  position: relative;
+  aspect-ratio: 16/9;
+  padding: 8px;
+  border-radius: 26px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  cursor: pointer;
+  transition: transform .55s var(--spring), box-shadow .3s;
+}
+.pc:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.pc:active {
+  transform: scale(.985);
+}
+.pc-frame {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 19px;
+}
+.pc-base {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: #14171C;
+}
+.pc-contour,
+.ar-contour {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+/* Fixed dark scrim — theme-independent, so the white overlay text holds in both themes. */
+.pc-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(10,13,20,.86) 0%, rgba(10,13,20,.5) 38%, rgba(10,13,20,0) 74%);
+}
+.pc-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px 20px;
+  /* The whole tile is a link target; dragging across it must not start a text selection. */
+  user-select: none;
+}
+/* 2a's reveal: each foldable row is a 0fr/1fr grid track, so it opens to its own height. */
+.pc-fold {
+  display: grid;
+  transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1), opacity .3s;
+}
+.pc-fold > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.pc-meta,
+.pc-tech {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pc-sum {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.pc-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+.pc-type {
+  white-space: nowrap;
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(10,13,20,.55);
+}
+.pc-year {
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+}
+.pc-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.22;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Full-tile hit target for the title link, while keeping it a real <a>. */
+.pc-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.pc-sum p {
+  padding-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pc-tech-row {
+  padding-top: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* The logos are the one layer above the title's stretched link (z 3): the row itself lets
+   clicks through (gaps, text chips), only the logo buttons take them. A logo shows its name
+   on hover, focus and tap (TechTile) and a mouse click on it opens the project like the rest
+   of the card. */
+.pc-skills {
+  position: relative;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  /* One row only. 2a's logo tiles always fit; the legacy text-chip fallback (not in 2a) can
+     wrap to three rows on a 375px tile and push the title out of the frame, so chips that do
+     not fit on the first row are dropped whole. */
+  max-height: 26px;
+  overflow: hidden;
+}
+.pc-logo {
+  pointer-events: auto;
+  display: flex;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(255,255,255,.92);
+}
+.pc-logo .tech-tile-img {
+  width: 17px;
+  height: 17px;
+}
+.pc-chip {
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 26px;
+  white-space: nowrap;
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.92);
+}
+.pc-details {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+}
+/* Hover, or keyboard focus on the card's link: the summary opens; on small tiles the type and
+   technology rows fold away to make room (2a's hideRest). Two deliberate exceptions, so the
+   logo names stay reachable: nothing folds while the pointer is on a logo, and focusing a
+   logo (rather than the link) does not fold the row it sits in. */
+.pc:is(:hover:not(:has(.pc-logo:hover)), :has(.pc-link:focus-visible)) .pc-sum {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pc:is(:hover:not(:has(.pc-logo:hover)), :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+/* "Big" tiles keep both rows and allow six summary lines. Which tiles are big follows 2a:
+   the two-row tiles in a multi-column grid, and every home/services tile at 560–899px. */
+@media (min-width: 900px) {
+  .bento[data-layout="home"] .pc[data-rows="2"]:is(:hover, :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento[data-layout="home"] .pc[data-rows="2"] .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+@media (min-width: 560px) and (max-width: 899px) {
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc:is(:hover, :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+@media (min-width: 720px) {
+  .bento[data-layout="projects"] .pc[data-rows="2"]:is(:hover, :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .bento[data-layout="projects"] .pc[data-rows="2"] .pc-sum p {
+    -webkit-line-clamp: 6;
+  }
+}
+
+/* ---------------- Article row (articles/article-list-item.tsx) ---------------- */
+
+.ar-list {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+.ar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px,2vw,22px);
+  padding: 14px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  cursor: pointer;
+  transition: transform .55s var(--spring);
+}
+.ar:hover {
+  transform: translateY(-3px);
+}
+.ar:active {
+  transform: scale(.99);
+}
+.ar-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 200px;
+  flex-shrink: 0;
+}
+@media (max-width: 639px) {
+  .ar-side {
+    width: 100%;
+  }
+}
+.ar-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+}
+.ar-cat,
+.ar-feat {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--out-sm);
+}
+.ar-cat {
+  color: var(--accent-ink);
+  background: var(--bg);
+}
+.ar-feat {
+  background: var(--accent-b);
+  color: var(--on-b);
+}
+.ar-lang {
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.ar-thumb {
+  aspect-ratio: 4/3;
+  padding: 7px;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.ar-thumb-in {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ar-main {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 200px;
+  flex-direction: column;
+  padding: 0 8px 4px 0;
+}
+.ar-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.ar-read {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+.ar-title {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+/* Full-row hit target for the title link, while keeping it a real <a>. */
+.ar-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.ar-excerpt {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------------- Contact CTA (sections/contact-cta.tsx) ---------------- */
+
+.cta {
+  position: relative;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 64px clamp(12px,3vw,40px) 24px;
+}
+.cta-ring {
+  padding: clamp(8px,1.4vw,14px);
+  border-radius: 48px;
+  box-shadow: var(--in-deco);
+}
+.cta-ring .cta-ring {
+  border-radius: 40px;
+}
+.cta-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: clamp(36px,5vw,56px) clamp(18px,4vw,40px);
+  text-align: center;
+  border-radius: 32px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.cta-title {
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.cta-text {
+  margin: 12px auto 0;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.cta[data-variant="services"] .cta-title {
+  text-wrap: balance;
+}
+.cta[data-variant="services"] .cta-text {
+  max-width: 46ch;
+}
+.cta-well {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px;
+  border-radius: 32px;
+  box-shadow: var(--in);
+}
+.cta .cta-btn {
+  display: inline-flex;
+  align-items: center;
   gap: 9px;
-  padding: 8px 4px;
-  list-style: none;
+  padding: 13px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 999px;
+  transition: transform .45s var(--spring);
+}
+.cta .cta-btn:hover {
+  transform: translateY(-2px);
+}
+/* Pressing wins over hovering, as in 2a. */
+.cta .nm-btn-accent:active {
+  transform: translateY(1px) scale(.97);
+}
+.cta-btn-email {
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.cta .cta-btn-email:active {
+  transform: scale(.97);
+  box-shadow: var(--in-sm);
+}
+
+/* ====================================================================== */
+/* Phase 3a — projects and articles pages, Portfolio 2a values verbatim.   */
+/* ====================================================================== */
+
+/* ---------------- Listing headers (/projects, /articles) ---------------- */
+
+.pg-head,
+.pg-chips-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(40px,6vw,72px) clamp(16px,4vw,40px) 0;
+}
+.pg-chips-wrap {
+  padding-top: 0;
+}
+.pg-title {
+  font-weight: 700;
+  font-size: clamp(34px,6vw,50px);
+  letter-spacing: -0.035em;
+}
+.pg-sub {
+  margin-top: 12px;
+  max-width: 52ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.pg-chips {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pg-chip {
+  padding: 9px 17px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring);
+}
+.pg-chip:hover {
+  transform: translateY(-2px);
+}
+.pg-chip:active {
+  transform: scale(.96);
+}
+.pg-chip[aria-pressed="true"] {
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+/* The page body: 36px under the header, content up to 1180px wide. */
+.pg-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px clamp(16px,4vw,40px) 20px;
+}
+.pg-body > * {
+  width: 100%;
+  max-width: 1180px;
+}
+.pg-empty,
+.af-empty {
+  padding: 28px;
+  border-radius: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-faint);
+  box-shadow: var(--in-sm);
+}
+
+/* "← All projects" / "← All articles". */
+.nm-back {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  color: var(--ink-dim);
+  transition: transform .4s var(--spring);
+}
+.nm-back:hover {
+  transform: translateX(-3px);
+  color: var(--accent-ink);
+}
+.nm-back:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- Project detail ---------------- */
+
+.pj-head,
+.pj-body {
+  max-width: 908px;
+  margin: 0 auto;
+  padding: clamp(36px,5vw,56px) clamp(16px,4vw,24px) 0;
+}
+.pj-body {
+  padding: 40px clamp(16px,4vw,24px) 20px;
+}
+.pj-badges {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.pj-type {
+  white-space: nowrap;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out-sm);
+}
+.pj-status {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.pj-year {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.pj-title {
+  margin-top: 14px;
+  font-weight: 700;
+  font-size: clamp(28px,5.5vw,46px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.pj-summary {
+  margin-top: 16px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.pj-cover-well {
+  padding: 10px;
+  border-radius: 30px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.pj-cover {
+  position: relative;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #14171C;
+}
+.pj-contour,
+.ad-contour {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.pj-meta {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+.pj-label {
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pj-logos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.pj-logo {
+  display: flex;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.pj-logo .tech-tile-img {
+  width: 26px;
+  height: 26px;
+}
+.pj-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pj-chip {
+  padding: 6px 11px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.pj-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pj-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.pj-link:hover {
+  color: var(--accent-ink);
+}
+.pj-link:active {
+  box-shadow: var(--in-sm);
+}
+.pj-sections {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.pj-h2 {
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.pj-h2-lg {
+  margin-bottom: 16px;
+}
+.pj-h2-flush {
+  margin-bottom: 0;
+}
+.pj-text {
+  font-size: 16px;
+  line-height: 1.75;
+}
+.pj-result {
+  padding: 20px 24px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.pj-result .sb-p {
+  font-weight: 500;
+  line-height: 1.7;
+}
+.pj-gal-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pj-gal-count {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.pj-related {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%,320px), 1fr));
+  gap: 20px;
+}
+
+/* Notebooks & outputs */
+.nb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%,300px), 1fr));
+  gap: 18px;
+}
+.nb {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.nb-kind {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.nb-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.nb-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.nb-embed {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: none;
+  border-radius: 14px;
+  box-shadow: var(--in-sm);
+}
+.nb-action {
+  margin-top: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+.nb-action:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Gallery (masonry) */
+.gm-lead {
   margin: 0;
 }
-.toc-rail-dot {
+.gm-lead-btn,
+.gm-btn {
+  display: block;
+  width: 100%;
+  border: none;
+  cursor: zoom-in;
+  background: var(--bg);
+  transition: transform .5s var(--spring);
+}
+.gm-lead-btn {
+  padding: 9px;
+  border-radius: 28px;
+  box-shadow: var(--in);
+}
+.gm-btn {
+  padding: 6px;
+  border-radius: 18px;
+  box-shadow: var(--in-sm);
+}
+.gm-lead-btn:hover,
+.gm-btn:hover {
+  transform: translateY(-2px);
+}
+.gm-lead-img,
+.gm-img {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+.gm-lead-img {
+  aspect-ratio: 16/9;
+  border-radius: 21px;
+}
+.gm-img {
+  border-radius: 12px;
+}
+.gm-cap {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+.gm-cap-lead {
+  gap: 12px;
+  margin-top: 12px;
+  padding: 0 6px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.gm-num {
+  flex-shrink: 0;
+  font-size: 11px;
+  line-height: 18px;
+  color: var(--ink-faint);
+}
+.gm-cap-lead .gm-num {
+  font-size: 12px;
+  line-height: 22px;
+  color: var(--accent-ink);
+}
+.gm-cap-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gm-cols {
+  margin-top: 26px;
+  columns: 3 200px;
+  column-gap: 16px;
+}
+.gm-item {
+  break-inside: avoid;
+  margin: 0 0 18px;
+}
+.gm-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.gm-more {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.gm-more:active {
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- Related card (cards/related-card.tsx) ---------------- */
+
+.rc {
+  position: relative;
+  background: var(--bg);
+  cursor: pointer;
+  transition: transform .5s var(--spring);
+}
+.rc[data-size="aside"] {
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: var(--out-sm), var(--rim);
+  transition-duration: .45s;
+}
+.rc[data-size="aside"]:hover {
+  transform: translateY(-2px);
+}
+.rc[data-size="aside"]:active {
+  box-shadow: var(--in-sm);
+}
+.rc[data-size="below"] {
+  padding: 16px 18px;
+  border-radius: 20px;
+  box-shadow: var(--out), var(--rim);
+}
+.rc[data-size="below"]:active {
+  transform: scale(.98);
+}
+.rc[data-size="writing"] {
+  padding: 18px 20px;
+  border-radius: 22px;
+  box-shadow: var(--out), var(--rim);
+}
+.rc[data-size="below"]:hover,
+.rc[data-size="writing"]:hover {
+  transform: translateY(-3px);
+}
+.rc-chip {
+  display: inline-flex;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.rc-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.38;
+}
+.rc[data-size="below"] .rc-title {
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.rc[data-size="writing"] .rc-title {
+  margin-top: 12px;
+  font-size: 16.5px;
+  line-height: 1.35;
+}
+/* Whole-card hit target for the title link, while keeping it a real <a>. */
+.rc-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.rc-meta {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.rc[data-size="below"] .rc-meta {
+  margin-top: 8px;
+}
+.rc[data-size="writing"] .rc-meta {
+  margin-top: 10px;
+  font-size: 11.5px;
+}
+
+/* ---------------- /articles filters (articles/articles-browser.tsx) ---------------- */
+
+.af {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+.af-list {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.af-col {
+  position: sticky;
+  top: var(--sticky-top);
+  z-index: 8;
+  flex: 0 0 290px;
+}
+.af-toggle,
+.af-panel-head,
+.af-actives {
+  display: none;
+}
+.af-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-height: calc(100vh - 124px);
+  overflow: auto;
+  padding: 22px;
+  border-radius: 26px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.af-label {
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.af-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.af-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.af-chip,
+.af-tag {
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.af-chip {
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.af-tag {
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.af-chip:active,
+.af-tag:active {
+  transform: scale(.95);
+}
+.af-chip[aria-pressed="true"],
+.af-tag[aria-pressed="true"] {
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.af-more {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+.af-more:hover {
+  text-decoration: underline;
+}
+.af-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.af-active button {
+  display: flex;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+.af-clear {
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* Below 1000px (2a): a 48px column with a vertical button; the panel opens over the list. */
+@media (max-width: 999px) {
+  .af {
+    gap: 18px;
+  }
+  .af-col {
+    flex: 0 0 48px;
+  }
+  .af-toggle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 48px;
+    padding: 16px 0;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--accent-ink);
+    background: var(--bg);
+    box-shadow: var(--out-sm), var(--rim);
+  }
+  .af-toggle[aria-expanded="true"] {
+    box-shadow: var(--in-sm);
+  }
+  .af-toggle:active {
+    transform: scale(.96);
+  }
+  .af-toggle-label {
+    writing-mode: vertical-rl;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .af-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    background: var(--accent-b);
+    color: var(--on-b);
+    box-shadow: var(--out-sm);
+  }
+  .af-panel {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(300px, calc(100vw - 40px));
+    box-shadow: var(--out-lg), var(--rim);
+  }
+  .af-panel[data-open] {
+    display: flex;
+  }
+  .af-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .af-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--ink-dim);
+    background: var(--bg);
+    box-shadow: var(--out-sm);
+  }
+  .af-close:active {
+    box-shadow: var(--in-sm);
+  }
+  .af-actives {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+}
+@media (max-width: 559px) {
+  .af {
+    gap: 12px;
+  }
+}
+
+/* ---------------- Article detail ---------------- */
+
+.ad {
+  position: relative;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(36px,5vw,56px) clamp(16px,4vw,40px) 20px;
+}
+.ad[data-wide] {
+  max-width: 1140px;
+}
+/* Room for the fixed TOC rail on the left edge, only where it renders. */
+@media (max-width: 1023px) {
+  .ad[data-rail] {
+    padding-left: 50px;
+  }
+}
+.ad-grid[data-aside] {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.ad-content {
+  min-width: 0;
+  order: 1;
+}
+/* Stacked, a related-content aside follows the body; a TOC aside gives way to the rail. */
+/* Latest 2a hides the aside's scrollbar; a long TOC still scrolls inside the card. */
+.ad-aside {
+  order: 2;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ad-aside::-webkit-scrollbar {
+  display: none;
+}
+.ad-aside[data-kind="toc"] {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .ad-grid[data-aside] {
+    display: grid;
+    grid-template-columns: 250px minmax(0,1fr);
+    align-items: start;
+  }
+  /* Sticky and capped at the viewport: a long TOC scrolls inside the card, with its scrollbar
+     hidden, and the active entry is glided to the centre (articles/article-toc.tsx). */
+  .ad-aside {
+    order: 0;
+    position: sticky;
+    top: var(--sticky-top);
+    max-height: calc(100vh - 124px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .ad-aside[data-kind="toc"] {
+    display: block;
+  }
+}
+.ad-head {
+  margin-top: 22px;
+  padding-bottom: 26px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.ad-title {
+  font-weight: 700;
+  font-size: clamp(28px,4vw,44px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.ad-cover-well {
+  margin-top: 24px;
+  padding: 9px;
+  border-radius: 28px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.ad-cover {
+  position: relative;
+  aspect-ratio: 16/9;
+  border-radius: 21px;
+  overflow: hidden;
+}
+.ad-excerpt {
+  margin-top: 24px;
+  font-size: 16.5px;
+  line-height: 1.62;
+  color: var(--ink-dim);
+}
+.ad-byline {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+.ad-author {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.ad-avatar {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.ad-avatar-in {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.ad-monogram {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.ad-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+.ad-name:hover {
+  color: var(--accent-ink);
+}
+.ad-sep {
+  color: var(--ink-faint);
+}
+.ad-date {
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.ad-pills {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+.ad-cat {
+  white-space: nowrap;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.ad-lang {
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.ad-tags {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ad-tag {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+/* Related content, in the aside or below the body. */
+.ad-rel + .ad-rel {
+  margin-top: 24px;
+}
+.ad-rel-title {
+  margin-bottom: 14px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.ad-rel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%,220px), 1fr));
+  gap: 12px;
+}
+@media (min-width: 1024px) {
+  .ad-aside .ad-rel-grid {
+    grid-template-columns: minmax(0,1fr);
+  }
+}
+.ad-back-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.ad-back-all:hover {
+  color: var(--accent-ink);
+}
+.ad-below {
+  margin-top: 56px;
+}
+.ad-below .ad-rel + .ad-rel {
+  margin-top: 32px;
+}
+.ad-below .ad-rel-title {
+  margin-bottom: 18px;
+  font-size: 22px;
+}
+.ad-below .ad-rel-grid {
+  gap: 18px;
+}
+.ad-below .ad-back-all {
+  margin-top: 18px;
+  font-size: 12.5px;
+}
+
+/* TOC in the aside (articles/article-toc.tsx) */
+/* "On this page" + % row, used by the rail panel (articles/toc-rail.tsx). */
+.toc-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.toc-pct {
+  color: var(--accent-ink);
+}
+/* The sidebar's plain label (latest 2a: no reading % or progress bar in the sidebar). */
+.toc-label {
+  margin-bottom: 12px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.toc-list {
+  position: relative;
+}
+.toc-list ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.toc-track,
+.toc-fill {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 4px;
+  border-radius: 4px;
+}
+.toc-track {
+  bottom: 2px;
+  box-shadow: var(--in-sm);
+}
+.toc-fill {
+  max-height: calc(100% - 4px);
+  background: var(--accent);
+  transition: height .3s;
+}
+.toc-a,
+.rail-a {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-dim);
+  transition: color .2s;
+}
+.toc-a {
+  padding: 6px 4px 6px 14px;
+  line-height: 1.4;
+}
+.toc-a[data-sub],
+.rail-a[data-sub] {
+  padding-left: 26px;
+  font-size: 12.5px;
+}
+.toc-a[data-state="past"],
+.rail-a[data-state="past"] {
+  color: var(--ink);
+}
+.toc-a[data-state="on"],
+.rail-a[data-state="on"] {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.toc-a:hover {
+  color: var(--accent-ink);
+}
+
+/* TOC rail below 1024px (articles/toc-rail.tsx) */
+.rail {
+  position: fixed;
+  left: 8px;
+  top: 104px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+@media (min-width: 1024px) {
+  .rail {
+    display: none;
+  }
+}
+.rail-toggle {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.rail-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 34px;
+  max-height: calc(100vh - 170px);
+  overflow: hidden;
+  padding: 10px 0;
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.rail-dots li {
+  display: flex;
+}
+.rail-dot {
   display: block;
   width: 7px;
   height: 7px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 26%, transparent);
-  transition: transform 0.18s ease, background 0.18s ease;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  opacity: .45;
+  transition: width .3s, height .3s;
 }
-.toc-rail-dot[data-sub] {
+.rail-dot[data-sub] {
   width: 5px;
   height: 5px;
-  margin-left: 1px;
 }
-.toc-rail-dot[data-active] {
+.rail-dot[data-state="past"] {
   background: var(--accent);
-  transform: scale(1.7);
+  opacity: .7;
 }
-.toc-rail-panel {
-  /* Left-aligned instead of centred under the 26px toggle, which would push a 168px+
-     panel half off the left edge of the screen. */
-  align-self: flex-start;
-  /* Leaves room for the toggle stacked above it. */
-  max-height: 70dvh;
-  overflow-y: auto;
-  padding: 10px 12px 10px 8px;
-  border-radius: 14px;
-  background: var(--glass-bg);
-  background-image: var(--glass-tint);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border: 1px solid var(--glass-brd);
-  box-shadow: var(--glass-sh-lg);
-  min-width: 168px;
-  max-width: 62vw;
+.rail-dot[data-state="on"] {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  opacity: 1;
 }
-
-/* ---------------- Project bento card (cover-filled) ---------------- */
-
-/* Uniform ratio by default. Inside a bento grid the row/col spans drive the height from
-   `lg` up instead, so the ratio is released only there — cards used in ordinary grids
-   (services portfolio, related projects) keep their aspect ratio at every width. */
-.pcard {
-  aspect-ratio: 16 / 10;
+.rail-panel {
+  width: min(300px, calc(100vw - 32px));
+  max-height: 70vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
 }
-@media (min-width: 1024px) {
-  .bento .pcard {
-    aspect-ratio: auto;
-  }
+.rail-panel ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-/* The whole tile is one link target, so the overlay text must not be selectable: dragging
-   across it used to start a text selection and flicker the cursor between the I-beam and
-   the pointer. Scoped to the overlay only — article prose and code blocks stay selectable. */
-.pcard {
-  cursor: pointer;
+.rail-a {
+  padding: 6px 8px 6px 14px;
+  border-left: 2px solid transparent;
+  line-height: 1.35;
 }
-.pcard-body {
-  user-select: none;
-}
-.pcard-cover {
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.pcard:hover .pcard-cover {
-  transform: scale(1.04);
-}
-/* Type-hue panel for projects without a cover yet, plus a faint grain so it doesn't
-   read as a flat colour block. */
-.pcard-fallback {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(120% 90% at 20% 10%, color-mix(in srgb, var(--pcard-hue) 55%, transparent), transparent 60%),
-    linear-gradient(150deg, color-mix(in srgb, var(--pcard-hue) 42%, #0d1c21), #0d1c21 70%);
-}
-.pcard-fallback::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.16;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px);
-  background-size: 5px 5px;
-}
-/* Fixed dark scrim — theme-independent, so white overlay text keeps contrast over any
-   image in both light and dark mode. */
-.pcard-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    to top,
-    rgba(6, 16, 20, 0.88) 0%,
-    rgba(6, 16, 20, 0.62) 34%,
-    rgba(6, 16, 20, 0.16) 66%,
-    rgba(6, 16, 20, 0.04) 100%
-  );
-}
-/* Clamp the title so a long project name can't push the badge out of the top of a
-   short (single-row) tile, which overflow:hidden would then clip. */
-.pcard-heading {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  line-height: 1.22;
-}
-.pcard[data-tall] .pcard-heading {
-  -webkit-line-clamp: 3;
-}
-.pcard-title::after {
-  /* Full-card hit target for the title link, while keeping it a real <a>. */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-/* Matches the body's own padding, so an absolutely positioned child can sit on the
-   content box — absolute offsets resolve against the PADDING box, which would otherwise
-   put it flush against the border. */
-.pcard-body {
-  --pcard-pad: 16px;
-}
-@media (min-width: 640px) {
-  .pcard-body {
-    --pcard-pad: 20px;
-  }
+.rail-a[data-state="on"] {
+  border-left-color: var(--accent);
 }
 
-/* The whole card is a navigation target, so tap-to-reveal would fight tapping through:
-   the summary is a hover/focus affordance only. Base = hidden (also the touch state for
-   compact tiles). */
-.pcard-summary {
-  display: none;
-}
-
-/* ----- Feature (2×2) tiles: inline reveal, unchanged ----- */
-@media (hover: hover) {
-  .pcard[data-tall] .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    max-height: 0;
-    margin-top: 0;
-    opacity: 0;
-    transition: max-height 0.28s ease, opacity 0.28s ease, margin-top 0.28s ease;
-  }
-  .pcard[data-tall]:hover .pcard-summary,
-  .pcard[data-tall]:focus-within .pcard-summary {
-    max-height: 4.8em;
-    margin-top: 7px;
-    opacity: 1;
-  }
-}
-@media (hover: none) {
-  .pcard[data-tall] .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    margin-top: 7px;
-    opacity: 1;
-  }
-}
-
-/* ----- Compact (2×1) tiles: rest ⇄ hover crossfade -----
-   Rest shows the metadata (badge + year, title, tech tiles, Details); hover shows the
-   title + summary. Strictly opacity — the faded elements keep their boxes and the summary
-   is taken out of flow, so nothing shifts or reflows during the swap. It lands in the
-   band the foot vacates, which is why it clamps to 2 lines: three would reach back up
-   into the title. Touch pointers get no swap at all and keep the rest state permanently
-   (the summary is one tap away on the detail page). */
-@media (hover: hover) {
-  .pcard:not([data-tall]) .pcard-topline,
-  .pcard:not([data-tall]) .pcard-foot {
-    transition: opacity 0.28s ease;
-  }
-  .pcard:not([data-tall]):hover .pcard-topline,
-  .pcard:not([data-tall]):focus-within .pcard-topline,
-  .pcard:not([data-tall]):hover .pcard-foot,
-  .pcard:not([data-tall]):focus-within .pcard-foot {
-    opacity: 0;
-  }
-  /* Keyboard focus can land on the Details link inside the foot; it must stay visible
-     when it does. Same specificity as the rule above, so source order decides — this one
-     has to come after it. */
-  .pcard:not([data-tall]) .pcard-foot:focus-within {
-    opacity: 1;
-  }
-
-  .pcard:not([data-tall]) .pcard-summary {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    position: absolute;
-    left: var(--pcard-pad);
-    right: var(--pcard-pad);
-    bottom: var(--pcard-pad);
-    margin: 0;
-    opacity: 0;
-    transition: opacity 0.28s ease;
-  }
-  .pcard:not([data-tall]):hover .pcard-summary,
-  .pcard:not([data-tall]):focus-within .pcard-summary {
-    opacity: 1;
-  }
-}
-
-/* Technology logo tile. The surface is a FIXED off-white in both themes (not
-   token-driven, same "always-X" approach as the mkdir terminal's always-dark):
-   many brand logos are black/dark and would vanish on the dark glass. It's held
-   at ~0.94 rather than pure white so it doesn't glare in dark mode. */
-.tech-tile {
-  position: relative;
-  display: inline-flex;
+/* Back to top (articles/back-to-top.tsx) */
+.to-top {
+  position: fixed;
+  right: clamp(16px,3vw,32px);
+  bottom: clamp(16px,3vw,32px);
+  z-index: 60;
+  display: flex;
+  width: 52px;
+  height: 52px;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
-  /* Inner padding comes from the component as a px value derived from `size`.
-     A percentage must NOT be used here: percentage padding resolves against the
-     containing block's width, not the tile, which would blow the tile up and
-     collapse the logo to 0px. */
-  border-radius: 11px;
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
-  background: rgba(246, 248, 247, 0.94);
-  border: 1px solid rgba(15, 32, 38, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px -3px rgba(9, 24, 30, 0.35);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .45s var(--spring);
 }
-[data-theme="dark"] .tech-tile {
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 8px -3px rgba(0, 0, 0, 0.6);
+.to-top:hover {
+  transform: translateY(-3px);
 }
-.tech-tile:hover,
-.tech-tile:focus-visible {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 6px 14px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+.to-top:active {
+  transform: scale(.92);
+  box-shadow: var(--press);
 }
+
+/* ---------------- Prose (blocks/strapi-blocks.tsx, 2a variants) ---------------- */
+
+.sb {
+  display: flex;
+  flex-direction: column;
+}
+.sb-article {
+  max-width: 740px;
+  gap: 20px;
+  font-size: 16.5px;
+  line-height: 1.82;
+}
+.sb-project {
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.sb-p {
+  text-wrap: pretty;
+}
+.sb-h {
+  font-weight: 700;
+}
+.sb-h2 {
+  margin-top: 22px;
+  font-size: clamp(23px,3vw,28px);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.sb-h3 {
+  margin-top: 8px;
+  font-size: 19.5px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.sb > .sb-h:first-child {
+  margin-top: 0;
+}
+.sb-quote {
+  padding: 20px 24px;
+  border-radius: 20px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink);
+  box-shadow: var(--in);
+}
+.sb-ul,
+.sb-ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sb-ul {
+  padding-left: 4px;
+}
+.sb-li {
+  display: flex;
+  gap: 12px;
+}
+.sb-ul > .sb-li::before {
+  content: "";
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: .7em;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.sb-ol {
+  counter-reset: sb-ol;
+}
+.sb-ol > .sb-li {
+  counter-increment: sb-ol;
+}
+.sb-ol > .sb-li::before {
+  content: counter(sb-ol) ".";
+  flex-shrink: 0;
+  min-width: 22px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: .9em;
+  color: var(--accent-ink);
+}
+.sb-fig {
+  margin: 6px 0;
+}
+.sb-fig-well {
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.sb-fig-img {
+  position: relative;
+  width: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+}
+.sb-cap {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+.sb-a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sb-b {
+  font-weight: 700;
+}
+.sb-code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: .86em;
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- Code block (blocks/code-block.tsx) ---------------- */
+
+/* 2a's window: a raised frame, traffic lights, centred language, copy pill, and a terminal
+   body that stays dark (`--term`) in both themes. `color-scheme: dark` on the body keeps its
+   horizontal scrollbar dark in light mode; [data-sb="dark"] sets the colours. */
+.code-window {
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.code-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 10px;
+}
+.code-dots {
+  display: flex;
+  gap: 7px;
+}
+.code-dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,.25);
+}
+.code-lang {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  user-select: none;
+}
+.code-copy {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.code-copy:hover {
+  color: var(--accent-ink);
+}
+.code-copy:active {
+  box-shadow: var(--in-sm);
+}
+.code-pre {
+  color-scheme: dark;
+  overflow-x: auto;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--term);
+  box-shadow: inset 6px 6px 16px rgba(0,0,0,.5), inset -3px -3px 10px rgba(255,255,255,.04);
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: pre;
+}
+
 /* object-contain + the tile's padding: any aspect ratio (wordmark or icon) fits
    fully inside the square without cropping or distortion. */
 .tech-tile-img {
@@ -1040,11 +3256,9 @@ button {
   height: 100%;
   object-fit: contain;
 }
-/* Name label. PORTALLED to document.body and fixed-positioned by the component:
-   `.glass-card` sets overflow:hidden AND backdrop-filter, and backdrop-filter makes
-   the card a containing block even for fixed descendants — so an in-card tooltip is
-   clipped at the card edge. Coordinates come from the tile's bounding rect, clamped
-   to the viewport, so an edge tile's name stays fully readable. */
+/* Name label. PORTALLED to document.body and fixed-positioned by the component, so a
+   card's overflow:hidden never clips it. Coordinates come from the tile's bounding rect,
+   clamped to the viewport, so an edge tile's name stays fully readable. */
 .tech-tile-label {
   position: fixed;
   z-index: 60;
@@ -1060,134 +3274,1244 @@ button {
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
   transition: opacity 0.15s ease;
 }
-/* "+N" overflow indicator — same square footprint as a tile. */
-.tech-tile-more {
-  display: inline-flex;
+/* ====================================================================== */
+/* Phase 3b — remaining pages, Portfolio 2a values verbatim.               */
+/* ====================================================================== */
+
+/* ---------------- /services ---------------- */
+
+.sv-hero {
+  display: flex;
+  justify-content: center;
+  padding: clamp(40px,6vw,72px) clamp(16px,4vw,40px) 24px;
+}
+.sv-hero-grid {
+  display: grid;
+  width: 100%;
+  max-width: 1180px;
+  grid-template-columns: minmax(0,1fr);
+  gap: 44px;
+  align-items: center;
+}
+@media (min-width: 1000px) {
+  .sv-hero-grid {
+    grid-template-columns: minmax(0,1fr) 480px;
+  }
+}
+.sv-hero-text {
+  max-width: 760px;
+}
+.sv-title {
+  font-weight: 700;
+  font-size: clamp(30px,4.8vw,50px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.sv-lede {
+  margin-top: 16px;
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.sv-intro {
+  margin-top: 18px;
+  max-width: 65ch;
+}
+.sv-hero-ctas {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.sv-hero-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  gap: 9px;
+  padding: 13px 23px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Device stage (services/device-showcase.tsx). 2a's three stages: L ≥1000 (monitor, laptop,
+   phone), M 720–999 (laptop, phone), S <720 (phone, centred). */
+.dv-stage {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 330px;
+  justify-self: center;
+}
+.dv-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--term);
+}
+.dv-mon,
+.dv-lap {
+  display: none;
+}
+.dv-mon {
+  position: absolute;
+  top: 0;
+  left: 9%;
+  width: 82%;
+}
+.dv-mon-frame {
+  padding: 9px;
+  border-radius: 16px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.dv-mon-well {
+  aspect-ratio: 16/9;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.dv-mon-well .dv-screen {
+  border-radius: 7px;
+}
+.dv-mon-neck {
+  margin: 0 auto;
+  width: 15%;
+  height: 30px;
+  background: var(--bg);
+  box-shadow: inset 6px 0 8px -6px var(--sd), inset -6px 0 8px -6px var(--hl);
+}
+.dv-mon-foot {
+  margin: 0 auto;
+  width: 36%;
+  height: 10px;
+  border-radius: 8px 8px 4px 4px;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.dv-lap {
+  position: absolute;
+  bottom: 6px;
+  z-index: 2;
+}
+.dv-lap-frame {
+  padding: 8px 8px 10px;
+  border-radius: 14px 14px 4px 4px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.dv-lap-well {
+  aspect-ratio: 16/10;
+  padding: 3px;
+  border-radius: 7px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.dv-lap-well .dv-screen {
+  border-radius: 5px;
+}
+.dv-lap-base {
+  position: relative;
+  margin-left: -7%;
+  width: 114%;
+  height: 13px;
+  border-radius: 3px 3px 12px 12px;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.dv-lap-base > span {
+  position: absolute;
+  top: 0;
+  left: 42%;
+  width: 16%;
+  height: 5px;
+  border-radius: 0 0 6px 6px;
+  box-shadow: var(--in-sm);
+}
+.dv-ph {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 150px;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.dv-ph-frame {
+  position: relative;
+  padding: 6px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.dv-ph-well {
+  aspect-ratio: 9/19.5;
+  padding: 3px;
+  border-radius: 19px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.dv-ph-well .dv-screen {
+  border-radius: 16px;
+}
+.dv-ph-notch {
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  width: 30%;
+  height: 7px;
+  margin-left: -15%;
+  border-radius: 6px;
+  background: var(--term);
+}
+/* S: only the phone shows, so a stage without one collapses. */
+@media (max-width: 719px) {
+  .dv-stage:not([data-ph]) {
+    display: none;
+  }
+}
+@media (min-width: 720px) {
+  .dv-stage {
+    max-width: 560px;
+    height: 320px;
+  }
+  .dv-lap {
+    display: block;
+    left: 2%;
+    width: 68%;
+  }
+  .dv-ph {
+    left: auto;
+    right: 4%;
+    width: 25%;
+    transform: none;
+  }
+}
+@media (min-width: 720px) and (max-width: 999px) {
+  .dv-stage:not([data-lap]):not([data-ph]) {
+    display: none;
+  }
+}
+@media (min-width: 1000px) {
+  .dv-stage {
+    max-width: 100%;
+    height: 350px;
+  }
+  .dv-mon {
+    display: block;
+  }
+  .dv-lap {
+    left: 0;
+    width: 58%;
+  }
+  .dv-ph {
+    right: 0;
+    width: 22%;
+  }
+}
+
+/* Sections under the hero. */
+.sv-body {
+  position: relative;
+  z-index: 3;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px clamp(16px,4vw,40px) 0;
+}
+.sv-sec {
+  margin-top: 64px;
+}
+.sv-sec-first {
+  margin-top: 48px;
+}
+.sv-h2 {
+  font-weight: 700;
+  font-size: clamp(24px,4vw,32px);
+  letter-spacing: -0.025em;
+}
+.sv-sub {
+  margin-top: 8px;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.sv-bento {
+  margin-top: 24px;
+}
+
+/* Features. */
+.sv-ft-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(min(100%,270px),1fr));
+  gap: 22px;
+}
+.sv-ft {
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.sv-ft-n {
+  display: flex;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
-  border-radius: 11px;
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
+  border-radius: 13px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  box-shadow: var(--in-sm);
+}
+.sv-ft-title {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.sv-ft-desc {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--ink-dim);
 }
 
-/* Type/category badge — background/border/text color set per-instance via
-   style (color-mix against the type's hue), shape/spacing shared here. */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  padding: 5px 12px;
+/* Packages, bundles, maintenance. */
+.sv-pk-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(min(100%,300px),1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+.sv-pk {
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+  border-radius: 26px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.sv-pk[data-popular] {
+  box-shadow: var(--out), var(--rim), 0 0 0 2px var(--accent-b);
+}
+.sv-pk-badge {
+  align-self: flex-start;
+  margin-bottom: 14px;
+  padding: 4px 12px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
-  border: 1px solid transparent;
+  background: var(--accent-b);
+  color: var(--on-b);
+  box-shadow: var(--out-sm);
 }
-
-/* Loading skeleton block. Pulse is auto-disabled under prefers-reduced-motion
-   by the global rule above; base opacity stays 1 so it's still visible. */
-.skeleton {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
-  animation: skeleton-pulse 1.4s ease-in-out infinite;
+.sv-pk-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
-@keyframes skeleton-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 0.9;
-  }
+.sv-pk-tag {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-dim);
 }
-
-/* ---------------------------------------------------------------------- */
-/* /mkdir terminal — an ALWAYS-DARK scheme, independent of the site theme. */
-/* Tokens live on .mkdir-term (not under [data-theme]) so light mode never  */
-/* touches the terminal interior.                                          */
-/* ---------------------------------------------------------------------- */
-.mkdir-term {
-  --t-bg: #0a0e0f;
-  --t-bg-2: #10171a;
-  --t-fg: #cdd6d3;
-  --t-dim: #708179;
-  --t-green: #52d18a;
-  --t-accent: #6fb2e6;
-  --t-red: #f2727b;
-  --t-yellow: #e6c07a;
-  --t-brd: rgba(255, 255, 255, 0.09);
-
-  position: relative;
+.sv-pk-price {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: var(--in-sm);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+.sv-pk-amount {
+  white-space: nowrap;
+  font-size: clamp(20px,2.2vw,23px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.sv-pk-suffix {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.sv-pk-list {
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
-  height: clamp(440px, 74dvh, 760px);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--t-bg);
-  color: var(--t-fg);
-  border: 1px solid var(--t-brd);
-  box-shadow:
-    0 30px 80px -40px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(0, 0, 0, 0.3),
-    0 0 60px -20px rgba(111, 178, 230, 0.14);
-  font-family: var(--font-mono), "JetBrains Mono", monospace;
-  font-size: 13.5px;
-  line-height: 1.55;
+  gap: 9px;
+}
+.sv-pk-list li {
+  display: flex;
+  gap: 9px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+.sv-pk-list svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-ink);
+}
+.sv-pk-rule {
+  margin-top: 18px;
+  height: 4px;
+  border-radius: 4px;
+  box-shadow: var(--in-sm);
+}
+.sv-pk-meta {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.sv-pk-meta-row {
+  display: flex;
+  gap: 8px;
+}
+.sv-pk-meta-row dt {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+.sv-pk-meta-row dd {
+  color: var(--ink-dim);
+}
+.sv-pk-cta-wrap {
+  margin-top: auto;
+  padding-top: 24px;
+}
+.sv-pk-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--out-sm);
+  transition: transform .45s var(--spring);
+}
+.sv-pk[data-popular] .sv-pk-cta {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.sv-pk-cta:hover {
+  transform: translateY(-2px);
+}
+.sv-pk-cta:active,
+.sv-pk[data-popular] .sv-pk-cta:active {
+  transform: scale(.97);
+  box-shadow: var(--press);
 }
 
+/* Add-ons. */
+.sv-ad-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(min(100%,340px),1fr));
+  gap: 22px;
+  align-items: start;
+}
+.sv-ad {
+  padding: 22px 22px 18px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.sv-ad-label {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+.sv-ad-list {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sv-ad-item {
+  padding: 11px 14px;
+  border-radius: 14px;
+  box-shadow: var(--in-sm);
+}
+.sv-ad-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sv-ad-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sv-ad-pop {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  background: var(--accent-b);
+  color: var(--on-b);
+}
+.sv-ad-price {
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 12.5px;
+}
+.sv-ad-sub {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+/* Process. */
+.sv-pr-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(min(100%,200px),1fr));
+  gap: 18px;
+}
+.sv-pr {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.sv-pr-ring {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--in-sm);
+}
+.sv-pr-n {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13.5px;
+  font-weight: 700;
+  background: var(--accent-b);
+  color: var(--on-b);
+  box-shadow: var(--out-sm);
+}
+.sv-pr-title {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+.sv-pr-desc {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+/* FAQ. The whole header row is the button, so 2a's card padding sits on it. */
+.sv-faq {
+  max-width: 900px;
+}
+.sv-faq-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sv-faq-item {
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.sv-faq-item:hover {
+  transform: translateY(-2px);
+}
+.sv-faq-item:active {
+  transform: scale(.99);
+}
+.sv-faq-q {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 22px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--ink);
+}
+.sv-faq-text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.sv-faq-chev {
+  width: 30px;
+  height: 30px;
+}
+.sv-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows .3s ease, visibility 0s .3s;
+}
+.sv-faq-item[data-open] .sv-faq-panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows .3s ease;
+}
+.sv-faq-panel > div {
+  overflow: hidden;
+}
+.sv-faq-a {
+  margin-top: -6px;
+  padding: 0 20px 16px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-dim);
+}
+
+/* ---------------- /guestbook ---------------- */
+
+.gb {
+  position: relative;
+  z-index: 3;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px clamp(16px,4vw,40px) 20px;
+}
+.gb-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 36px;
+  align-items: start;
+}
+.gb-form-col {
+  align-self: start;
+  scroll-margin-top: var(--sticky-top);
+}
+@media (min-width: 960px) {
+  .gb-grid {
+    grid-template-columns: 420px minmax(0,1fr);
+  }
+  .gb-form-col {
+    position: sticky;
+    top: var(--sticky-top);
+  }
+}
+.gb-card {
+  position: relative;
+  border-radius: 28px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.gb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+}
+@media (min-width: 720px) {
+  .gb-form {
+    padding: 24px;
+  }
+}
+.gb-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.gb-req {
+  color: var(--accent-ink);
+}
+.gb-opt {
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+.gb-field {
+  display: block;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  outline: none;
+  border-radius: 14px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.gb-field:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gb-field:disabled {
+  opacity: .5;
+}
+.gb-textarea {
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 16px;
+  line-height: 1.55;
+}
+.gb-select {
+  padding: 11px 12px;
+  cursor: pointer;
+}
+.gb-help {
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+}
+.gb-err-line {
+  color: transparent;
+}
+.gb-err-line[data-show] {
+  color: #C8463B;
+}
+.gb-count {
+  color: var(--ink-faint);
+}
+.gb-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+  gap: 14px;
+}
+.gb-check {
+  position: relative;
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--ink-dim);
+}
+.gb-check input {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.gb-box {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+  color: var(--on-accent);
+}
+.gb-box svg {
+  opacity: 0;
+}
+.gb-check input:checked + .gb-box {
+  background: var(--accent);
+  box-shadow: var(--out-sm);
+}
+.gb-check input:checked + .gb-box svg {
+  opacity: 1;
+}
+.gb-check input:focus-visible + .gb-box {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gb-error {
+  font-size: 13px;
+  color: #C8463B;
+}
+.gb-submit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.gb-submit {
+  flex-shrink: 0;
+  white-space: nowrap;
+  gap: 9px;
+  padding: 13px 22px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gb-submit:disabled {
+  opacity: .6;
+  cursor: default;
+}
+.gb-hint {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+.gb-sent {
+  padding: 34px 28px;
+  text-align: center;
+}
+.gb-sent-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.gb-sent-text {
+  margin: 8px auto 0;
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.gb-again {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.gb-h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.gb-none {
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+.gb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.gb-msg {
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.gb-pin {
+  margin-bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.gb-pin > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.gb-msg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.gb-name {
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+}
+.gb-cat {
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.gb-date {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.gb-text {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.62;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.gb-reply {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: var(--in-sm);
+}
+.gb-reply-label {
+  margin-bottom: 4px;
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.gb-reply-text {
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-line;
+  color: var(--ink-dim);
+}
+/* Floating "Send Message" (guestbook/back-to-form.tsx): 2a's floating-button recipe as a pill,
+   single-column layout only. Above the safe-area inset so it clears iOS home indicators. */
+.gb-float {
+  position: fixed;
+  right: clamp(16px,3vw,32px);
+  bottom: calc(clamp(16px,3vw,32px) + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  /* Portalled to <body>, so it was never inside a 2a surface: it keeps the 1.5 it has always
+     rendered with (46.5px tall), now that `normal` is the document default. */
+  line-height: 1.5;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .45s var(--spring);
+}
+.gb-float:hover {
+  transform: translateY(-3px);
+}
+.gb-float:active {
+  transform: scale(.95);
+  box-shadow: var(--press);
+}
+@media (min-width: 960px) {
+  .gb-float {
+    display: none;
+  }
+}
+
+/* ---------------- /about ---------------- */
+
+.ab-head {
+  max-width: 968px;
+  margin: 0 auto;
+  padding: clamp(40px,6vw,64px) clamp(16px,4vw,24px) 0;
+}
+.ab-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 40px;
+  align-items: start;
+}
+.ab-photo {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  justify-self: center;
+  margin-top: 18px;
+}
+@media (min-width: 900px) {
+  .ab-head {
+    max-width: calc(1180px + 2 * clamp(10px,2.5vw,20px));
+    padding-left: clamp(10px,2.5vw,20px);
+    padding-right: clamp(10px,2.5vw,20px);
+  }
+  .ab-grid {
+    grid-template-columns: 298px minmax(0,1fr);
+  }
+  .ab-photo {
+    width: 280px;
+    justify-self: start;
+    margin-left: 18px;
+    margin-top: calc(18px + clamp(34px,6vw,50px) * 0.16);
+  }
+}
+/* The dish: two concave rings behind the frame (terraces on). */
+.ab-dish {
+  position: absolute;
+  inset: -18px;
+  border-radius: 44px;
+  padding: 9px;
+  box-shadow: var(--in-deco);
+}
+.ab-dish > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 36px;
+  box-shadow: var(--in-deco);
+}
+.ab-frame {
+  position: relative;
+  padding: 10px;
+  border-radius: 30px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
+.ab-well {
+  padding: 6px;
+  border-radius: 22px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.ab-img {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg));
+}
+.ab-text {
+  min-width: 0;
+  max-width: 760px;
+}
+.ab-title {
+  font-weight: 700;
+  font-size: clamp(34px,6vw,50px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.ab-sub {
+  margin-top: 16px;
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+.ab-body {
+  margin-top: 20px;
+}
+.sb-about {
+  gap: 14px;
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.sb-intro {
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+/* Skills (about/skills-section.tsx), in the Experiences column. */
+/* In 2a Skills sits inside the Experiences section, before its 10px bottom padding, so that
+   padding moves below Skills here. */
+.sk {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+  padding: 0 clamp(16px,4vw,40px) 10px;
+}
+.sk-inner {
+  width: 100%;
+  max-width: 820px;
+}
+.sk-title {
+  margin: 56px 0 22px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.sk-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.sk-label {
+  margin-bottom: 12px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.sk-logos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sk-logos:not(:last-child) {
+  margin-bottom: 12px;
+}
+.sk-logo {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  padding: 11px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  background: var(--bg);
+  box-shadow: var(--out-sm), var(--rim);
+}
+.sk-logo .tech-tile-img {
+  width: 30px;
+  height: 30px;
+}
+.sk-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.sk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.sk-level {
+  font-size: 10.5px;
+  text-transform: capitalize;
+  color: var(--accent-ink);
+}
+
+/* ---------------- /certifications ---------------- */
+
+/* 2a's narrower header for certifications. */
+.pg-head[data-w="928"] {
+  max-width: 928px;
+  padding-left: clamp(16px,4vw,24px);
+  padding-right: clamp(16px,4vw,24px);
+}
+.pg-head[data-w="928"] .pg-sub {
+  max-width: 56ch;
+}
+.ct {
+  position: relative;
+  z-index: 3;
+  max-width: 928px;
+  margin: 0 auto;
+  padding: 36px clamp(16px,4vw,24px) 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.ct-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ct-none {
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+
+/* ---------------- /mkdir terminal (mkdir/terminal.tsx) ---------------- */
+
+/* 2a's window over an always-dark screen. The tone tokens live on the window, so the site
+   theme never reaches the terminal interior. */
+.term-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(32px,5vw,52px) clamp(10px,3vw,24px) 24px;
+}
+.term-win {
+  --t-fg: #C5CCD8;
+  --t-dim: #7D8796;
+  --t-green: #7CC79A;
+  --t-accent: #8EB0F2;
+  --t-red: #F08C7E;
+  --t-yellow: #D8A94A;
+  --t-input: #DCE2EC;
+
+  padding: 10px;
+  border-radius: 28px;
+  background: var(--bg);
+  box-shadow: var(--out-lg), var(--rim);
+}
 .term-titlebar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--t-bg-2);
-  border-bottom: 1px solid var(--t-brd);
-  flex: 0 0 auto;
+  gap: 14px;
+  padding: 6px 10px 12px;
 }
 .term-dots {
-  display: inline-flex;
+  display: flex;
   gap: 7px;
 }
 .term-dots i {
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  background: #3a4448;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,.25);
 }
 .term-dots i:nth-child(1) {
-  background: #f2727b;
+  background: #D9695C;
 }
 .term-dots i:nth-child(2) {
-  background: #e6c07a;
+  background: #D8A94A;
 }
 .term-dots i:nth-child(3) {
-  background: #52d18a;
+  background: #5FA878;
 }
 .term-title {
-  font-size: 12px;
-  color: var(--t-dim);
+  flex: 1;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-dim);
 }
-
+.term-spacer {
+  width: 50px;
+}
+.term-screen {
+  position: relative;
+}
+/* position:relative contains the sr-only input label, which would otherwise escape the
+   scroll box and lengthen the page. */
 .term-body {
-  flex: 1 1 auto;
-  min-height: 0;
+  position: relative;
+  height: 460px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 14px 16px 8px;
+  padding: 20px 22px;
+  border-radius: 20px;
+  background: var(--term);
+  box-shadow: inset 6px 6px 16px rgba(0,0,0,.5), inset -3px -3px 10px rgba(255,255,255,.04);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--t-fg);
   cursor: text;
-  /* faint top vignette/glow, tasteful — not scanlines */
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgba(111, 178, 230, 0.06), transparent 60%),
-    var(--t-bg);
 }
-
 .term-line {
+  min-height: 1.65em;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -1195,7 +4519,6 @@ button {
   white-space: pre;
   overflow-x: auto;
 }
-
 .t-fg {
   color: var(--t-fg);
 }
@@ -1214,11 +4537,9 @@ button {
 .t-yellow {
   color: var(--t-yellow);
 }
-
 .term-inputline {
   display: flex;
   align-items: flex-start;
-  padding-bottom: 6px;
 }
 .term-prompt {
   white-space: pre;
@@ -1231,6 +4552,7 @@ button {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
+  color: var(--t-input);
 }
 .term-realinput {
   display: block;
@@ -1257,11 +4579,11 @@ button {
 .term-cursor {
   border-radius: 1px;
   background: var(--t-accent);
-  color: var(--t-bg);
+  color: var(--term);
 }
 .term-inputline:not(:focus-within) .term-cursor {
   background: color-mix(in srgb, var(--t-accent) 45%, transparent);
-  color: var(--t-fg);
+  color: var(--t-input);
 }
 .term-inputline:focus-within .term-cursor {
   animation: term-blink 1.06s step-end infinite;
@@ -1271,14 +4593,15 @@ button {
 @keyframes term-blink {
   50% {
     background: transparent;
-    color: var(--t-fg);
+    color: var(--t-input);
   }
 }
-
 .term-app {
   position: absolute;
   inset: 0;
   z-index: 5;
+  overflow: hidden;
+  border-radius: 20px;
   background: #05080b;
   outline: none;
 }
@@ -1297,8 +4620,8 @@ button {
   padding: 6px 12px;
   font-size: 12px;
   color: var(--t-fg);
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid var(--t-brd);
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.09);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -1306,26 +4629,466 @@ button {
   border-color: var(--t-accent);
   color: var(--t-accent);
 }
-
 .term-chips {
+  margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--t-bg-2);
-  border-top: 1px solid var(--t-brd);
-  flex: 0 0 auto;
+  justify-content: center;
+  gap: 10px;
 }
 .term-chip {
-  padding: 4px 11px;
-  font-size: 12px;
-  color: var(--t-dim);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--t-brd);
+  padding: 8px 15px;
+  border: none;
   border-radius: 999px;
   cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+  transition: transform .4s var(--spring);
 }
 .term-chip:hover {
-  color: var(--t-accent);
-  border-color: var(--t-accent);
+  transform: translateY(-2px);
+  color: var(--accent-ink);
+}
+.term-chip:active {
+  transform: scale(.95);
+  box-shadow: var(--in-sm);
+}
+
+/* ---------------- 404 (app/not-found.tsx): 2a's CTA nest ---------------- */
+
+.nf {
+  position: relative;
+  z-index: 3;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: clamp(48px,8vw,96px) clamp(12px,3vw,40px) 24px;
+}
+.nf-code {
+  font-size: 13px;
+  color: var(--accent-ink);
+}
+.nf-title {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: clamp(28px,5vw,38px);
+  letter-spacing: -0.03em;
+}
+.nf-btn {
+  gap: 9px;
+  padding: 13px 24px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------------- /tours, /tours/[slug] (not in 2a; its recipes) ---------------- */
+
+.tr {
+  position: relative;
+  z-index: 3;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px clamp(16px,4vw,40px) 20px;
+}
+.tr-hero-well {
+  padding: 10px;
+  border-radius: 28px;
+  background: var(--bg);
+  box-shadow: var(--in);
+}
+.tr-hero {
+  position: relative;
+  aspect-ratio: 21/9;
+  overflow: hidden;
+  border-radius: 21px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+.tr-intro {
+  margin-top: 28px;
+  max-width: 760px;
+}
+.tr-cta-row {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.tr-btn {
+  gap: 9px;
+  padding: 13px 23px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.tr-cta-note {
+  max-width: 36ch;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.tr-why {
+  margin-top: 40px;
+  padding: 24px 26px;
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.tr-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 22px;
+}
+@media (min-width: 768px) {
+  .tr-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+.tr-grid-home {
+  margin-top: 0;
+}
+.tr-none {
+  margin-top: 40px;
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+
+/* Tour card (cards/tour-card.tsx). */
+.tc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px;
+  border-radius: 26px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+  transition: transform .55s var(--spring);
+}
+.tc:hover {
+  transform: translateY(-5px);
+}
+.tc-cover-well {
+  flex-shrink: 0;
+  padding: 5px;
+  border-radius: 20px;
+  box-shadow: var(--in-sm);
+}
+.tc-cover {
+  aspect-ratio: 16/9;
+  width: 100%;
+}
+.tc-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 4px 10px 8px;
+}
+.tc-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tc-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.tc-title a:hover {
+  color: var(--accent-ink);
+}
+.tc-price {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 8px 12px;
+  border-radius: 14px;
+  box-shadow: var(--in-sm);
+}
+.tc-from {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+.tc-amount {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent-ink);
+}
+.tc-desc {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+.tc-chips {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  box-shadow: var(--in-sm);
+}
+.tc-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+}
+.tc-group {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.tc-btn {
+  margin-left: auto;
+  gap: 7px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Tour detail. */
+.tr-meta {
+  margin-top: 20px;
+}
+.tr-know {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 24px 32px;
+}
+@media (min-width: 640px) {
+  .tr-know {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+.tr-prices {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.tr-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.tr-price-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.tr-price-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+.tr-price-amount {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent-ink);
+}
+.tr-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.tr-book {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Bullet lists (tours/info-list.tsx). */
+.il-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.il-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.il-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+.il-list li > span {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.il[data-tone="muted"] .il-list li > span {
+  background: var(--ink-faint);
+}
+
+/* Route timeline (tours/tour-route.tsx): 2a's experience rail. */
+.rt {
+  position: relative;
+}
+.rt-rail {
+  position: absolute;
+  top: 10px;
+  bottom: 24px;
+  left: 21px;
+  width: 6px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+}
+.rt-stop {
+  position: relative;
+  padding: 0 0 20px 60px;
+}
+.rt-node {
+  position: absolute;
+  top: 24px;
+  left: 14px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--out-sm);
+}
+.rt-node > span {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--accent-b);
+}
+.rt-card {
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: var(--bg);
+  box-shadow: var(--out), var(--rim);
+}
+.rt-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rt-title {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.rt-loc {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.rt-map {
+  width: 36px;
+  height: 36px;
+}
+.rt-img {
+  margin-top: 12px;
+  aspect-ratio: 16/9;
+  width: 100%;
+}
+.rt-desc {
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+}
+
+/* ---------------- Loading skeletons (each route loading.tsx, ui/skeleton.tsx) ---------------- */
+
+/* An inset well that breathes. The pulse is switched off under prefers-reduced-motion by the
+   global rule; base opacity stays visible. Placed after the page rules so it wins over a
+   layout class it shares an element with (e.g. `.ad-aside`). */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--in-sm);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.sk-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .bento[data-layout="projects"] > .sk-tile {
+    grid-column: span 2;
+  }
+  .bento[data-layout="projects"] > .sk-tile[data-rows="2"] {
+    grid-row: span 2;
+  }
+}
+.sk-af-panel {
+  height: 150px;
+}
+@media (min-width: 1000px) {
+  .sk-af-panel {
+    height: 440px;
+  }
+}
+/* Keeps the aside's own sticky positioning (.skeleton's position:relative would turn its
+   sticky top offset into a 100px shift). */
+.sk-ad-aside {
+  position: sticky;
+  height: 320px;
+}
+.sk-stage {
+  width: 100%;
+  max-width: 320px;
+  height: 330px;
+  justify-self: center;
+}
+@media (min-width: 720px) {
+  .sk-stage {
+    max-width: 560px;
+    height: 320px;
+  }
+}
+@media (min-width: 1000px) {
+  .sk-stage {
+    max-width: 100%;
+    height: 350px;
+  }
 }

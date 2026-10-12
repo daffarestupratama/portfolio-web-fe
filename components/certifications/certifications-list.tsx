@@ -32,14 +32,8 @@ export function CertificationsList({ certifications }: { certifications: Certifi
   return (
     <>
       {showFilter && (
-        <div className="mb-6 flex flex-wrap gap-1.5" role="group" aria-label="Filter by type">
-          <button
-            type="button"
-            onClick={() => setKind(ALL)}
-            data-active={kind === ALL}
-            className="tab-btn"
-            style={{ fontSize: "12px", padding: "6px 13px" }}
-          >
+        <div className="ct-chips" role="group" aria-label="Filter by type">
+          <button type="button" onClick={() => setKind(ALL)} aria-pressed={kind === ALL} className="nm-chip">
             All
           </button>
           {kinds.map((k) => (
@@ -47,9 +41,8 @@ export function CertificationsList({ certifications }: { certifications: Certifi
               key={k.value}
               type="button"
               onClick={() => setKind(k.value)}
-              data-active={kind === k.value}
-              className="tab-btn"
-              style={{ fontSize: "12px", padding: "6px 13px" }}
+              aria-pressed={kind === k.value}
+              className="nm-chip"
             >
               {k.label}
             </button>
@@ -58,15 +51,11 @@ export function CertificationsList({ certifications }: { certifications: Certifi
       )}
 
       {visible.length === 0 ? (
-        <p className="text-sm" style={{ color: "var(--ink-faint)" }}>
-          No certifications match this filter.
-        </p>
+        <p className="pg-empty">No certifications match this filter.</p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {visible.map((c) => (
-            <CertificationCard key={c.id} certification={c} defaultExpanded={defaultExpanded} headingLevel="h2" />
-          ))}
-        </div>
+        visible.map((c) => (
+          <CertificationCard key={c.id} certification={c} defaultExpanded={defaultExpanded} headingLevel="h2" />
+        ))
       )}
     </>
   );

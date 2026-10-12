@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { StrapiImage } from "@/components/ui/strapi-image";
 import { titleCase } from "@/lib/mappers";
 import type { MappedImage } from "@/content/home";
@@ -17,28 +18,38 @@ export interface TileItem {
 const EDGE_PAD = 8;
 const GAP = 8;
 
-function TextChip({ label }: { label: string }) {
-  return (
-    <span className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-      {label}
-    </span>
-  );
+/** `card`: 2a's 26px white tile on project cards. `tile46`: 2a's 46px raised tile on the
+ *  project page. `skill`: 2a's 52px tile in the about page's Skills groups. */
+export type TechTileVariant = "card" | "tile46" | "skill";
+
+const VARIANT_CLASS: Record<TechTileVariant, string> = {
+  card: "pc-logo",
+  tile46: "pj-logo",
+  skill: "sk-logo",
+};
+
+function TextChip({ label, variant }: { label: string; variant: TechTileVariant }) {
+  if (variant === "card") return <span className="pc-chip mono">{label}</span>;
+  if (variant === "tile46") return <span className="pj-chip mono">{label}</span>;
+  return <span className="sk-pill">{label}</span>;
 }
 
 interface TechTileProps {
   item: TileItem;
-  /** Square edge length in px. */
-  size: number;
+  variant: TechTileVariant;
+  /** When set (project cards), activating the tile with a mouse or the keyboard opens this
+   *  URL like the rest of the card; Ctrl/⌘/middle click opens it in a new tab. A touch or pen
+   *  tap still only toggles the name, so a phone user can read it. */
+  href?: string;
 }
 
 /** A technology as a uniform square logo tile. The name (plus level when given) is always
  *  exposed via aria-label, and shown visually on hover, keyboard focus, or tap.
  *
- *  The label is PORTALLED to document.body with fixed positioning: `.glass-card` sets both
- *  `overflow:hidden` and `backdrop-filter`, and backdrop-filter makes the card a containing
- *  block even for fixed-position descendants — so an in-card tooltip gets clipped at the
- *  card edge (the same trap the gallery lightbox hit). */
-export function TechTile({ item, size }: TechTileProps) {
+ *  The label is PORTALLED to document.body with fixed positioning, so a card's
+ *  `overflow:hidden` can never clip it at the card edge. */
+export function TechTile({ item, variant, href }: TechTileProps) {
+  const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -79,7 +90,7 @@ export function TechTile({ item, size }: TechTileProps) {
     };
   }, [visible, place]);
 
-  if (!item.logo) return <TextChip label={item.name} />;
+  if (!item.logo) return <TextChip label={item.name} variant={variant} />;
 
   return (
     <>
@@ -98,9 +109,20 @@ export function TechTile({ item, size }: TechTileProps) {
         onPointerLeave={(e) => {
           if (e.pointerType === "mouse") setVisible(false);
         }}
-        // Tap toggles the label; this is a button (not a link) so it never navigates.
-        onClick={() => {
-          if (lastPointer.current !== "mouse") setVisible((v) => !v);
+        // Tap toggles the label. A mouse click, or Enter/Space (detail 0), follows `href` when
+        // the tile sits on a card that links somewhere; without `href` it never navigates.
+        onClick={(e) => {
+          const keyboard = e.detail === 0;
+          if (!keyboard && lastPointer.current !== "mouse") {
+            setVisible((v) => !v);
+            return;
+          }
+          if (!href) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey) window.open(href, "_blank", "noopener");
+          else router.push(href);
+        }}
+        onAuxClick={(e) => {
+          if (href && e.button === 1) window.open(href, "_blank", "noopener");
         }}
         // Only *keyboard* focus reveals the label. A tap also focuses the button, and an
         // unconditional show here would immediately be toggled back off by the click that
@@ -110,9 +132,7 @@ export function TechTile({ item, size }: TechTileProps) {
         }}
         onBlur={() => setVisible(false)}
         aria-label={label}
-        className="tech-tile"
-        // Padding in px (not %) so it scales with the tile instead of the container.
-        style={{ width: size, height: size, padding: Math.round(size * 0.18) }}
+        className={VARIANT_CLASS[variant]}
       >
         <StrapiImage
           src={item.logo.url}
@@ -141,38 +161,5 @@ export function TechTile({ item, size }: TechTileProps) {
           document.body,
         )}
     </>
-  );
-}
-
-interface TechTileRowProps {
-  items: TileItem[];
-  size?: number;
-  /** Visible tile cap; the remainder collapses into a "+N" tile. */
-  max?: number;
-}
-
-export function TechTileRow({ items, size = 44, max = Number.POSITIVE_INFINITY }: TechTileRowProps) {
-  if (items.length === 0) return null;
-  const visible = items.slice(0, max);
-  const hidden = items.length - visible.length;
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {visible.map((item) => (
-        <TechTile key={item.name} item={item} size={size} />
-      ))}
-      {hidden > 0 && (
-        <span
-          className="tech-tile-more mono"
-          style={{ width: size, height: size }}
-          aria-label={`${hidden} more ${hidden === 1 ? "technology" : "technologies"}: ${items
-            .slice(max)
-            .map((i) => i.name)
-            .join(", ")}`}
-        >
-          +{hidden}
-        </span>
-      )}
-    </div>
   );
 }

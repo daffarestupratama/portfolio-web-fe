@@ -3,7 +3,7 @@ import { getAboutPage } from "@/content/about";
 import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata, mappedImageToOg } from "@/lib/seo";
 import { StrapiBlocks } from "@/components/blocks/strapi-blocks";
-import { CoverImage } from "@/components/ui/cover-image";
+import { StrapiImage } from "@/components/ui/strapi-image";
 import { SkillsSection } from "@/components/about/skills-section";
 import { Experiences } from "@/components/sections/experiences";
 import { getFeaturedCertifications } from "@/content/certifications";
@@ -30,52 +30,59 @@ export default async function AboutPage() {
     getSiteSettings(),
     getFeaturedCertifications(),
   ]);
+  const photo = about.profileImage;
 
   return (
-    <main className="relative z-[3] pt-28 pb-16 sm:pt-32">
-      {/* Top: square profile image on the left, all text on the right (stacks on mobile). */}
-      <div className="mx-auto w-full max-w-[920px] px-[22px]">
-        <div className="grid gap-8 md:grid-cols-[260px_minmax(0,1fr)] md:items-start">
-          {about.profileImage && (
-            // 2:3 matches the source photo (844×1264), so the whole portrait is shown
-            // instead of a square crop that cut off the top of the head.
-            <CoverImage
-              image={about.profileImage}
-              variant="article"
-              label={about.title || "Profile photo"}
-              className="mx-auto aspect-[2/3] w-full max-w-[260px]"
-              sizes="(max-width: 768px) 260px, 260px"
-              priority
-            />
+    <main className="relative z-[3]">
+      {/* 2a: portrait left, text right from 900px; stacked and centred below. */}
+      <header className="ab-head">
+        <div className="ab-grid">
+          {photo && (
+            <div className="ab-photo">
+              <div aria-hidden="true" className="ab-dish">
+                <div />
+              </div>
+              <div className="ab-frame">
+                <div className="ab-well">
+                  {/* The image box takes the photo's own ratio (2a's 2/3 when unknown), so
+                      `cover` shows the whole portrait and never crops it. */}
+                  <div
+                    className="ab-img"
+                    style={{ aspectRatio: photo.width && photo.height ? `${photo.width} / ${photo.height}` : "2 / 3" }}
+                  >
+                    <StrapiImage
+                      src={photo.url}
+                      alt={photo.alt || about.title || "Profile photo"}
+                      fill
+                      sizes="280px"
+                      priority
+                      style={{ objectFit: "cover", objectPosition: "center top" }}
+                      fallback={null}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
 
-          <div className="min-w-0">
-            <h1 className="font-bold" style={{ fontSize: "clamp(30px,4.5vw,48px)", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
-              {about.title}
-            </h1>
-            {about.subtitle && (
-              <p className="mt-4 text-[16px]" style={{ lineHeight: 1.62, color: "var(--ink-dim)" }}>
-                {about.subtitle}
-              </p>
-            )}
+          <div className="ab-text">
+            <h1 className="ab-title">{about.title}</h1>
+            {about.subtitle && <p className="ab-sub">{about.subtitle}</p>}
             {about.body && (
-              <div className="mt-6">
-                <StrapiBlocks content={about.body} />
+              <div className="ab-body">
+                <StrapiBlocks content={about.body} variant="about" />
               </div>
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       <Experiences experiences={about.experiences} certifications={certifications} />
 
-      <div className="mx-auto w-full max-w-[820px] px-[22px]">
-        <SkillsSection groups={about.skillGroups} />
-      </div>
+      <SkillsSection groups={about.skillGroups} />
 
-      {/* Outside the 820px wrapper: the component centres its own full-width card, the
-          same way it does on the homepage and /services. It renders `id="contact"` and
-          this is the page's only instance, so the anchor stays unique. */}
+      {/* It renders `id="contact"` and this is the page's only instance, so the anchor stays
+          unique. */}
       <ContactCTA
         email={site.email}
         whatsappUrl={site.whatsappUrl}

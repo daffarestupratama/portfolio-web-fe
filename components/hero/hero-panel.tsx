@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IndonesiaMap } from "@/lib/geo/indonesia";
 
 const BAR_COUNT = 6;
@@ -67,11 +67,134 @@ function randomSlices(): number[] {
 
 const DONUT_R = 15.5;
 const DONUT_C = 2 * Math.PI * DONUT_R;
-const SLICE_TONES = ["var(--accent)", "var(--accent-2)", "var(--green)", "var(--teal)"];
+/** 2a's donut tones, in slice order. */
+const SLICE_TONES = ["var(--accent)", "var(--accent-b)", "var(--accent-2)", "color-mix(in srgb, var(--accent-b) 45%, var(--bg))"];
 
-export function HeroPanel({ map }: { map: IndonesiaMap }) {
+/** The land, in its own SVG and its own React subtree: ~321 pre-serialised paths that never
+ *  change, so neither a pluck frame nor a re-render of the panel ever repaints or re-inserts
+ *  them. Memoised on the markup string. */
+const MapLand = memo(function MapLand({ viewBox, markup }: { viewBox: string; markup: string }) {
+  return (
+    <svg viewBox={viewBox} className="block h-auto w-full" aria-hidden="true">
+      {/* Injected as one pre-serialised string rather than ~321 React <path> elements:
+          measured ~6.3ms vs ~0.02ms of server CPU (the cost scales with element count),
+          which matters on the Workers free plan's 10ms budget. Content is build-time
+          generated numeric path data — see lib/geo/indonesia-geometry.ts. */}
+      <g className="hero-map-land" dangerouslySetInnerHTML={{ __html: markup }} />
+    </svg>
+  );
+});
+
+/** Charts (decorative, deliberately unlabelled), with their own state, so a tick re-renders
+ *  only these two small SVGs and never the map. They animate only while on screen and while
+ *  the tab is visible, and never under reduced motion. */
+function HeroCharts() {
   const [bars, setBars] = useState(INITIAL_BARS);
   const [slices, setSlices] = useState(INITIAL_SLICES);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+    let firstFrame = 0;
+    let onScreen = false;
+    const tick = () => {
+      setBars(randomBars());
+      setSlices(randomSlices());
+    };
+    const start = () => {
+      if (timer) return;
+      // setInterval only fires its FIRST callback after a whole period, so with a 2.6s tick
+      // the charts sat frozen for ~3s after load while the map was already animating. Fire
+      // one tick straight away — through rAF, so the deterministic initial values have been
+      // painted and the CSS transition animates instead of snapping to the new values.
+      // `start()` early-returns while a timer exists, so this runs once per becoming-visible
+      // rather than on every observer callback.
+      firstFrame = requestAnimationFrame(tick);
+      timer = setInterval(tick, TICK_MS);
+    };
+    const stop = () => {
+      if (firstFrame) {
+        cancelAnimationFrame(firstFrame);
+        firstFrame = 0;
+      }
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+    };
+    const sync = () => (onScreen && !document.hidden ? start() : stop());
+
+    const observer = new IntersectionObserver((entries) => {
+      onScreen = entries.some((e) => e.isIntersecting);
+      sync();
+    });
+    observer.observe(root);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      stop();
+    };
+  }, []);
+
+  return (
+    // Side by side at every width, in 2a's 1.55fr / 1fr split.
+    <div ref={rootRef} className="hero-charts">
+      <div className="hero-chart">
+        <div className="hero-chart-label mono">throughput</div>
+        <svg viewBox="0 0 120 34" className="block h-auto w-full" aria-hidden="true">
+          {bars.map((v, i) => (
+            <rect
+              key={i}
+              // 6 bars: pitch 21 × 5 + width 15 = exactly the 120-unit viewBox.
+              x={i * 21}
+              y={0}
+              width={15}
+              height={34}
+              rx={3}
+              className="hero-bar"
+              // scaleY from the bottom edge: universally supported, unlike CSS
+              // transitions on the SVG `y`/`height` geometry properties.
+              style={{ transform: `scaleY(${v})`, fill: i % 2 ? "var(--accent-b)" : "var(--accent)" }}
+            />
+          ))}
+        </svg>
+      </div>
+
+      <div className="hero-chart hero-chart-mix">
+        <div className="hero-chart-label hero-chart-label-abs mono">mix</div>
+        {/* 2a sizes the donut to its card: a flexible box with the SVG laid over it. */}
+        <div className="hero-donut-box">
+          <svg viewBox="0 0 44 44" className="hero-donut" aria-hidden="true">
+            <circle cx={22} cy={22} r={DONUT_R} className="hero-donut-track" />
+            {slices.map((v, i) => {
+              const offset = slices.slice(0, i).reduce((a, b) => a + b, 0);
+              return (
+                <circle
+                  key={i}
+                  cx={22}
+                  cy={22}
+                  r={DONUT_R}
+                  className="hero-donut-slice"
+                  style={{
+                    stroke: SLICE_TONES[i % SLICE_TONES.length],
+                    strokeDasharray: `${(v * DONUT_C).toFixed(2)} ${DONUT_C.toFixed(2)}`,
+                    strokeDashoffset: `${(-offset * DONUT_C).toFixed(2)}`,
+                  }}
+                />
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HeroPanel({ map }: { map: IndonesiaMap }) {
   const [active, setActive] = useState<number | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   /** Pointer type of the most recent press, so click-toggle only applies to touch/pen. */
@@ -156,7 +279,7 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
     const schedule = () => {
       const delay = AUTO_PLUCK_MIN_MS + Math.random() * (AUTO_PLUCK_MAX_MS - AUTO_PLUCK_MIN_MS);
       timer = setTimeout(() => {
-        if (onScreen.current) {
+        if (onScreen.current && !document.hidden) {
           // Partial Fisher–Yates over a copy: draws N *distinct* edges in one pass, where
           // independent draws could pick the same edge twice and waste half the tick.
           const pool = autoEdges.slice();
@@ -178,234 +301,132 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
     };
   }, [autoEdges, pluck]);
 
-  // Animate only while the panel is on screen, and never under reduced motion.
+  // Track whether the panel is on screen; the auto-pluck timer reads it.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    let timer: ReturnType<typeof setInterval> | null = null;
-    let firstFrame = 0;
-    const tick = () => {
-      setBars(randomBars());
-      setSlices(randomSlices());
-    };
-    const start = () => {
-      if (timer) return;
-      // setInterval only fires its FIRST callback after a whole period, so with a 2.6s tick
-      // the charts sat frozen for ~3s after load while the map was already animating. Fire
-      // one tick straight away — through rAF, so the deterministic initial values have been
-      // painted and the CSS transition animates instead of snapping to the new values.
-      // `start()` early-returns while a timer exists, so this runs once per becoming-visible
-      // rather than on every observer callback.
-      firstFrame = requestAnimationFrame(tick);
-      timer = setInterval(tick, TICK_MS);
-    };
-    const stop = () => {
-      if (firstFrame) {
-        cancelAnimationFrame(firstFrame);
-        firstFrame = 0;
-      }
-      if (!timer) return;
-      clearInterval(timer);
-      timer = null;
-    };
-
     const observer = new IntersectionObserver((entries) => {
-      const visible = entries.some((e) => e.isIntersecting);
-      // Also gates the auto-pluck timer (see the pluck engine above).
-      onScreen.current = visible;
-      if (visible) start();
-      else stop();
+      onScreen.current = entries.some((e) => e.isIntersecting);
     });
     observer.observe(root);
-    return () => {
-      observer.disconnect();
-      stop();
-    };
+    return () => observer.disconnect();
   }, []);
 
   const activeNode = active !== null ? map.nodes[active] : null;
 
   return (
-    <div ref={rootRef} className="relative z-[2]">
-      {/* ---------- Map ---------- */}
-      <div className="relative">
-        <svg
-          viewBox={map.viewBox}
-          className="block h-auto w-full"
-          role="img"
-          aria-label="Map of Indonesia with a network of major cities"
-        >
-          {/* Injected as one pre-serialised string rather than ~321 React <path> elements:
-              measured ~6.3ms vs ~0.02ms of server CPU (the cost scales with element count),
-              which matters on the Workers free plan's 10ms budget. Content is build-time
-              generated numeric path data — see lib/geo/indonesia-geometry.ts. */}
-          <g className="hero-map-land" dangerouslySetInnerHTML={{ __html: map.markup }} />
-
-          <g className="hero-map-edges">
-            {map.edges.map(([from, to], i) => {
-              const a = map.nodes[from];
-              const b = map.nodes[to];
-              if (!a || !b) return null;
-              const rest = edgePath(a.x, a.y, b.x, b.y, 0);
-              return (
-                <g key={i} className="hero-edge-group">
-                  {/* Visible string — solid and complete at rest; `d` is mutated by the
-                      rAF loop while it's vibrating. */}
-                  <path
-                    ref={(el) => {
-                      edgeRefs.current[i] = el;
-                    }}
-                    d={rest}
-                    className="hero-map-edge"
-                  />
-                  {/* Wide transparent overlay: the visible line is ~2.6px, far too thin
-                      to hit reliably. pointer-events:stroke makes only the band clickable. */}
-                  <path
-                    d={rest}
-                    className="hero-edge-hit"
-                    onPointerEnter={(e) => {
-                      if (e.pointerType === "mouse") pluck(i);
-                    }}
-                    onPointerDown={(e) => {
-                      // Touch/pen have no hover — a tap plucks instead.
-                      if (e.pointerType !== "mouse") pluck(i);
-                    }}
-                  />
-                </g>
-              );
-            })}
-          </g>
-
-          <g>
-            {map.nodes.map((node, i) => (
-              <g
-                key={node.name}
-                role="button"
-                tabIndex={0}
-                aria-label={node.name}
-                className="hero-map-node"
-                data-active={active === i || undefined}
-                // Pointer-type aware (same reason as TechTile): on touch, Chrome emits
-                // compatibility mouseenter AFTER pointerdown, so hover+click would cancel
-                // each other out. Hover is mouse-only; tap-toggle is touch-only.
-                onPointerDown={(e) => {
-                  lastPointer.current = e.pointerType;
-                }}
-                onPointerEnter={(e) => {
-                  if (e.pointerType === "mouse") setActive(i);
-                }}
-                onPointerLeave={(e) => {
-                  if (e.pointerType === "mouse") setActive((cur) => (cur === i ? null : cur));
-                }}
-                // Only *keyboard* focus reveals the popup: a tap also focuses the node, and
-                // an unconditional show here would be toggled straight back off by the
-                // click that follows, making the first tap appear to do nothing.
-                onFocus={(e) => {
-                  if (e.currentTarget.matches(":focus-visible")) setActive(i);
-                }}
-                onBlur={() => setActive((cur) => (cur === i ? null : cur))}
-                onClick={() => {
-                  if (lastPointer.current !== "mouse") setActive((cur) => (cur === i ? null : i));
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setActive((cur) => (cur === i ? null : i));
-                  }
-                }}
-              >
-                {/* Generous invisible hit area, larger than the visible dot. */}
-                <circle cx={node.x} cy={node.y} r={16} fill="transparent" />
-                <circle cx={node.x} cy={node.y} r={11} className="hero-node-halo" />
-                <circle cx={node.x} cy={node.y} r={5.5} className="hero-node-dot" />
-              </g>
-            ))}
-          </g>
-        </svg>
-
-        {/* City popup. An HTML overlay (crisp text at any scale) positioned from the
-            node's viewBox coordinates and clamped horizontally so edge cities like
-            Medan and Jayapura stay fully inside the panel instead of being cut off. */}
-        {activeNode && (
-          <span
-            className="hero-city-popup mono"
-            style={{
-              left: `${Math.min(Math.max((activeNode.x / map.width) * 100, 12), 88)}%`,
-              top: `${(activeNode.y / map.height) * 100}%`,
-            }}
+    <div ref={rootRef}>
+      {/* ---------- Map, in 2a's inset well ---------- */}
+      <div className="hero-well">
+        <div className="relative">
+          <MapLand viewBox={map.viewBox} markup={map.markup} />
+          {/* Edges and nodes in a second SVG laid exactly over the land (same viewBox, same box). */}
+          <svg
+            viewBox={map.viewBox}
+            className="hero-map-top"
+            role="img"
+            aria-label="Map of Indonesia with a network of major cities"
           >
-            {activeNode.name}
-          </span>
-        )}
-      </div>
+            <g className="hero-map-edges">
+              {map.edges.map(([from, to], i) => {
+                const a = map.nodes[from];
+                const b = map.nodes[to];
+                if (!a || !b) return null;
+                const rest = edgePath(a.x, a.y, b.x, b.y, 0);
+                return (
+                  <g key={i}>
+                    {/* Visible string — solid and complete at rest; `d` is mutated by the
+                        rAF loop while it's vibrating. */}
+                    <path
+                      ref={(el) => {
+                        edgeRefs.current[i] = el;
+                      }}
+                      d={rest}
+                      className="hero-map-edge"
+                    />
+                    {/* Wide transparent overlay: the visible line is ~2.6px, far too thin
+                        to hit reliably. pointer-events:stroke makes only the band clickable. */}
+                    <path
+                      d={rest}
+                      className="hero-edge-hit"
+                      onPointerEnter={(e) => {
+                        if (e.pointerType === "mouse") pluck(i);
+                      }}
+                      onPointerDown={(e) => {
+                        // Touch/pen have no hover — a tap plucks instead.
+                        if (e.pointerType !== "mouse") pluck(i);
+                      }}
+                    />
+                  </g>
+                );
+              })}
+            </g>
 
-      {/* ---------- Charts (decorative — deliberately unlabelled) ---------- */}
-      {/* Side by side at EVERY width, including 320px. The 1.55fr/1fr split is what keeps
-          the bar chart at 60.8% of the panel — the same share the old max-width cap
-          enforced below sm, now expressed structurally so it holds everywhere. */}
-      <div className="mt-3 grid grid-cols-[1.55fr_1fr] gap-2">
-        <div
-          className="hero-chart-card px-3 py-2.5"
-          style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
-        >
-          <div className="mono mb-1.5 text-[10px] tracking-[0.14em] uppercase" style={{ color: "var(--ink-faint)" }}>
-            throughput
-          </div>
-          <svg viewBox="0 0 120 34" className="block h-auto w-full" aria-hidden="true">
-            {bars.map((v, i) => (
-              <rect
-                key={i}
-                // 6 bars: pitch 21 × 5 + width 15 = exactly the 120-unit viewBox.
-                x={i * 21}
-                y={0}
-                width={15}
-                height={34}
-                className="hero-bar"
-                // scaleY from the bottom edge: universally supported, unlike CSS
-                // transitions on the SVG `y`/`height` geometry properties.
-                style={{ transform: `scaleY(${v})`, fill: i % 2 === 0 ? "var(--accent)" : "var(--accent-2)" }}
-              />
-            ))}
-          </svg>
-        </div>
-
-        <div
-          className="flex flex-col items-center px-3 py-2.5"
-          style={{ borderRadius: 13, background: "var(--glass-bg-2)", border: "1px solid var(--glass-brd)" }}
-        >
-          <div
-            className="mono mb-1.5 self-start text-[10px] tracking-[0.14em] uppercase"
-            style={{ color: "var(--ink-faint)" }}
-          >
-            mix
-          </div>
-          {/* `.hero-donut` scales with its card and caps at the previous fixed 76px, so the
-              donut shrinks with the panel exactly as the bar chart does instead of filling
-              its card on narrow viewports — see globals.css. */}
-          <svg viewBox="0 0 44 44" className="hero-donut block h-auto" aria-hidden="true">
-            <circle cx={22} cy={22} r={DONUT_R} className="hero-donut-track" />
-            {slices.map((v, i) => {
-              const offset = slices.slice(0, i).reduce((a, b) => a + b, 0);
-              return (
-                <circle
-                  key={i}
-                  cx={22}
-                  cy={22}
-                  r={DONUT_R}
-                  className="hero-donut-slice"
-                  style={{
-                    stroke: SLICE_TONES[i % SLICE_TONES.length],
-                    strokeDasharray: `${(v * DONUT_C).toFixed(2)} ${DONUT_C.toFixed(2)}`,
-                    strokeDashoffset: `${(-offset * DONUT_C).toFixed(2)}`,
+            <g>
+              {map.nodes.map((node, i) => (
+                <g
+                  key={node.name}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={node.name}
+                  className="hero-map-node"
+                  data-active={active === i || undefined}
+                  // Pointer-type aware (same reason as TechTile): on touch, Chrome emits
+                  // compatibility mouseenter AFTER pointerdown, so hover+click would cancel
+                  // each other out. Hover is mouse-only; tap-toggle is touch-only.
+                  onPointerDown={(e) => {
+                    lastPointer.current = e.pointerType;
                   }}
-                />
-              );
-            })}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse") setActive(i);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse") setActive((cur) => (cur === i ? null : cur));
+                  }}
+                  // Only *keyboard* focus reveals the popup: a tap also focuses the node, and
+                  // an unconditional show here would be toggled straight back off by the
+                  // click that follows, making the first tap appear to do nothing.
+                  onFocus={(e) => {
+                    if (e.currentTarget.matches(":focus-visible")) setActive(i);
+                  }}
+                  onBlur={() => setActive((cur) => (cur === i ? null : cur))}
+                  onClick={() => {
+                    if (lastPointer.current !== "mouse") setActive((cur) => (cur === i ? null : i));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setActive((cur) => (cur === i ? null : i));
+                    }
+                  }}
+                >
+                  {/* Generous invisible hit area, larger than the visible dot. */}
+                  <circle cx={node.x} cy={node.y} r={16} fill="transparent" />
+                  <circle cx={node.x} cy={node.y} r={11} className="hero-node-halo" />
+                  <circle cx={node.x} cy={node.y} r={5.5} className="hero-node-dot" />
+                </g>
+              ))}
+            </g>
           </svg>
+
+          {/* City popup. An HTML overlay (crisp text at any scale) positioned from the
+              node's viewBox coordinates and clamped horizontally so edge cities like
+              Medan and Jayapura stay fully inside the panel instead of being cut off. */}
+          {activeNode && (
+            <span
+              className="hero-city-popup mono"
+              style={{
+                left: `${Math.min(Math.max((activeNode.x / map.width) * 100, 12), 88)}%`,
+                top: `${(activeNode.y / map.height) * 100}%`,
+              }}
+            >
+              {activeNode.name}
+            </span>
+          )}
         </div>
       </div>
+
+      <HeroCharts />
     </div>
   );
 }

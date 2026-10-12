@@ -2,10 +2,13 @@
 
 import { forwardRef, useEffect, useRef, type RefObject } from "react";
 import Link from "next/link";
-import { navLinks } from "./nav-links";
-import { CloseIcon, MenuIcon } from "@/components/ui/icons";
+import { isActiveLink, mkdirLink, navLinks } from "./nav-links";
+import { NavIcon } from "./nav-icon";
 
 const PANEL_ID = "mobile-nav-panel";
+
+/** 2a's menu lists every nav link plus mkdir, which has no pill of its own at this stage. */
+const menuLinks = [...navLinks, mkdirLink];
 
 interface MobileMenuButtonProps {
   open: boolean;
@@ -24,9 +27,13 @@ export const MobileMenuButton = forwardRef<HTMLButtonElement, MobileMenuButtonPr
       aria-label={open ? "Close menu" : "Open menu"}
       aria-expanded={open}
       aria-controls={PANEL_ID}
-      className="glass-icon-btn flex h-10 w-10 shrink-0"
+      className="nv-burger"
     >
-      {open ? <CloseIcon /> : <MenuIcon />}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+        <line x1="4" y1="7" x2="20" y2="7" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <line x1="4" y1="17" x2="20" y2="17" />
+      </svg>
     </button>
   );
 });
@@ -35,9 +42,10 @@ interface MobileMenuPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
+  pathname: string;
 }
 
-export function MobileMenuPanel({ open, onOpenChange, returnFocusRef }: MobileMenuPanelProps) {
+export function MobileMenuPanel({ open, onOpenChange, returnFocusRef, pathname }: MobileMenuPanelProps) {
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -57,27 +65,34 @@ export function MobileMenuPanel({ open, onOpenChange, returnFocusRef }: MobileMe
   if (!open) return null;
 
   return (
-    <div id={PANEL_ID} className="relative mx-auto w-full max-w-[1080px] px-5 pb-4 lg:hidden">
+    <>
+      {/* Invisible click-away layer: tapping outside the panel closes it. */}
       <button
         type="button"
         aria-hidden="true"
         tabIndex={-1}
         onClick={() => onOpenChange(false)}
-        className="fixed inset-0 z-10 cursor-default border-none bg-transparent p-0"
+        className="nv-menu fixed inset-0 z-[-1] cursor-default border-none bg-transparent p-0"
       />
-      <div className="glass-card relative z-20 flex flex-col gap-1 p-3" style={{ borderRadius: 20 }}>
-        {navLinks.map((link, i) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            ref={i === 0 ? firstLinkRef : undefined}
-            onClick={() => onOpenChange(false)}
-            className="nav-link justify-start px-4 py-3 text-base"
-          >
-            {link.label}
-          </Link>
-        ))}
+      <div id={PANEL_ID} className="nv-menu nv-menu-panel">
+        {menuLinks.map((link, i) => {
+          const active = isActiveLink(pathname, link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              ref={i === 0 ? firstLinkRef : undefined}
+              onClick={() => onOpenChange(false)}
+              aria-current={active ? "page" : undefined}
+              data-active={active || undefined}
+              className="nv-menu-item"
+            >
+              <NavIcon d={link.icon} size={18} style={{ flexShrink: 0, color: "var(--accent-ink)" }} />
+              {link.label}
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </>
   );
 }

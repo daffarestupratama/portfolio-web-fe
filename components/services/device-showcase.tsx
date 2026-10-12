@@ -7,68 +7,75 @@ interface DeviceShowcaseProps {
   mobile: MappedImage | null;
 }
 
-const screenFallback = <span className="absolute inset-0" style={{ background: "var(--glass-bg-2)" }} aria-hidden="true" />;
-
-/** A screen: the image is cropped to the device's own aspect with object-cover, so any
- *  upload ratio fits sensibly. Renders a soft empty screen when the field is unset. */
-function Screen({ image, className }: { image: MappedImage | null; className?: string }) {
+/** A screen: the upload is cropped to the device's own aspect (cover, top centre), over the
+ *  terminal colour, which is also what shows when the image URL fails to load. */
+function Screen({ image, sizes }: { image: MappedImage; sizes: string }) {
   return (
-    <div className={`device-screen ${className ?? ""}`}>
-      {image ? (
-        <StrapiImage
-          src={image.url}
-          alt={image.alt || ""}
-          fill
-          sizes="(max-width: 1024px) 50vw, 520px"
-          style={{ objectFit: "cover", objectPosition: "top center" }}
-          fallback={screenFallback}
-        />
-      ) : (
-        screenFallback
-      )}
-      <span className="device-glare" aria-hidden="true" />
+    <div className="dv-screen">
+      <StrapiImage
+        src={image.url}
+        alt={image.alt || ""}
+        fill
+        sizes={sizes}
+        style={{ objectFit: "cover", objectPosition: "top center" }}
+        fallback={null}
+      />
     </div>
   );
 }
 
 /**
- * Device-mockup hero for /services: a monitor, laptop and phone drawn with CSS (no new
- * dependencies) in the site's glass idiom, composed as an overlapping group — monitor
- * centre-back, laptop front-left, phone front-right.
+ * Portfolio 2a's device stage for /services: a monitor, a laptop and a phone in neumorphic
+ * frames. 2a's three stages: all three devices from 1000px, laptop and phone from 720px, the
+ * phone alone below that.
  *
- * Degrades gracefully: each device renders only when its field is set, and if all three
- * are empty the whole visual is omitted so the hero stays clean rather than showing empty
- * frames. Responsive: all three at lg+, laptop + phone at md, phone only at sm.
+ * Degrades gracefully: each device renders only when its field is set, the stage collapses at
+ * any width where none of the devices it would show exists (data attributes + CSS), and with
+ * all three empty the whole visual is omitted.
  */
 export function DeviceShowcase({ desktop, laptop, mobile }: DeviceShowcaseProps) {
   if (!desktop && !laptop && !mobile) return null;
 
   return (
-    <div className="device-stage" aria-hidden="true">
+    <div
+      className="dv-stage"
+      aria-hidden="true"
+      data-mon={desktop ? "" : undefined}
+      data-lap={laptop ? "" : undefined}
+      data-ph={mobile ? "" : undefined}
+    >
       {desktop && (
-        <div className="device-monitor hidden lg:block">
-          <div className="device-bezel">
-            <Screen image={desktop} />
+        <div className="dv-mon">
+          <div className="dv-mon-frame">
+            <div className="dv-mon-well">
+              <Screen image={desktop} sizes="400px" />
+            </div>
           </div>
-          <span className="device-monitor-neck" />
-          <span className="device-monitor-foot" />
+          <div className="dv-mon-neck" />
+          <div className="dv-mon-foot" />
         </div>
       )}
 
       {laptop && (
-        <div className="device-laptop hidden md:block">
-          <div className="device-bezel device-bezel-laptop">
-            <Screen image={laptop} />
+        <div className="dv-lap">
+          <div className="dv-lap-frame">
+            <div className="dv-lap-well">
+              <Screen image={laptop} sizes="(max-width: 999px) 380px, 280px" />
+            </div>
           </div>
-          <span className="device-laptop-base" />
+          <div className="dv-lap-base">
+            <span />
+          </div>
         </div>
       )}
 
       {mobile && (
-        <div className="device-phone">
-          <div className="device-bezel device-bezel-phone">
-            <span className="device-notch" />
-            <Screen image={mobile} className="device-screen-phone" />
+        <div className="dv-ph">
+          <div className="dv-ph-frame">
+            <div className="dv-ph-well">
+              <Screen image={mobile} sizes="150px" />
+            </div>
+            <span className="dv-ph-notch" />
           </div>
         </div>
       )}

@@ -3,18 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import type { TocEntry } from "@/components/blocks/toc";
 import { useActiveHeading } from "@/hooks/use-active-heading";
+import { useReadingProgress } from "@/hooks/use-reading-progress";
+import { ARTICLE_BODY_ID } from "@/components/articles/article-toc";
 
 /**
- * Narrow-viewport replacement for the sticky sidebar: a slim rail pinned to the LEFT
- * edge showing one dot per heading, with the current section's dot filled and enlarged.
- * Tapping (or keyboard-activating) the toggle expands the rail into a labelled TOC panel.
- *
- * Collapsed it is only a few px wide and offset from the text column, so it never
- * obscures the article. Hidden entirely at `lg`, where the real sidebar takes over.
+ * Narrow-viewport replacement for the sticky sidebar (below 1024px): Portfolio 2a's rail,
+ * fixed at left 8px / top 104px. Collapsed it is a toggle over an inset column of dots (the
+ * current section large and accent, read sections accent, the rest faint). Expanded it is a
+ * panel with "On this page", the reading percentage and every entry.
  */
 export function TocRail({ entries }: { entries: TocEntry[] }) {
   const [open, setOpen] = useState(false);
   const active = useActiveHeading(entries);
+  const pct = useReadingProgress(ARTICLE_BODY_ID);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -53,11 +54,12 @@ export function TocRail({ entries }: { entries: TocEntry[] }) {
   }, [open]);
 
   if (entries.length === 0) return null;
+  const activeIndex = entries.findIndex((e) => e.id === active);
+  const state = (i: number) => (i === activeIndex ? "on" : i < activeIndex ? "past" : undefined);
 
   return (
-    // Breakpoint hiding lives in the .toc-rail CSS rule, not a `lg:hidden` utility —
-    // see the note in globals.css (source order made the utility a no-op here).
-    <div ref={rootRef} className="toc-rail" data-open={open || undefined}>
+    // Hidden from 1024px by the .rail rule in globals.css, where the sidebar takes over.
+    <div ref={rootRef} className="rail" data-open={open || undefined}>
       <button
         ref={toggleRef}
         type="button"
@@ -65,55 +67,48 @@ export function TocRail({ entries }: { entries: TocEntry[] }) {
         aria-expanded={open}
         aria-controls="toc-rail-panel"
         aria-label={open ? "Collapse table of contents" : "Expand table of contents"}
-        className="toc-rail-toggle mono"
+        className="rail-toggle mono"
       >
         {open ? "×" : "☰"}
       </button>
 
       {open ? (
-        <nav id="toc-rail-panel" aria-label="Table of contents" className="toc-rail-panel">
-          <ul className="flex flex-col gap-1">
-            {entries.map((e) => {
-              const isActive = active === e.id;
-              return (
-                <li key={e.id}>
-                  <a
-                    href={`#${e.id}`}
-                    aria-current={isActive ? "true" : undefined}
-                    onClick={() => setOpen(false)}
-                    className="block py-1 text-[12.5px] transition-colors"
-                    style={{
-                      paddingLeft: e.level === 3 ? 18 : 8,
-                      borderLeft: `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
-                      color: isActive ? "var(--accent-ink)" : "var(--ink-dim)",
-                      fontWeight: isActive ? 600 : 400,
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {e.text}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      ) : (
-        <ul id="toc-rail-panel" className="toc-rail-dots" aria-label="Article sections">
-          {entries.map((e) => {
-            const isActive = active === e.id;
-            return (
+        <nav id="toc-rail-panel" aria-label="Table of contents" data-sb="toc" className="rail-panel">
+          <div className="toc-head-row mono">
+            <span>On this page</span>
+            <span className="toc-pct">{pct}%</span>
+          </div>
+          <ul>
+            {entries.map((e, i) => (
               <li key={e.id}>
                 <a
                   href={`#${e.id}`}
-                  aria-label={e.text}
-                  aria-current={isActive ? "true" : undefined}
-                  className="toc-rail-dot"
-                  data-active={isActive || undefined}
+                  aria-current={i === activeIndex ? "true" : undefined}
+                  onClick={() => setOpen(false)}
+                  data-state={state(i)}
                   data-sub={e.level === 3 || undefined}
-                />
+                  className="rail-a"
+                >
+                  {e.text}
+                </a>
               </li>
-            );
-          })}
+            ))}
+          </ul>
+        </nav>
+      ) : (
+        <ul id="toc-rail-panel" className="rail-dots" aria-label="Article sections">
+          {entries.map((e, i) => (
+            <li key={e.id}>
+              <a
+                href={`#${e.id}`}
+                aria-label={e.text}
+                aria-current={i === activeIndex ? "true" : undefined}
+                data-state={state(i)}
+                data-sub={e.level === 3 || undefined}
+                className="rail-dot"
+              />
+            </li>
+          ))}
         </ul>
       )}
     </div>

@@ -12,7 +12,7 @@ export function Logo() {
     <Link
       href="/"
       aria-label="dir home"
-      className="inline-flex shrink-0 items-center gap-1.5 no-underline transition-transform duration-200 ease-out hover:-translate-y-px"
+      className="nv-logo inline-flex shrink-0 items-center gap-1.5"
     >
       <svg
         height={LOGO_HEIGHT}
@@ -35,7 +35,7 @@ export function Logo() {
       <span
         aria-hidden="true"
         className="w-2 rounded-xs"
-        style={{ height: LOGO_HEIGHT, background: "var(--accent)", animation: "blink 1.15s steps(1) infinite" }}
+        style={{ height: LOGO_HEIGHT, background: "var(--accent-b)", animation: "blink 1.15s steps(1) infinite" }}
       />
     </Link>
   );

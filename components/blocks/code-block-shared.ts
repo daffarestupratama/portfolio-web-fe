@@ -73,11 +73,11 @@ export interface CodeBlockInnerProps {
 
 /** Shared by the plain fallback and the highlighted version so the two are
  *  metrically identical — only token colours differ, so there is no layout shift. */
-export const PRE_CLASS = "mono code-scroll overflow-x-auto p-4 text-[13px] leading-relaxed";
+/** 2a's terminal body: `--term` surface, inset shadow, 13/1.65 (see `.code-pre`). */
+export const PRE_CLASS = "mono code-pre";
 
-/** nightOwl's `plain` foreground, so the unhighlighted text is already the right colour. */
+/** 2a's plain foreground; Prism's nightOwl token colours paint over it once loaded. */
 export const PRE_STYLE: CSSProperties = {
-  background: "transparent",
   margin: 0,
-  color: "#d6deeb",
+  color: "#DCE2EC",
 };

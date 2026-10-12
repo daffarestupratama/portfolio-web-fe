@@ -1,17 +1,23 @@
 import { Delayed } from "@/components/ui/delayed";
+import { Sk, SkLines } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[820px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3]">
       <Delayed>
-        <div className="skeleton" style={{ height: 44, width: 240, borderRadius: 10 }} />
-        <div className="skeleton mt-4" style={{ height: 16, maxWidth: 560, borderRadius: 8 }} />
-        <div className="skeleton mt-7" style={{ aspectRatio: "16 / 9", borderRadius: 15 }} />
-        <div className="mt-8 flex flex-col gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 15, width: i % 3 === 2 ? "70%" : "100%", borderRadius: 6 }} />
-          ))}
-        </div>
+        <header className="ab-head">
+          <div className="ab-grid">
+            <div className="ab-photo">
+              <Sk r={30} style={{ aspectRatio: "844 / 1264" }} />
+            </div>
+            <div className="ab-text">
+              <Sk h={50} w={240} r={14} style={{ maxWidth: "100%" }} />
+              <div style={{ marginTop: 24 }}>
+                <SkLines count={8} />
+              </div>
+            </div>
+          </div>
+        </header>
       </Delayed>
     </main>
   );

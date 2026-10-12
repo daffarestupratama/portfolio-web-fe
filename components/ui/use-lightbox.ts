@@ -19,9 +19,8 @@ interface UseLightboxOptions {
  *
  * Extracted from Gallery so the certificate viewer gets the identical, already-proven
  * behaviour instead of a second implementation. Callers still own their own markup and must
- * portal to `document.body` — `.glass-card` sets `backdrop-filter`, which makes it a
- * containing block even for `position: fixed` descendants, so an in-card dialog is clipped
- * at the card edge.
+ * portal to `document.body`, so no ancestor stacking context, transform or overflow can
+ * clip or trap the fixed-position dialog.
  */
 export function useLightbox({ open, onClose, dialogRef, onKeyDown }: UseLightboxOptions) {
   useEffect(() => {

@@ -329,7 +329,9 @@ export function useTerminal({ counts, cmsCommands, inputRef, scrollRef }: UseTer
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
       navHistory(1);
-    } else if (e.key === "Tab") {
+    } else if (e.key === "Tab" && !e.shiftKey) {
+      // Tab completes; Shift+Tab is left alone so keyboard users can always leave the input
+      // (otherwise the terminal is a keyboard trap).
       e.preventDefault();
       tabComplete();
     } else if (e.ctrlKey && (e.key === "c" || e.key === "C")) {

@@ -1,23 +1,25 @@
 import { Delayed } from "@/components/ui/delayed";
+import { Sk, SkPageHeader } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="relative z-[3] mx-auto w-full max-w-[1180px] px-[22px] pt-28 pb-16 sm:pt-32">
+    <main className="relative z-[3]">
       <Delayed>
-        <div className="skeleton" style={{ height: 40, width: 200, borderRadius: 10 }} />
-        <div className="skeleton mt-4" style={{ height: 16, maxWidth: 460, borderRadius: 8 }} />
-        <div className="mt-8 flex flex-col gap-8 lg:flex-row">
-          <aside className="flex flex-col gap-4 lg:order-2 lg:w-[290px] lg:shrink-0">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: 84, borderRadius: 12 }} />
-            ))}
-          </aside>
-          <div className="flex flex-1 flex-col gap-4 lg:order-1">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: 150, borderRadius: 18 }} />
-            ))}
+        <SkPageHeader titleWidth={200} />
+        <section className="pg-body">
+          <div className="af">
+            <div className="af-list">
+              <div className="ar-list">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Sk key={i} h={150} r={24} />
+                ))}
+              </div>
+            </div>
+            <div className="af-col">
+              <Sk r={26} className="sk-af-panel" />
+            </div>
           </div>
-        </div>
+        </section>
       </Delayed>
     </main>
   );

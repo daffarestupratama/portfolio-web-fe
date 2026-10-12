@@ -3,119 +3,106 @@
 import Link from "next/link";
 import type { Project } from "@/content/home";
 import { StrapiImage } from "@/components/ui/strapi-image";
-import { TechTileRow } from "@/components/ui/tech-tile";
-import { ArrowRightIcon } from "@/components/ui/icons";
-import { bentoSpan, isTallSpan } from "@/components/cards/bento";
+import { bentoRows, type BentoLayout } from "@/components/cards/bento";
 import { projectTypeMeta } from "@/components/cards/project-type-meta";
+import { Contour } from "@/components/ui/contour";
+import { TechTile } from "@/components/ui/tech-tile";
 
 interface ProjectCardProps {
   project: Project;
-  /** Position in the grid — drives the bento tile shape. */
+  /** Position in the grid — drives the tile's row span in `layout`. */
   index?: number;
+  layout?: BentoLayout;
 }
 
-/** Cover-filled bento tile: the cover image fills the card and the metadata sits on top
- *  of a bottom-up scrim. The scrim is a fixed dark gradient (not token-driven) so overlay
- *  text is white-on-dark and legible in BOTH themes over any image — the same
- *  "always-X" approach as the tech tiles' fixed light surface. */
-export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
+/** 2a shows at most this many technologies on a tile. */
+const MAX_SKILLS = 6;
+
+/**
+ * Portfolio 2a's project tile: a raised frame holding the cover (or a seeded contour map when
+ * there is none), a dark bottom scrim, and the type, year, title, technologies and
+ * "Details →". Hovering, or focusing the link, reveals the summary; on single-row tiles the
+ * type and technology rows fold away to make room, as 2a's `hideRest` does. All of it is CSS
+ * (`.pc*` in globals.css), so nothing re-renders on hover.
+ *
+ * The whole tile is one link: the title's stretched `::after` covers the card, so a pointer
+ * click anywhere navigates. The technology logos are the one layer above it (TechTile, so they
+ * keep their name tooltip on hover, focus and tap); a mouse click on a logo opens the project
+ * too, so the card still behaves as one target.
+ */
+export function ProjectCard({ project, index = 0, layout = "standalone" }: ProjectCardProps) {
   const meta = projectTypeMeta(project.projectType);
   const cover = project.coverImage;
-  const aspect = cover ? cover.width / cover.height : null;
-  const span = bentoSpan(index, aspect);
+  const href = `/projects/${project.slug}`;
+  // Drawn in the browser after hydration; the server sends only its base colour.
+  const contour = <Contour seed={project.slug} dark className="pc-contour" />;
+  const skills = project.technologies.slice(0, MAX_SKILLS);
 
   return (
-    <article
-      // `data-tall` marks two-row tiles, which have room to reveal a longer summary.
-      data-tall={isTallSpan(span) || undefined}
-      className={`pcard group relative isolate overflow-hidden ${span}`}
-      style={{
-        borderRadius: 20,
-        border: "1px solid var(--glass-brd)",
-        boxShadow: "var(--glass-sh)",
-      }}
-    >
-      {/* Cover, or a type-hue gradient panel when the project has no cover yet. Both get
-          the identical scrim + overlay, so a cover-less card reads as deliberately
-          colour-coded by project type rather than broken. */}
-      {cover ? (
-        <StrapiImage
-          src={cover.url}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 560px"
-          style={{ objectFit: "cover" }}
-          className="pcard-cover"
-          fallback={<span className="pcard-fallback" style={{ ["--pcard-hue" as string]: meta.hue }} />}
-        />
-      ) : (
-        <span className="pcard-fallback" style={{ ["--pcard-hue" as string]: meta.hue }} aria-hidden="true" />
-      )}
+    <article className="pc" data-rows={bentoRows(layout, index)}>
+      <div className="pc-frame">
+        <span aria-hidden="true" className="pc-base">
+          {!cover && contour}
+        </span>
+        {cover && (
+          <StrapiImage
+            src={cover.url}
+            alt=""
+            fill
+            sizes="(max-width: 900px) 100vw, 560px"
+            style={{ objectFit: "cover" }}
+            className="pc-cover"
+            fallback={contour}
+          />
+        )}
+        <span aria-hidden="true" className="pc-scrim" />
 
-      <span className="pcard-scrim" aria-hidden="true" />
-
-      <div className="pcard-body relative z-[2] flex h-full flex-col justify-end p-4 sm:p-5">
-        <div className="pcard-topline flex items-center justify-between gap-2.5">
-          <span
-            className="badge"
-            style={{
-              background: `color-mix(in srgb, ${meta.hue} 30%, rgba(8,18,22,0.62))`,
-              borderColor: `color-mix(in srgb, ${meta.hue} 50%, transparent)`,
-              color: "#fff",
-            }}
-          >
-            {meta.label}
-          </span>
-          <span className="mono shrink-0 text-[11px]" style={{ color: "rgba(255,255,255,0.72)" }}>
-            {project.year}
-          </span>
-        </div>
-
-        <h3 className="pcard-heading mt-2.5 text-[18px] font-bold" style={{ letterSpacing: "-0.025em", color: "#fff" }}>
-          <Link href={`/projects/${project.slug}`} className="pcard-title transition-opacity hover:opacity-85">
-            {project.title}
-          </Link>
-        </h3>
-
-        {/* Compact tiles take this out of flow and crossfade it with the topline/foot on
-            hover; feature tiles reveal it inline. Hidden on touch — see globals.css. */}
-        <p className="pcard-summary text-[13px]" style={{ lineHeight: 1.5, color: "rgba(255,255,255,0.86)" }}>
-          {project.summary}
-        </p>
-
-        <div className="pcard-foot mt-3 flex items-end justify-between gap-3">
-          <div className="pcard-tech min-w-0">
-            {project.technologies.length > 0 ? (
-              <TechTileRow items={project.technologies} size={28} max={5} />
-            ) : (
-              <div className="flex flex-wrap gap-[6px]">
-              {project.techStack.slice(0, 4).map((tech) => (
-                <span
-                  key={tech}
-                  className="mono px-[7px] py-[3px] text-[10.5px]"
-                  style={{
-                    borderRadius: 7,
-                    background: "rgba(255,255,255,0.14)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    color: "rgba(255,255,255,0.9)",
-                  }}
-                  >
-                    {tech}
-                  </span>
-                ))}
+        <div className="pc-body">
+          <div className="pc-fold pc-meta">
+            <div>
+              <div className="pc-meta-row">
+                <span className="pc-type">{meta.label}</span>
+                <span className="pc-year mono">{project.year}</span>
               </div>
-            )}
+            </div>
           </div>
 
-          <Link
-            href={`/projects/${project.slug}`}
-            aria-label={`Details: ${project.title}`}
-            className="mono inline-flex shrink-0 items-center gap-1 text-[12px] font-medium transition-opacity hover:opacity-80"
-            style={{ color: "rgba(255,255,255,0.9)" }}
-          >
-            Details
-            <ArrowRightIcon width={13} height={13} />
-          </Link>
+          <h3 className="pc-title">
+            <Link href={href} className="pc-link">
+              {project.title}
+            </Link>
+          </h3>
+
+          <div className="pc-fold pc-sum">
+            <div>
+              <p>{project.summary}</p>
+            </div>
+          </div>
+
+          <div className="pc-fold pc-tech">
+            <div>
+              <div className="pc-tech-row">
+                <div className="pc-skills">
+                  {skills.length > 0
+                    ? skills.map((t) => (
+                        // Name only, as 2a's title tooltip shows (no level on cards).
+                        <TechTile key={t.id} item={{ name: t.name, logo: t.logo }} variant="card" href={href} />
+                      ))
+                    : // Legacy plain-text stack, for projects with no linked technologies yet.
+                      project.techStack.slice(0, MAX_SKILLS).map((name) => (
+                        <span key={name} className="pc-chip mono">
+                          {name}
+                        </span>
+                      ))}
+                </div>
+                {layout !== "services" && (
+                  <span aria-hidden="true" className="pc-details mono">
+                    Details →
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </article>

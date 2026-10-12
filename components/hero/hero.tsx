@@ -1,7 +1,8 @@
-import type { HomePage } from "@/content/home";
+import type { ContactIcon, ContactLink, HomePage } from "@/content/home";
 import { indonesiaMap } from "@/lib/geo/indonesia";
 import { CtaLink } from "@/components/ui/cta-link";
 import { HeroPanel } from "./hero-panel";
+import { HeroName } from "./hero-name";
 import { FileTextIcon, UserIcon, LinkedinIcon, GithubIcon, InstagramIcon, MailIcon } from "@/components/ui/icons";
 
 const contactIcons = {
@@ -11,94 +12,74 @@ const contactIcons = {
   email: MailIcon,
 };
 
+/** 2a's social row: these four, in this order. */
+const SOCIAL_ORDER: ContactIcon[] = ["linkedin", "github", "instagram", "email"];
+
 interface HeroProps {
   home: HomePage;
+  /** From site-setting.contactLinks (see mapHeroContactLinks). */
+  links: ContactLink[];
 }
 
-export function Hero({ home }: HeroProps) {
+export function Hero({ home, links }: HeroProps) {
+  const socials = SOCIAL_ORDER.flatMap((icon) => links.filter((l) => l.icon === icon).slice(0, 1));
+
   return (
-    <header className="relative z-[3] flex justify-center px-[22px] pt-24 pb-[34px] sm:pt-28 lg:pt-[132px]">
-      <div className="grid w-full max-w-[1180px] grid-cols-1 items-center gap-11 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          {/* The h1 is the first element in this column, so it carries no top margin —
-              the old `mt-5` was the gap below the tagline pill, and grid items are BFC
-              roots, so leaving it would have held 20px of dead space against the
-              `items-center` panel rather than collapsing away. */}
-          <h1
-            className="font-bold"
-            style={{ fontSize: "clamp(34px,4.7vw,60px)", lineHeight: 1.03, letterSpacing: "-0.04em" }}
-          >
-            {/* ~2/3 of the fullName clamp below, so the name clearly dominates. */}
-            <span style={{ fontSize: "clamp(23px,3.1vw,40px)" }}>{home.headline}</span>
-            <br />
-            <span
-              style={{
-                backgroundImage: "linear-gradient(120deg, var(--accent-ink), var(--accent) 42%, var(--green))",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              {home.fullName}
+    <header className="hero">
+      <div className="hero-grid">
+        <div className="hero-copy">
+          <h1 className="hero-h1">
+            <span className="hero-headline">{home.headline}</span>
+            <span className="hero-fullname">
+              <HeroName text={home.fullName} />
             </span>
           </h1>
 
-          <p
-            className="mt-5 max-w-[31em] font-normal"
-            style={{ fontSize: "clamp(15px,1.5vw,17.5px)", lineHeight: 1.62, color: "var(--ink-dim)" }}
-          >
-            {home.subheadline}
-          </p>
+          <p className="hero-sub">{home.subheadline}</p>
 
-          <div className="mt-7 flex flex-wrap items-center gap-[11px]">
-            <CtaLink href={home.heroCtaPrimary.url} className="btn-gradient gap-[9px] px-[21px] py-3 text-[14.5px]">
+          <div className="hero-actions">
+            <CtaLink href={home.heroCtaPrimary.url} className="nm-btn-accent hero-cta">
               <FileTextIcon />
               {home.heroCtaPrimary.label}
             </CtaLink>
-            <CtaLink
-              href={home.heroCtaSecondary.url}
-              className="glass-pill gap-[9px] px-[21px] py-3 text-[14.5px] font-semibold"
-            >
+            <CtaLink href={home.heroCtaSecondary.url} className="nm-btn hero-cta">
               <UserIcon />
               {home.heroCtaSecondary.label}
             </CtaLink>
-            <span aria-hidden="true" className="mx-0.5 h-[26px] w-px shrink-0" style={{ background: "var(--border)" }} />
-            {home.contactLinks.map((link) => {
-              const Icon = contactIcons[link.icon];
-              return (
-                <a
-                  key={link.icon}
-                  href={link.url}
-                  aria-label={link.label}
-                  className="glass-icon-btn h-[42px] w-[42px] shrink-0"
-                >
-                  <Icon />
-                </a>
-              );
-            })}
+            {socials.length > 0 && (
+              <>
+                <span aria-hidden="true" className="hero-divider" />
+                <div className="hero-socials">
+                  {socials.map((link) => {
+                    const Icon = contactIcons[link.icon];
+                    const external = /^https?:\/\//.test(link.url);
+                    return (
+                      <a
+                        key={link.icon}
+                        href={link.url}
+                        aria-label={link.label}
+                        className="hero-social"
+                        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      >
+                        <Icon />
+                      </a>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        <div
-          className="relative p-[18px]"
-          style={{
-            borderRadius: 26,
-            background: "var(--card-bg)",
-            backgroundImage: "var(--card-tint)",
-            backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
-            border: "1px solid var(--glass-brd)",
-            boxShadow: "var(--glass-sh-lg), inset 0 1px 0 var(--card-hi), inset 0 -10px 30px -16px rgba(27,46,51,0.10)",
-            animation: "floaty var(--float) ease-in-out infinite",
-            animationPlayState: "var(--float-play)",
-          }}
-        >
-          <div className="pointer-events-none relative z-[3] mb-1.5 flex items-center">
-            <span className="mono text-[11px] tracking-wide uppercase" style={{ color: "var(--ink-faint)" }}>
-              geo.network
-            </span>
+        <div className="hero-panel-wrap">
+          {/* 2a's "dish": two concave rings the panel sits in. Static, decorative. */}
+          <div aria-hidden="true" className="hero-dish">
+            <div />
           </div>
-
-          <HeroPanel map={indonesiaMap} />
+          <div className="hero-panel">
+            <div className="hero-label mono">geo.network</div>
+            <HeroPanel map={indonesiaMap} />
+          </div>
         </div>
       </div>
     </header>

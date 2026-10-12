@@ -10,11 +10,12 @@ export interface TocEntry {
 export const TOC_LEVELS = [2, 3];
 
 /**
- * Distance below the viewport top where a heading is considered "current" — clears the
- * floating navbar (~80px) with a small gap. Drives BOTH the headings' `scroll-margin-top`
- * and the scroll-spy's reading line, so clicking a TOC entry lands the heading exactly on
- * the line that decides which entry is highlighted. Two separate numbers would make the
- * highlight disagree with the click by their difference.
+ * Distance below the viewport top where a heading is considered "current". 104 is 2a's own
+ * heading scroll-margin, which clears the 60px stuck navbar (globals.css --nav-stuck-h) by
+ * 44px. It drives BOTH the headings' `scroll-margin-top` and the scroll-spy's reading line,
+ * so clicking a TOC entry lands the heading exactly on the line that decides which entry is
+ * highlighted. 2a uses 110 for its spy line, but one number is kept on purpose: two separate
+ * numbers would make the highlight disagree with the click by their difference.
  */
 export const HEADING_SCROLL_OFFSET = 104;
 

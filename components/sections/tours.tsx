@@ -1,27 +1,19 @@
-import Link from "next/link";
 import type { TourPackage } from "@/content/home";
 import { TourCard } from "@/components/cards/tour-card";
-import { ArrowRightIcon } from "@/components/ui/icons";
+import { SectionHeader } from "@/components/sections/section-header";
 
 interface ToursProps {
   tours: TourPackage[];
 }
 
+/** Homepage tours (only while FEATURES.tours is on): 2a's section heading row over the
+ *  tour cards, the same recipe the other homepage sections use. */
 export function Tours({ tours }: ToursProps) {
   return (
-    <section className="relative z-[3] flex justify-center px-[22px] pt-[46px] pb-2.5">
-      <div className="w-full max-w-[1180px]">
-        <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-bold" style={{ fontSize: "clamp(26px,3vw,38px)", letterSpacing: "-0.03em" }}>
-            Walking tours
-          </h2>
-          <Link href="/tours" className="glass-pill gap-[7px] px-[17px] py-[9px] text-[13.5px] font-semibold">
-            All tours
-            <ArrowRightIcon />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 gap-[18px] md:grid-cols-2">
+    <section className="home-sec">
+      <div className="home-sec-inner">
+        <SectionHeader title="Walking tours" href="/tours" linkLabel="All tours" />
+        <div className="tr-grid tr-grid-home">
           {tours.map((tour) => (
             <TourCard key={tour.id} tour={tour} />
           ))}

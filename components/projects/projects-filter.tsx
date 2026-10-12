@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "@/content/home";
 import { ProjectCard } from "@/components/cards/project-card";
-import { BENTO_GRID_CLASS } from "@/components/cards/bento";
-import { badgeStyle, projectTypeMeta } from "@/components/cards/project-type-meta";
+import { projectTypeMeta } from "@/components/cards/project-type-meta";
 
 interface ProjectsFilterProps {
   projects: Project[];
@@ -47,49 +46,37 @@ export function ProjectsFilter({ projects }: ProjectsFilterProps) {
 
   return (
     <>
+      {/* 2a's type chips sit under the page header. Shown only when there is more than one
+          type to choose between (a lone "All" chip would filter nothing). */}
       {showFilter && (
-        <div className="mb-7 flex flex-wrap gap-2" role="group" aria-label="Filter projects by type">
-          <button
-            type="button"
-            onClick={() => selectType(ALL)}
-            data-active={active === ALL}
-            className="tab-btn"
-            style={{ fontSize: "12.5px", padding: "7px 15px" }}
-          >
-            All
-          </button>
-          {types.map((type) => {
-            const meta = projectTypeMeta(type);
-            const isActive = active === type;
-            return (
-              <button
-                key={type}
-                type="button"
-                onClick={() => selectType(type)}
-                aria-pressed={isActive}
-                className="badge cursor-pointer"
-                style={{
-                  ...badgeStyle(meta.hue),
-                  padding: "7px 15px",
-                  fontSize: "12.5px",
-                  outline: isActive ? "2px solid var(--accent)" : "none",
-                  outlineOffset: 2,
-                }}
-              >
-                {meta.label}
-              </button>
-            );
-          })}
+        <div className="pg-chips-wrap">
+          <div className="pg-chips" role="group" aria-label="Filter projects by type">
+            {[ALL, ...types].map((type) => {
+              const isActive = active === type;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => selectType(type)}
+                  aria-pressed={isActive}
+                  className="pg-chip"
+                >
+                  {type === ALL ? "All" : projectTypeMeta(type).label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      <div className={BENTO_GRID_CLASS}>
-        {shown.map((project, i) => (
-          <ProjectCard key={project.id} project={project} index={i} />
-        ))}
-      </div>
-
-      {hasMore && <div ref={sentinelRef} aria-hidden="true" className="h-8" />}
+      <section className="pg-body">
+        <div className="bento" data-layout="projects">
+          {shown.map((project, i) => (
+            <ProjectCard key={project.id} project={project} index={i} layout="projects" />
+          ))}
+        </div>
+        {hasMore && <div ref={sentinelRef} aria-hidden="true" className="h-8" />}
+      </section>
     </>
   );
 }

@@ -73,7 +73,7 @@ export function RouteProgress() {
         top: 0,
         left: 0,
         right: 0,
-        height: 2,
+        height: 3,
         zIndex: 200,
         pointerEvents: "none",
         opacity: visible ? 1 : 0,
@@ -84,8 +84,8 @@ export function RouteProgress() {
         style={{
           height: "100%",
           width,
-          background: "linear-gradient(90deg, var(--accent), var(--accent-ink))",
-          boxShadow: "0 0 8px var(--accent)",
+          // 2a's two accents, flat (no glow, as nothing in 2a glows).
+          background: "linear-gradient(90deg, var(--accent), var(--accent-b))",
           transition: "width 300ms ease",
         }}
       />

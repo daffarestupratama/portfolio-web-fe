@@ -115,6 +115,16 @@ export function mapContactLinks(links: StrapiContactLink[]): ContactLink[] {
     .map((l) => ({ icon: l.icon as ContactIcon, label: l.label, url: l.url }));
 }
 
+/** Hero social row, sourced from site-setting.contactLinks (home-page.contactLinks is empty in
+ *  the CMS). Same known-icon filter as above, except site settings name the email link `mail`,
+ *  which is accepted as `email`. Order and selection are the caller's concern. */
+export function mapHeroContactLinks(links: { icon: string; label: string; url: string }[]): ContactLink[] {
+  return links
+    .map((l) => ({ ...l, icon: l.icon === "mail" ? "email" : l.icon }))
+    .filter((l) => KNOWN_ICONS.has(l.icon))
+    .map((l) => ({ icon: l.icon as ContactIcon, label: l.label, url: l.url }));
+}
+
 function twoDigitYear(iso: string): string {
   return `'${iso.slice(2, 4)}`;
 }
@@ -165,6 +175,7 @@ export function mapExperience(e: StrapiExperience): Experience {
     role: e.title,
     dateRange: formatDateRange(e.startDate, e.endDate, e.isCurrent),
     description: e.description,
+    location: e.location?.trim() || null,
     startDate: e.startDate,
     endDate: e.endDate,
     isCurrent: e.isCurrent ?? false,
