@@ -80,7 +80,7 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
   };
 
   return (
-    <section className="xp nm-root">
+    <section className="xp">
       <div className="xp-inner">
         <h2 className="xp-title">Experiences</h2>
 

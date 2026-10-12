@@ -24,7 +24,7 @@ export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
   return (
-    <main className="nm-root">
+    <main>
       <PageHeader title="Articles" subtitle="Notes on data, technology, business, and the ideas I explore along the way." />
       <div className="pg-body">
         {articles.length === 0 ? (

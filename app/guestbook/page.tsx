@@ -23,7 +23,7 @@ export default async function GuestbookPage() {
   const messages = await getVisibleGuestbookMessages();
 
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       <PageHeader
         title="Guestbook"
         subtitle="Say hi, leave feedback, or ask a question. New notes appear here right away."

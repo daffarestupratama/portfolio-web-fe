@@ -132,6 +132,19 @@ export function Terraces() {
 
   const rings = useMemo(() => (dims ? buildTerraces(dims.H, dims.vw) : null), [dims]);
 
+  // A ring that is off screen does no work: its drift and breathing pause (data-off, see
+  // globals.css) and resume where they stopped when it scrolls back in, so nothing visible
+  // changes. Most of the page's rings are off screen at any moment.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !rings) return;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) e.target.toggleAttribute("data-off", !e.isIntersecting);
+    });
+    for (const ring of Array.from(el.children)) io.observe(ring);
+    return () => io.disconnect();
+  }, [rings]);
+
   return (
     <div
       ref={ref}

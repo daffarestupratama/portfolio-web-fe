@@ -33,7 +33,7 @@ export default async function AboutPage() {
   const photo = about.profileImage;
 
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       {/* 2a: portrait left, text right from 900px; stacked and centred below. */}
       <header className="ab-head">
         <div className="ab-grid">

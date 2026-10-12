@@ -70,7 +70,7 @@ export default async function ServicesPage() {
     );
 
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       {/* 1. Hero: text left, device mockups right (the stage omits itself entirely when none
           of the three screens is uploaded). */}
       <header className="sv-hero">

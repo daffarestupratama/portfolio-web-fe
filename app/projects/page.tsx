@@ -24,7 +24,7 @@ export default async function ProjectsPage() {
   const projects = await getAllProjects();
 
   return (
-    <main className="nm-root">
+    <main>
       <PageHeader
         title="Projects"
         subtitle="Selected data, machine-learning, and mapping work — each with the problem it tackled, the approach, and the result."

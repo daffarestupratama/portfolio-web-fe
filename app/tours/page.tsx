@@ -34,7 +34,7 @@ export default async function ToursPage() {
   const hasFeatured = featured.length > 0;
 
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       <PageHeader title={landing.title} subtitle={landing.subtitle ?? undefined} />
 
       {/* Not in Portfolio 2a: built from its recipes (cover well, raised cards, accent button). */}

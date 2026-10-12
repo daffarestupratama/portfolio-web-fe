@@ -10,7 +10,7 @@ interface PageHeaderProps {
  *  17px standfirst, and optional controls underneath (the projects type chips). */
 export function PageHeader({ title, subtitle, narrow, children }: PageHeaderProps) {
   return (
-    <header className="pg-head nm-root" data-w={narrow ? "928" : undefined}>
+    <header className="pg-head" data-w={narrow ? "928" : undefined}>
       <h1 className="pg-title">{title}</h1>
       {subtitle && <p className="pg-sub">{subtitle}</p>}
       {children}

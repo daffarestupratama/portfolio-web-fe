@@ -18,13 +18,11 @@ export interface TileItem {
 const EDGE_PAD = 8;
 const GAP = 8;
 
-/** `default`: the legacy square tile. `card`: 2a's 26px white tile on project cards.
- *  `tile46`: 2a's 46px raised tile on the project page. `skill`: 2a's 52px tile in the about
- *  page's Skills groups. */
-export type TechTileVariant = "default" | "card" | "tile46" | "skill";
+/** `card`: 2a's 26px white tile on project cards. `tile46`: 2a's 46px raised tile on the
+ *  project page. `skill`: 2a's 52px tile in the about page's Skills groups. */
+export type TechTileVariant = "card" | "tile46" | "skill";
 
 const VARIANT_CLASS: Record<TechTileVariant, string> = {
-  default: "tech-tile",
   card: "pc-logo",
   tile46: "pj-logo",
   skill: "sk-logo",
@@ -33,19 +31,12 @@ const VARIANT_CLASS: Record<TechTileVariant, string> = {
 function TextChip({ label, variant }: { label: string; variant: TechTileVariant }) {
   if (variant === "card") return <span className="pc-chip mono">{label}</span>;
   if (variant === "tile46") return <span className="pj-chip mono">{label}</span>;
-  if (variant === "skill") return <span className="sk-pill">{label}</span>;
-  return (
-    <span className="chip mono px-[9px] py-1 text-[11px]" style={{ borderRadius: 8 }}>
-      {label}
-    </span>
-  );
+  return <span className="sk-pill">{label}</span>;
 }
 
 interface TechTileProps {
   item: TileItem;
-  /** Square edge length in px (the `default` variant only; the 2a variants are fixed). */
-  size?: number;
-  variant?: TechTileVariant;
+  variant: TechTileVariant;
   /** When set (project cards), activating the tile with a mouse or the keyboard opens this
    *  URL like the rest of the card; Ctrl/⌘/middle click opens it in a new tab. A touch or pen
    *  tap still only toggles the name, so a phone user can read it. */
@@ -55,11 +46,9 @@ interface TechTileProps {
 /** A technology as a uniform square logo tile. The name (plus level when given) is always
  *  exposed via aria-label, and shown visually on hover, keyboard focus, or tap.
  *
- *  The label is PORTALLED to document.body with fixed positioning: `.glass-card` sets both
- *  `overflow:hidden` and `backdrop-filter`, and backdrop-filter makes the card a containing
- *  block even for fixed-position descendants — so an in-card tooltip gets clipped at the
- *  card edge (the same trap the gallery lightbox hit). */
-export function TechTile({ item, size = 44, variant = "default", href }: TechTileProps) {
+ *  The label is PORTALLED to document.body with fixed positioning, so a card's
+ *  `overflow:hidden` can never clip it at the card edge. */
+export function TechTile({ item, variant, href }: TechTileProps) {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
@@ -144,8 +133,6 @@ export function TechTile({ item, size = 44, variant = "default", href }: TechTil
         onBlur={() => setVisible(false)}
         aria-label={label}
         className={VARIANT_CLASS[variant]}
-        // Padding in px (not %) so it scales with the tile instead of the container.
-        style={variant === "default" ? { width: size, height: size, padding: Math.round(size * 0.18) } : undefined}
       >
         <StrapiImage
           src={item.logo.url}
@@ -174,38 +161,5 @@ export function TechTile({ item, size = 44, variant = "default", href }: TechTil
           document.body,
         )}
     </>
-  );
-}
-
-interface TechTileRowProps {
-  items: TileItem[];
-  size?: number;
-  /** Visible tile cap; the remainder collapses into a "+N" tile. */
-  max?: number;
-}
-
-export function TechTileRow({ items, size = 44, max = Number.POSITIVE_INFINITY }: TechTileRowProps) {
-  if (items.length === 0) return null;
-  const visible = items.slice(0, max);
-  const hidden = items.length - visible.length;
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {visible.map((item) => (
-        <TechTile key={item.name} item={item} size={size} />
-      ))}
-      {hidden > 0 && (
-        <span
-          className="tech-tile-more mono"
-          style={{ width: size, height: size }}
-          aria-label={`${hidden} more ${hidden === 1 ? "technology" : "technologies"}: ${items
-            .slice(max)
-            .map((i) => i.name)
-            .join(", ")}`}
-        >
-          +{hidden}
-        </span>
-      )}
-    </div>
   );
 }

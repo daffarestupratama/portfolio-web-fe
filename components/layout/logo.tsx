@@ -12,7 +12,7 @@ export function Logo() {
     <Link
       href="/"
       aria-label="dir home"
-      className="inline-flex shrink-0 items-center gap-1.5"
+      className="nv-logo inline-flex shrink-0 items-center gap-1.5"
     >
       <svg
         height={LOGO_HEIGHT}

@@ -8,7 +8,7 @@ interface ProjectsProps {
 
 export function Projects({ projects }: ProjectsProps) {
   return (
-    <section className="home-sec home-sec-projects nm-root">
+    <section className="home-sec home-sec-projects">
       <div className="home-sec-inner">
         <SectionHeader title="Selected projects" href="/projects" linkLabel="All projects" />
         <div className="bento" data-layout="home">

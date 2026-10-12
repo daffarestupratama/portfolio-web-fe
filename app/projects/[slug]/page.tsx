@@ -61,7 +61,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const galleryCount = `${project.gallery.length} ${project.gallery.length === 1 ? "image" : "images"}`;
 
   return (
-    <main className="nm-root">
+    <main>
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },

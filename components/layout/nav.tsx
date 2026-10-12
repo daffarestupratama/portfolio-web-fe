@@ -56,9 +56,13 @@ export function Nav() {
 
   return (
     // data-nm-keep: the nav animates its surfaces on the first load only (latest 2a).
-    <div className="nv-wrap nm-root" data-stuck={stuck} data-nm-keep="">
+    <div className="nv-wrap" data-stuck={stuck} data-nm-keep="">
       <style dangerouslySetInnerHTML={{ __html: STAGE_CSS }} />
       <nav className="nv-bar">
+        {/* The two looks as fixed-geometry layers, crossfaded: the floating pill, and the
+            full-bleed bar. Neither box ever moves or resizes, so sticking shifts nothing. */}
+        <span aria-hidden="true" className="nv-bg nv-bg-pill" />
+        <span aria-hidden="true" className="nv-bg nv-bg-bar" />
         <Logo />
 
         <div className="nv-links">

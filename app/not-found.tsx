@@ -9,7 +9,7 @@ export const metadata: Metadata = notFoundMetadata();
  *  panel) and its accent button. */
 export default function NotFound() {
   return (
-    <main className="nf nm-root">
+    <main className="nf">
       <div className="cta-ring">
         <div className="cta-ring">
           <div className="cta-panel nf-panel">

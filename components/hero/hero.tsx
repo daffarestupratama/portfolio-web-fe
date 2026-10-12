@@ -25,7 +25,7 @@ export function Hero({ home, links }: HeroProps) {
   const socials = SOCIAL_ORDER.flatMap((icon) => links.filter((l) => l.icon === icon).slice(0, 1));
 
   return (
-    <header className="hero nm-root">
+    <header className="hero">
       <div className="hero-grid">
         <div className="hero-copy">
           <h1 className="hero-h1">

@@ -12,7 +12,7 @@ export async function Footer() {
 
   return (
     <footer
-      className="nm-root relative z-[3] flex justify-center"
+      className="relative z-[3] flex justify-center"
       style={{ padding: "36px clamp(16px,4vw,40px) 44px" }}
     >
       <div

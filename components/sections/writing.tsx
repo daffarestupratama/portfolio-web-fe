@@ -8,7 +8,7 @@ interface WritingProps {
 
 export function Writing({ articles }: WritingProps) {
   return (
-    <section className="home-sec home-sec-articles nm-root">
+    <section className="home-sec home-sec-articles">
       <div className="home-sec-inner">
         <SectionHeader title="Articles" href="/articles" linkLabel="All articles" />
         {/* Same row as /articles, as in 2a. */}

@@ -20,6 +20,10 @@ import { usePathname } from "next/navigation";
 const TIMING: KeyframeAnimationOptions = { duration: 1000, easing: "cubic-bezier(.3,.6,.2,1)", fill: "backwards" };
 const FULL: Keyframe[] = [{ boxShadow: "none", opacity: 0 }, { opacity: 1, offset: 0.6 }, {}];
 const SHADOW_ONLY: Keyframe[] = [{ boxShadow: "none" }, {}];
+/** The hold: flat and invisible. Applied as a PAUSED animation: it touches no DOM attribute
+ *  (content can still be hydrating when the first scan runs, and an attribute would be a
+ *  hydration mismatch), and unlike a running one it costs nothing per frame (a running
+ *  main-thread animation, even one with no visible change, forces a style pass every frame). */
 const HOLD: Keyframe[] = [{ boxShadow: "none", opacity: 0 }, { boxShadow: "none", opacity: 0 }];
 const MAX_STAGGER = 480;
 const STAGGER = 40;
@@ -100,10 +104,18 @@ function createEngine() {
     selector = tokenShadowSelector();
   };
 
-  const release = (el: Held) => {
+  const hold = (el: Held) => {
+    const a = el.animate(HOLD, { duration: 1000, fill: "both" });
+    a.pause();
+    el._nmHold = a;
+    held.add(el);
+  };
+
+  const release = (el: Held, reveal?: () => void) => {
+    held.delete(el);
     el._nmHold?.cancel();
     el._nmHold = null;
-    held.delete(el);
+    reveal?.();
   };
 
   const makeObserver = () =>
@@ -114,8 +126,8 @@ function createEngine() {
           if (!e.isIntersecting) continue;
           const el = e.target as Held;
           io.unobserve(el);
-          release(el);
-          el.animate(FULL, { ...TIMING, delay: Math.min(i++ * STAGGER, MAX_STAGGER) });
+          const delay = Math.min(i++ * STAGGER, MAX_STAGGER);
+          release(el, () => el.animate(FULL, { ...TIMING, delay }));
         }
       },
       { rootMargin: `0px 0px -${BOTTOM_INSET}px 0px` },
@@ -149,8 +161,7 @@ function createEngine() {
         el.animate(SHADOW_ONLY, { ...TIMING, delay: Math.min(i++ * STAGGER, MAX_STAGGER) });
         return;
       }
-      el._nmHold = el.animate(HOLD, { duration: 1e9 });
-      held.add(el);
+      hold(el);
       io.observe(el);
     });
   };

@@ -11,7 +11,7 @@ interface SkillsSectionProps {
 export function SkillsSection({ groups }: SkillsSectionProps) {
   if (groups.length === 0) return null;
   return (
-    <section className="sk nm-root" aria-labelledby="skills-title">
+    <section className="sk" aria-labelledby="skills-title">
       <div className="sk-inner">
         <h2 id="skills-title" className="sk-title">
           Skills

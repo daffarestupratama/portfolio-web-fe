@@ -19,6 +19,11 @@ body {
   margin: 0;
   padding: 0;
 }
+/* 2a sets no line-height, so its text uses the UA's `normal`; Tailwind's preflight puts 1.5
+   on <html>. Unlayered, this beats the preflight for the whole document. */
+html {
+  line-height: normal;
+}
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
   background: var(--bg);
@@ -75,33 +80,6 @@ textarea::placeholder {
   --term: #121315;
 }
 
-/* ---------------------------------------------------------------------- */
-/* LEGACY BRIDGE (removed in Phase 4). Pages not yet migrated to 2a still   */
-/* reference the old glass/hue tokens inline. Aliasing them to the          */
-/* neumorphic tokens keeps every route coherent in the new palette until    */
-/* its phase replaces the markup. Nothing new should use these.            */
-/* ---------------------------------------------------------------------- */
-:root {
-  --surface: var(--bg);
-  --border: color-mix(in srgb, var(--ink) 12%, transparent);
-  --sky: var(--accent);
-  --teal: var(--accent-2);
-  --green: var(--accent-b);
-  --chip: color-mix(in srgb, var(--accent) 10%, transparent);
-  --chip-brd: color-mix(in srgb, var(--accent) 24%, transparent);
-  --glass-bg: var(--bg);
-  --glass-bg-2: var(--bg);
-  --glass-brd: transparent;
-  --glass-hi: var(--edge);
-  --glass-tint: none;
-  --glass-blur: 0px;
-  --glass-sh: var(--out);
-  --glass-sh-lg: var(--out-lg);
-  --card-bg: var(--bg);
-  --card-tint: none;
-  --card-hi: var(--edge);
-}
-
 /* 2a scrollbars: thin and themed. `toc` tints the thumb with the accent, `dark` is for
    surfaces that stay dark in both themes (code, terminal). */
 [data-sb] {
@@ -122,6 +100,12 @@ textarea::placeholder {
 [data-sb="dark"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18) padding-box; }
 
 @keyframes decoDrift { 0%, 100% { transform: translate(0,0) rotate(var(--r0)); } 50% { transform: translate(var(--dx),var(--dy)) rotate(var(--r1)); } }
+/* Off-screen terrace rings pause (layout/terraces.tsx); they resume where they stopped.
+   !important because each ring sets its animation shorthand inline. */
+[data-deco] > [data-off],
+[data-deco] > [data-off] * {
+  animation-play-state: paused !important;
+}
 @keyframes decoBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(var(--s)); } }
 @keyframes blink { 0%, 45% { opacity: .9; } 50%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
@@ -306,49 +290,88 @@ select {
 /* media queries for stages 3 to 0, whose widths derive from the link count. */
 /* ---------------------------------------------------------------------- */
 
-/* Not stuck: a 1180px floating pill. Stuck (scrollY > 8): a full-bleed 60px bar. */
-/* 2a sets no line-height, so its text uses the UA's `normal`; Tailwind's preflight puts 1.5
-   on <html>. Every 2a surface therefore opts back into `normal`. It is scoped to migrated
-   surfaces (this class) so pages still on the legacy bridge keep their spacing, and moves
-   to <html> once the last page is migrated (Phase 4). */
-.nm-root {
-  line-height: normal;
-}
-
+/* Not stuck: a 1180px floating pill. Stuck (scrollY > 8): a full-bleed 60px bar.
+   The switch never moves page content or any box (no layout shift): the wrapper keeps its
+   14px top padding, so its in-flow height is constant; the bar box is always full width; the
+   two looks are fixed-geometry layers that crossfade; and the bar's vertical move and the
+   content's narrow-width inset are transforms. */
 .nv-wrap {
+  --nv-wp: clamp(10px,2.5vw,20px);
   position: sticky;
   top: 0;
   z-index: 50;
-  display: flex;
-  justify-content: center;
-  padding: 14px clamp(10px,2.5vw,20px) 0px;
-  transition: padding .28s cubic-bezier(.4,0,.2,1);
-}
-.nv-wrap[data-stuck="true"] {
-  padding: 0px 0px 0px;
+  padding-top: 14px;
+  container-type: inline-size;
+  /* The padding band under the stuck bar must not swallow clicks on the page beneath. */
+  pointer-events: none;
 }
 .nv-bar {
+  /* Resolved against the wrapper (a size container): (100cqw - 1180px) / 2 is the gutter
+     either side of a centred 1180px column. */
+  --nv-a: calc((100cqw - 1180px) / 2);
+  /* How far the floating pill sits inside the full-bleed bar's content edges below ~1220px
+     (the wrapper's old side padding): 0 on wide screens, up to --nv-wp on narrow ones. */
+  --nv-s: clamp(0px, calc(var(--nv-wp) - var(--nv-a)), var(--nv-wp));
+  position: relative;
+  isolation: isolate;
+  pointer-events: auto;
   display: flex;
   width: 100%;
-  max-width: 1180px;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 10px 12px 10px 22px;
-  border-radius: 24px;
-  background: var(--bg);
-  box-shadow: var(--out), var(--rim);
-  transition:
-    max-width .28s cubic-bezier(.4,0,.2,1),
-    padding .28s cubic-bezier(.4,0,.2,1),
-    border-radius .28s cubic-bezier(.4,0,.2,1),
-    box-shadow .28s cubic-bezier(.4,0,.2,1);
+  padding: 10px max(12px, calc(var(--nv-a) + 12px)) 10px max(22px, calc(var(--nv-a) + 22px));
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
 }
 .nv-wrap[data-stuck="true"] .nv-bar {
-  max-width: 100vw;
-  padding: 10px max(12px, calc((100% - 1180px) / 2 + 12px)) 10px max(22px, calc((100% - 1180px) / 2 + 22px));
-  border-radius: 0px;
+  transform: translateY(-14px);
+}
+.nv-bg {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  background: var(--bg);
+  pointer-events: none;
+  transition: opacity .28s cubic-bezier(.4,0,.2,1);
+}
+.nv-bg-pill {
+  left: max(var(--nv-wp), var(--nv-a));
+  right: max(var(--nv-wp), var(--nv-a));
+  border-radius: 24px;
+  box-shadow: var(--out), var(--rim);
+}
+.nv-bg-bar {
+  left: 0;
+  right: 0;
+  opacity: 0;
   box-shadow: 0 10px 22px -8px var(--sd), 0 2px 5px -3px var(--sd), var(--rim);
+}
+.nv-wrap[data-stuck="true"] .nv-bg-pill {
+  opacity: 0;
+}
+.nv-wrap[data-stuck="true"] .nv-bg-bar {
+  opacity: 1;
+}
+/* Inside the floating pill the logo and the right-hand controls sit --nv-s further in; the
+   centred links need no correction (space-between keeps them centred). */
+.nv-logo,
+.nv-right {
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+/* Whole pixels, like the layout offset it replaces (layout snaps; a fractional transform would
+   re-rasterise the glyphs at a sub-pixel offset). The unrounded line is the fallback for
+   browsers without round(). */
+.nv-logo {
+  transform: translateX(var(--nv-s));
+  transform: translateX(round(var(--nv-s), 1px));
+}
+.nv-right {
+  transform: translateX(calc(-1 * var(--nv-s)));
+  transform: translateX(calc(-1 * round(var(--nv-s), 1px)));
+}
+.nv-wrap[data-stuck="true"] :is(.nv-logo, .nv-right) {
+  transform: none;
 }
 .nv-links {
   display: none;
@@ -455,6 +478,9 @@ select {
 .nv-burger[aria-expanded="true"] {
   box-shadow: var(--in-sm);
 }
+.nv-menu {
+  pointer-events: auto;
+}
 .nv-menu-panel {
   position: absolute;
   top: calc(100% + 8px);
@@ -467,6 +493,9 @@ select {
   border-radius: 22px;
   background: var(--bg);
   box-shadow: var(--out), var(--rim);
+}
+.nv-wrap[data-stuck="true"] .nv-menu-panel {
+  transform: translateY(-14px);
 }
 .nv-menu-item {
   display: flex;
@@ -561,126 +590,6 @@ a.cv-btn:hover {
 }
 button.cv-btn:active {
   box-shadow: var(--in-sm);
-}
-
-/* ---------------------------------------------------------------------- */
-/* LEGACY BRIDGE classes (removed in Phase 4): the glass recipes re-pointed */
-/* at the neumorphic ones, so unmigrated markup renders in the new material. */
-/* ---------------------------------------------------------------------- */
-
-.glass-pill {
-  display: inline-flex;
-  align-items: center;
-  /* Every .glass-pill is interactive. Links get a pointer from the UA default but buttons do
-     not, which is why the certificate button felt dead next to the credential link. */
-  cursor: pointer;
-  border-radius: 999px;
-  background: var(--bg);
-  box-shadow: var(--out-sm);
-  color: var(--ink);
-  text-decoration: none;
-  transition: transform .4s var(--spring), color .2s;
-}
-.glass-pill:hover {
-  transform: translateY(-2px);
-  color: var(--accent-ink);
-}
-.glass-pill:active {
-  box-shadow: var(--in-sm);
-}
-
-.glass-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 999px;
-  background: var(--bg);
-  box-shadow: var(--out-sm);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform .4s var(--spring), color .2s;
-}
-.glass-icon-btn:hover {
-  transform: translateY(-2px);
-  color: var(--accent-ink);
-}
-.glass-icon-btn:active {
-  box-shadow: var(--in-sm);
-}
-
-.glass-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg);
-  box-shadow: var(--out), var(--rim);
-  border-radius: 24px;
-}
-
-.btn-gradient {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: var(--out-sm), var(--rim);
-  transition: transform .45s var(--spring);
-}
-.btn-gradient:hover {
-  transform: translateY(-3px);
-}
-.btn-gradient:active {
-  transform: translateY(1px) scale(.97);
-  box-shadow: var(--press);
-}
-
-/* Segmented tab control: the active tab reads as a raised thumb on an inset track. */
-.tab-btn {
-  padding: 9px 20px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 13.5px;
-  letter-spacing: -0.01em;
-  background: transparent;
-  color: var(--ink-dim);
-  transition: color .2s, box-shadow .2s;
-}
-.tab-btn:not([data-active="true"]):hover {
-  color: var(--ink);
-}
-.tab-btn[data-active="true"] {
-  background: var(--bg);
-  color: var(--accent-ink);
-  box-shadow: var(--out-sm);
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  box-shadow: var(--in-sm);
-  color: var(--ink-dim);
-}
-
-/* "Read" affordance on article cards. Shared by ArticleListItem and ArticleCard so the two
-   can't drift. Underlines on hover AND :focus-visible — a keyboard user gets the same
-   signal that this is a link, not just the focus ring. */
-.read-link {
-  text-decoration: none;
-}
-.read-link:hover,
-.read-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 /* ====================================================================== */
@@ -831,6 +740,16 @@ button.cv-btn:active {
 /* Map: the pre-serialised coastline (MAP_MARKUP), recoloured to 2a's mapVars. */
 /* 2a sets `vector-effect` on the <g>, where it does not inherit, so its coastline strokes
    scale with the map (0.8 viewBox units). Matching that means no non-scaling-stroke here. */
+/* Edges and nodes, laid exactly over the land SVG (same viewBox and box). The land sits in
+   its own memoised SVG, so no panel re-render or pluck frame ever touches its ~321 paths.
+   (Promoting this layer measured no gain and shifted edge anti-aliasing, so it isn't.) */
+.hero-map-top {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .hero-map-land path {
   fill: color-mix(in srgb, var(--accent) 14%, transparent);
   stroke: color-mix(in srgb, var(--accent) 42%, transparent);
@@ -3330,38 +3249,6 @@ button.cv-btn:active {
   white-space: pre;
 }
 
-/* Technology logo tile. The surface is a FIXED off-white in both themes (not
-   token-driven, same "always-X" approach as the mkdir terminal's always-dark):
-   many brand logos are black/dark and would vanish on the dark glass. It's held
-   at ~0.94 rather than pure white so it doesn't glare in dark mode. */
-.tech-tile {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  /* Inner padding comes from the component as a px value derived from `size`.
-     A percentage must NOT be used here: percentage padding resolves against the
-     containing block's width, not the tile, which would blow the tile up and
-     collapse the logo to 0px. */
-  border-radius: 11px;
-  cursor: pointer;
-  background: rgba(246, 248, 247, 0.94);
-  border: 1px solid rgba(15, 32, 38, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px -3px rgba(9, 24, 30, 0.35);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-[data-theme="dark"] .tech-tile {
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 8px -3px rgba(0, 0, 0, 0.6);
-}
-.tech-tile:hover,
-.tech-tile:focus-visible {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 6px 14px -6px color-mix(in srgb, var(--accent) 55%, transparent);
-}
 /* object-contain + the tile's padding: any aspect ratio (wordmark or icon) fits
    fully inside the square without cropping or distortion. */
 .tech-tile-img {
@@ -3369,11 +3256,9 @@ button.cv-btn:active {
   height: 100%;
   object-fit: contain;
 }
-/* Name label. PORTALLED to document.body and fixed-positioned by the component:
-   `.glass-card` sets overflow:hidden AND backdrop-filter, and backdrop-filter makes
-   the card a containing block even for fixed descendants — so an in-card tooltip is
-   clipped at the card edge. Coordinates come from the tile's bounding rect, clamped
-   to the viewport, so an edge tile's name stays fully readable. */
+/* Name label. PORTALLED to document.body and fixed-positioned by the component, so a
+   card's overflow:hidden never clips it. Coordinates come from the tile's bounding rect,
+   clamped to the viewport, so an edge tile's name stays fully readable. */
 .tech-tile-label {
   position: fixed;
   z-index: 60;
@@ -3389,33 +3274,6 @@ button.cv-btn:active {
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.45);
   transition: opacity 0.15s ease;
 }
-/* "+N" overflow indicator — same square footprint as a tile. */
-.tech-tile-more {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  border-radius: 11px;
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--glass-bg-2);
-  border: 1px solid var(--glass-brd);
-  color: var(--ink-dim);
-}
-
-/* Type/category badge — background/border/text color set per-instance via
-   style (color-mix against the type's hue), shape/spacing shared here. */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 600;
-  border: 1px solid transparent;
-}
-
 /* ====================================================================== */
 /* Phase 3b — remaining pages, Portfolio 2a values verbatim.               */
 /* ====================================================================== */
@@ -4343,6 +4201,9 @@ button.cv-btn:active {
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 600;
+  /* Portalled to <body>, so it was never inside a 2a surface: it keeps the 1.5 it has always
+     rendered with (46.5px tall), now that `normal` is the document default. */
+  line-height: 1.5;
   background: var(--accent);
   color: var(--on-accent);
   box-shadow: var(--out), var(--rim);
@@ -4883,6 +4744,9 @@ button.cv-btn:active {
   .tr-grid {
     grid-template-columns: repeat(2,minmax(0,1fr));
   }
+}
+.tr-grid-home {
+  margin-top: 0;
 }
 .tr-none {
   margin-top: 40px;

@@ -31,7 +31,7 @@ export function ContactCTA({ email, whatsappUrl, heading, description, variant =
   return (
     // `--anchor-contact` (90px, 2a's value) keeps the section 30px clear of the 60px stuck
     // navbar when the "#contact" CTA scrolls here (scrollIntoView honours scroll-margin-top).
-    <section id="contact" className="cta nm-root scroll-mt-(--anchor-contact) outline-none" data-variant={variant}>
+    <section id="contact" className="cta scroll-mt-(--anchor-contact) outline-none" data-variant={variant}>
       <div className="cta-ring">
         <div className="cta-ring">
           <div className="cta-panel">

@@ -36,7 +36,7 @@ export default async function MkdirPage() {
   };
 
   return (
-    <main className="relative z-[3] nm-root term-page">
+    <main className="relative z-[3] term-page">
       {/* Crawlable description — the terminal is client-rendered, so this gives search
           engines and screen readers real content describing the page. */}
       <section className="sr-only">

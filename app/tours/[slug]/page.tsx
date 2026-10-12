@@ -50,7 +50,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
   // Not in Portfolio 2a: the project page's header, cover well and section recipes.
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },

@@ -11,9 +11,8 @@ const imgFallback = <span className="absolute inset-0" style={{ background: "col
 interface GalleryProps {
   images: GalleryImage[];
   /** `grid`: 2a's experience gallery, 4:3 inset tiles. `masonry`: 2a's project gallery, a
-   *  16:9 lead image over a numbered, captioned masonry. `strip`: the horizontal scroller the
-   *  tour pages still use until Phase 3b. */
-  variant?: "strip" | "grid" | "masonry";
+   *  16:9 lead image over a numbered, captioned masonry. */
+  variant: "grid" | "masonry";
 }
 
 /** 2a shows this many masonry images (after the lead) before "Show all". */
@@ -22,7 +21,7 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /** Reusable image carousel + accessible lightbox. Renders nothing when empty.
  *  Used by expandable experience items and the project/tour detail pages. */
-export function Gallery({ images, variant = "strip" }: GalleryProps) {
+export function Gallery({ images, variant }: GalleryProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [showAll, setShowAll] = useState(false);
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -121,7 +120,7 @@ export function Gallery({ images, variant = "strip" }: GalleryProps) {
             </div>
           )}
         </>
-      ) : variant === "grid" ? (
+      ) : (
         <ul className="xp-gallery">
           {images.map((img, i) => (
             <li key={`${img.url}-${i}`}>
@@ -148,32 +147,6 @@ export function Gallery({ images, variant = "strip" }: GalleryProps) {
             </li>
           ))}
         </ul>
-      ) : (
-      <ul className="mt-3 flex snap-x gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
-        {images.map((img, i) => (
-          <li key={`${img.url}-${i}`} className="snap-start">
-            <button
-              ref={(el) => {
-                triggerRefs.current[i] = el;
-              }}
-              type="button"
-              onClick={() => openAt(i)}
-              aria-label={`Open image${img.alt ? `: ${img.alt}` : ` ${i + 1}`}`}
-              className="glass-icon-btn relative block h-20 w-28 overflow-hidden p-0"
-              style={{ borderRadius: 12 }}
-            >
-              <StrapiImage
-                src={img.url}
-                alt={img.alt}
-                fill
-                sizes="112px"
-                style={{ objectFit: "cover" }}
-                fallback={imgFallback}
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
       )}
 
       {current &&
@@ -188,7 +161,7 @@ export function Gallery({ images, variant = "strip" }: GalleryProps) {
             aria-modal="true"
             aria-label={current.alt || "Image viewer"}
             tabIndex={-1}
-            className="nm-root fixed inset-0 z-[200] flex flex-col items-center justify-center outline-none"
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center outline-none"
             style={{ gap: 14, padding: "clamp(16px,4vw,48px)", background: "rgba(12,15,21,.86)" }}
             onClick={close}
           >

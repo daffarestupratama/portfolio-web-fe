@@ -56,7 +56,7 @@ export function CertificateViewer({ url, title }: CertificateViewerProps) {
             aria-modal="true"
             aria-label={`Certificate: ${title}`}
             tabIndex={-1}
-            className="nm-root fixed inset-0 z-[200] flex items-center justify-center outline-none"
+            className="fixed inset-0 z-[200] flex items-center justify-center outline-none"
             style={{ padding: "clamp(12px,3vw,40px)", background: "rgba(12,15,21,.8)" }}
             onClick={close}
           >

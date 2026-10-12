@@ -121,7 +121,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   return (
     // 2a widens the page only when there is a sidebar or related content, and pads the left
     // edge (50px) only when the fixed TOC rail renders below 1024px.
-    <main className="ad nm-root" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
+    <main className="ad" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },

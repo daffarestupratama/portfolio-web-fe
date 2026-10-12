@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** 2a's zigzag: 14 alternating strokes across a 100×40 box, drawn behind the first word. */
 const ZIGZAG =
@@ -21,6 +21,7 @@ const ZIGZAG =
 export function HeroName({ text }: { text: string }) {
   const [n, setN] = useState(0);
   const [highlight, setHighlight] = useState(false);
+  const rootRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!text) return;
@@ -28,7 +29,28 @@ export function HeroName({ text }: { text: string }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout>;
-    const wait = (ms: number) => new Promise<void>((resolve) => (timer = setTimeout(resolve, ms)));
+    // Paused while the name is off screen or the tab is hidden: nobody sees it, so it does no
+    // work, and it carries on from the same letter when it comes back.
+    let visible = true;
+    let resume: (() => void) | null = null;
+    const paused = () => !visible || document.hidden;
+    const sync = () => {
+      if (resume && !paused()) {
+        const go = resume;
+        resume = null;
+        go();
+      }
+    };
+    const io = new IntersectionObserver((entries) => {
+      visible = entries.some((e) => e.isIntersecting);
+      sync();
+    });
+    if (rootRef.current) io.observe(rootRef.current);
+    document.addEventListener("visibilitychange", sync);
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => (timer = setTimeout(resolve, ms))).then(() =>
+        alive && paused() ? new Promise<void>((resolve) => (resume = resolve)) : undefined,
+      );
     const L = text.length;
     (async () => {
       while (alive) {
@@ -53,6 +75,9 @@ export function HeroName({ text }: { text: string }) {
     return () => {
       alive = false;
       clearTimeout(timer);
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      resume?.();
     };
   }, [text]);
 
@@ -61,7 +86,7 @@ export function HeroName({ text }: { text: string }) {
   const shown = text.slice(0, n);
 
   return (
-    <span className="hn">
+    <span ref={rootRef} className="hn">
       <span className="sr-only">{text}</span>
       <span aria-hidden="true" className="hn-sizer">
         {text}

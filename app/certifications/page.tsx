@@ -27,7 +27,7 @@ export default async function CertificationsPage() {
   const certifications = await getAllCertifications();
 
   return (
-    <main className="relative z-[3] nm-root">
+    <main className="relative z-[3]">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
