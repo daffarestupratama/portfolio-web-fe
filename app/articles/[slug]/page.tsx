@@ -21,7 +21,7 @@ export const revalidate = 3600;
 
 /** Byline stand-in when no avatar is set, or when the image fails to load (2a's accent disc). */
 function AuthorMonogram() {
-  return <span className="ad-monogram">D</span>;
+  return <span className="art-monogram">D</span>;
 }
 
 export async function generateStaticParams() {
@@ -80,9 +80,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const relatedBlocks = hasRelated ? (
     <>
       {article.relatedProjects.length > 0 && (
-        <section aria-label="Related projects" className="ad-rel">
-          <h2 className="ad-rel-title">Related projects</h2>
-          <div className="ad-rel-grid">
+        <section aria-label="Related projects" className="art-rel">
+          <h2 className="art-rel-title">Related projects</h2>
+          <div className="art-rel-grid">
             {article.relatedProjects.map((p) => (
               <RelatedCard
                 key={p.id}
@@ -96,9 +96,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         </section>
       )}
       {related.length > 0 && (
-        <section aria-label="Related articles" className="ad-rel">
-          <h2 className="ad-rel-title">Related articles</h2>
-          <div className="ad-rel-grid">
+        <section aria-label="Related articles" className="art-rel">
+          <h2 className="art-rel-title">Related articles</h2>
+          <div className="art-rel-grid">
             {related.map((a) => (
               <RelatedCard
                 key={a.id}
@@ -111,7 +111,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           </div>
         </section>
       )}
-      <Link href="/articles" className="ad-back-all mono">
+      <Link href="/articles" className="art-back-all mono">
         <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
         Back to all articles
       </Link>
@@ -121,7 +121,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   return (
     // 2a widens the page only when there is a sidebar or related content, and pads the left
     // edge (50px) only when the fixed TOC rail renders below 1024px.
-    <main className="ad" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
+    <main className="art" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "" },
@@ -142,29 +142,29 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       {/* Narrow viewports: the TOC sidebar is replaced by the fixed rail on the left edge. */}
       <TocRail entries={toc} />
 
-      <div className="ad-grid" data-aside={hasSidebar || undefined}>
+      <div className="art-grid" data-aside={hasSidebar || undefined}>
         {/* The aside is sticky at --sticky-top and scrolls internally (scrollbar hidden,
             as in the latest 2a) when the TOC is taller than the viewport. `self-start` and `sticky`
             live on the same element, or sticky has nothing to stick within. With a TOC it is
             hidden below 1024px, where the rail takes over; carrying the related content it
             stays at every width and sits after the body when stacked. */}
         {hasSidebar && (
-          <aside className="ad-aside" data-kind={hasToc ? "toc" : "related"} data-sb="toc">
+          <aside className="art-aside" data-kind={hasToc ? "toc" : "related"} data-sb="toc">
             {hasToc ? <ArticleToc entries={toc} /> : relatedBlocks}
           </aside>
         )}
 
-        <div className="ad-content">
+        <div className="art-content">
           <Link href="/articles" className="nm-back mono">
             <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
             All articles
           </Link>
 
           {/* 2a's header: title, cover well, standfirst, byline, closed off by a rule. */}
-          <header className="ad-head">
-            <h1 className="ad-title">{article.title}</h1>
-            <div className="ad-cover-well">
-              <div className="ad-cover">
+          <header className="art-head">
+            <h1 className="art-title">{article.title}</h1>
+            <div className="art-cover-well">
+              <div className="art-cover">
                 {article.coverImage ? (
                   <StrapiImage
                     src={article.coverImage.url}
@@ -173,25 +173,25 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
                     sizes="(max-width: 860px) 100vw, 820px"
                     style={{ objectFit: "cover" }}
                     priority
-                    fallback={<Contour seed={article.slug} dark={false} className="ad-contour" />}
+                    fallback={<Contour seed={article.slug} dark={false} className="art-contour" />}
                   />
                 ) : (
-                  <Contour seed={article.slug} dark={false} className="ad-contour" />
+                  <Contour seed={article.slug} dark={false} className="art-contour" />
                 )}
               </div>
             </div>
 
-            {article.excerpt && <p className="ad-excerpt">{article.excerpt}</p>}
+            {article.excerpt && <p className="art-excerpt">{article.excerpt}</p>}
 
-            <div className="ad-byline">
-              <span className="ad-author">
+            <div className="art-byline">
+              <span className="art-author">
                 {/* The real photo from site-setting.authorAvatar — free, because
                     generateMetadata above already loads site-setting and React cache()
                     dedupes the two calls into one request. The monogram stays as the
                     fallback: StrapiImage swaps to it on load error as well as when the
                     field is empty. aria-hidden because the author's name sits beside it. */}
-                <span aria-hidden="true" className="ad-avatar">
-                  <span className="ad-avatar-in">
+                <span aria-hidden="true" className="art-avatar">
+                  <span className="art-avatar-in">
                     {site.authorAvatar ? (
                       <StrapiImage
                         src={site.authorAvatar.url}
@@ -210,33 +210,33 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
                 </span>
                 {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
                     the visible byline and the structured data cannot drift apart. */}
-                <Link href="/about" className="ad-name">
+                <Link href="/about" className="art-name">
                   {SITE_NAME}
                 </Link>
               </span>
-              <span aria-hidden="true" className="ad-sep">
+              <span aria-hidden="true" className="art-sep">
                 ·
               </span>
-              <span className="ad-date mono">
+              <span className="art-date mono">
                 {article.publishedDate} · {article.readTime}
               </span>
-              <span className="ad-pills">
-                <span className="ad-cat">{article.category}</span>
-                <span className="ad-lang mono">{article.language.toUpperCase()}</span>
+              <span className="art-pills">
+                <span className="art-cat">{article.category}</span>
+                <span className="art-lang mono">{article.language.toUpperCase()}</span>
               </span>
             </div>
           </header>
 
           {article.body && (
-            <article id={ARTICLE_BODY_ID} className="ad-body">
+            <article id={ARTICLE_BODY_ID} className="art-body">
               <StrapiBlocks content={bodyWithIds} variant="article" />
             </article>
           )}
 
           {article.tags.length > 0 && (
-            <div className="ad-tags">
+            <div className="art-tags">
               {article.tags.map((tag) => (
-                <span key={tag} className="ad-tag mono">
+                <span key={tag} className="art-tag mono">
                   #{tag}
                 </span>
               ))}
@@ -247,7 +247,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
       {/* After the body: the point at which someone has finished reading. Suppressed when
           the sidebar carries it. */}
-      {!relatedInSidebar && relatedBlocks && <div className="ad-below">{relatedBlocks}</div>}
+      {!relatedInSidebar && relatedBlocks && <div className="art-below">{relatedBlocks}</div>}
 
       <BackToTop />
     </main>

@@ -49,7 +49,7 @@ export function Hero({ home, links }: HeroProps) {
             {socials.length > 0 && (
               <>
                 <span aria-hidden="true" className="hero-divider" />
-                <div className="hero-socials">
+                <div className="hero-linkss">
                   {socials.map((link) => {
                     const Icon = contactIcons[link.icon];
                     const external = /^https?:\/\//.test(link.url);
@@ -58,7 +58,7 @@ export function Hero({ home, links }: HeroProps) {
                         key={link.icon}
                         href={link.url}
                         aria-label={link.label}
-                        className="hero-social"
+                        className="hero-links"
                         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       >
                         <Icon />

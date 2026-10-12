@@ -27,7 +27,7 @@ export function ArticleToc({ entries }: { entries: TocEntry[] }) {
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const link = activeRef.current;
-      const box = link?.closest<HTMLElement>(".ad-aside");
+      const box = link?.closest<HTMLElement>(".art-aside");
       if (!link || !box || box.scrollHeight <= box.clientHeight + 1) return;
       const lr = link.getBoundingClientRect();
       const br = box.getBoundingClientRect();

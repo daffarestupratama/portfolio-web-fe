@@ -414,7 +414,7 @@ export function HeroPanel({ map }: { map: IndonesiaMap }) {
               Medan and Jayapura stay fully inside the panel instead of being cut off. */}
           {activeNode && (
             <span
-              className="hero-city-popup mono"
+              className="hero-city-label mono"
               style={{
                 left: `${Math.min(Math.max((activeNode.x / map.width) * 100, 12), 88)}%`,
                 top: `${(activeNode.y / map.height) * 100}%`,

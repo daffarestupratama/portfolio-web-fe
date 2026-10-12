@@ -664,11 +664,11 @@ button.cv-btn:active {
   border-radius: 4px;
   box-shadow: var(--in-sm);
 }
-.hero-socials {
+.hero-linkss {
   display: flex;
   gap: 12px;
 }
-.hero-social {
+.hero-links {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -680,11 +680,11 @@ button.cv-btn:active {
   color: var(--ink-dim);
   transition: transform .45s var(--spring), color .2s;
 }
-.hero-social:hover {
+.hero-links:hover {
   transform: translateY(-3px);
   color: var(--accent-ink);
 }
-.hero-social:active {
+.hero-links:active {
   transform: scale(.92);
   box-shadow: var(--in-sm);
 }
@@ -794,7 +794,7 @@ button.cv-btn:active {
   fill: var(--ink);
 }
 /* Node popup — HTML overlay above the node (crisp text at any panel width). */
-.hero-city-popup {
+.hero-city-label {
   position: absolute;
   z-index: 4;
   transform: translate(-50%, calc(-100% - 10px));
@@ -2049,7 +2049,7 @@ button.cv-btn:active {
   background: #14171C;
 }
 .pj-contour,
-.ad-contour {
+.art-contour {
   position: absolute;
   inset: 0;
   display: block;
@@ -2634,33 +2634,33 @@ button.cv-btn:active {
 
 /* ---------------- Article detail ---------------- */
 
-.ad {
+.art {
   position: relative;
   max-width: 820px;
   margin: 0 auto;
   padding: clamp(36px,5vw,56px) clamp(16px,4vw,40px) 20px;
 }
-.ad[data-wide] {
+.art[data-wide] {
   max-width: 1140px;
 }
 /* Room for the fixed TOC rail on the left edge, only where it renders. */
 @media (max-width: 1023px) {
-  .ad[data-rail] {
+  .art[data-rail] {
     padding-left: 50px;
   }
 }
-.ad-grid[data-aside] {
+.art-grid[data-aside] {
   display: flex;
   flex-direction: column;
   gap: 48px;
 }
-.ad-content {
+.art-content {
   min-width: 0;
   order: 1;
 }
 /* Stacked, a related-content aside follows the body; a TOC aside gives way to the rail. */
 /* Latest 2a hides the aside's scrollbar; a long TOC still scrolls inside the card. */
-.ad-aside {
+.art-aside {
   order: 2;
   padding: 20px;
   border-radius: 24px;
@@ -2669,21 +2669,21 @@ button.cv-btn:active {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.ad-aside::-webkit-scrollbar {
+.art-aside::-webkit-scrollbar {
   display: none;
 }
-.ad-aside[data-kind="toc"] {
+.art-aside[data-kind="toc"] {
   display: none;
 }
 @media (min-width: 1024px) {
-  .ad-grid[data-aside] {
+  .art-grid[data-aside] {
     display: grid;
     grid-template-columns: 250px minmax(0,1fr);
     align-items: start;
   }
   /* Sticky and capped at the viewport: a long TOC scrolls inside the card, with its scrollbar
      hidden, and the active entry is glided to the centre (articles/article-toc.tsx). */
-  .ad-aside {
+  .art-aside {
     order: 0;
     position: sticky;
     top: var(--sticky-top);
@@ -2691,55 +2691,55 @@ button.cv-btn:active {
     overflow: auto;
     overscroll-behavior: contain;
   }
-  .ad-aside[data-kind="toc"] {
+  .art-aside[data-kind="toc"] {
     display: block;
   }
 }
-.ad-head {
+.art-head {
   margin-top: 22px;
   padding-bottom: 26px;
   margin-bottom: 32px;
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
 }
-.ad-title {
+.art-title {
   font-weight: 700;
   font-size: clamp(28px,4vw,44px);
   line-height: 1.12;
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
-.ad-cover-well {
+.art-cover-well {
   margin-top: 24px;
   padding: 9px;
   border-radius: 28px;
   background: var(--bg);
   box-shadow: var(--in);
 }
-.ad-cover {
+.art-cover {
   position: relative;
   aspect-ratio: 16/9;
   border-radius: 21px;
   overflow: hidden;
 }
-.ad-excerpt {
+.art-excerpt {
   margin-top: 24px;
   font-size: 16.5px;
   line-height: 1.62;
   color: var(--ink-dim);
 }
-.ad-byline {
+.art-byline {
   margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 12px;
 }
-.ad-author {
+.art-author {
   display: flex;
   align-items: center;
   gap: 9px;
 }
-.ad-avatar {
+.art-avatar {
   display: flex;
   width: 30px;
   height: 30px;
@@ -2748,7 +2748,7 @@ button.cv-btn:active {
   background: var(--bg);
   box-shadow: var(--out-sm);
 }
-.ad-avatar-in {
+.art-avatar-in {
   position: relative;
   display: flex;
   width: 100%;
@@ -2756,7 +2756,7 @@ button.cv-btn:active {
   border-radius: 50%;
   overflow: hidden;
 }
-.ad-monogram {
+.art-monogram {
   display: flex;
   width: 100%;
   height: 100%;
@@ -2768,26 +2768,26 @@ button.cv-btn:active {
   background: var(--accent);
   color: var(--on-accent);
 }
-.ad-name {
+.art-name {
   font-size: 14px;
   font-weight: 600;
 }
-.ad-name:hover {
+.art-name:hover {
   color: var(--accent-ink);
 }
-.ad-sep {
+.art-sep {
   color: var(--ink-faint);
 }
-.ad-date {
+.art-date {
   font-size: 12px;
   color: var(--ink-dim);
 }
-.ad-pills {
+.art-pills {
   margin-left: auto;
   display: flex;
   gap: 8px;
 }
-.ad-cat {
+.art-cat {
   white-space: nowrap;
   padding: 5px 12px;
   border-radius: 999px;
@@ -2797,7 +2797,7 @@ button.cv-btn:active {
   background: var(--bg);
   box-shadow: var(--out-sm);
 }
-.ad-lang {
+.art-lang {
   white-space: nowrap;
   padding: 4px 9px;
   border-radius: 8px;
@@ -2806,13 +2806,13 @@ button.cv-btn:active {
   color: var(--ink-dim);
   box-shadow: var(--in-sm);
 }
-.ad-tags {
+.art-tags {
   margin-top: 32px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.ad-tag {
+.art-tag {
   padding: 5px 10px;
   border-radius: 8px;
   font-size: 11.5px;
@@ -2820,26 +2820,26 @@ button.cv-btn:active {
   box-shadow: var(--in-sm);
 }
 /* Related content, in the aside or below the body. */
-.ad-rel + .ad-rel {
+.art-rel + .art-rel {
   margin-top: 24px;
 }
-.ad-rel-title {
+.art-rel-title {
   margin-bottom: 14px;
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
-.ad-rel-grid {
+.art-rel-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%,220px), 1fr));
   gap: 12px;
 }
 @media (min-width: 1024px) {
-  .ad-aside .ad-rel-grid {
+  .art-aside .art-rel-grid {
     grid-template-columns: minmax(0,1fr);
   }
 }
-.ad-back-all {
+.art-back-all {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -2847,23 +2847,23 @@ button.cv-btn:active {
   font-size: 12px;
   color: var(--ink-dim);
 }
-.ad-back-all:hover {
+.art-back-all:hover {
   color: var(--accent-ink);
 }
-.ad-below {
+.art-below {
   margin-top: 56px;
 }
-.ad-below .ad-rel + .ad-rel {
+.art-below .art-rel + .art-rel {
   margin-top: 32px;
 }
-.ad-below .ad-rel-title {
+.art-below .art-rel-title {
   margin-bottom: 18px;
   font-size: 22px;
 }
-.ad-below .ad-rel-grid {
+.art-below .art-rel-grid {
   gap: 18px;
 }
-.ad-below .ad-back-all {
+.art-below .art-back-all {
   margin-top: 18px;
   font-size: 12.5px;
 }
@@ -3716,42 +3716,42 @@ button.cv-btn:active {
 }
 
 /* Add-ons. */
-.sv-ad-grid {
+.sv-addon-grid {
   margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill,minmax(min(100%,340px),1fr));
   gap: 22px;
   align-items: start;
 }
-.sv-ad {
+.sv-addon {
   padding: 22px 22px 18px;
   border-radius: 24px;
   background: var(--bg);
   box-shadow: var(--out), var(--rim);
 }
-.sv-ad-label {
+.sv-addon-label {
   font-size: 14.5px;
   font-weight: 700;
   color: var(--accent-ink);
 }
-.sv-ad-list {
+.sv-addon-list {
   margin-top: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.sv-ad-item {
+.sv-addon-item {
   padding: 11px 14px;
   border-radius: 14px;
   box-shadow: var(--in-sm);
 }
-.sv-ad-row {
+.sv-addon-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
 }
-.sv-ad-name {
+.sv-addon-name {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -3759,7 +3759,7 @@ button.cv-btn:active {
   font-size: 14px;
   font-weight: 600;
 }
-.sv-ad-pop {
+.sv-addon-pop {
   padding: 2px 7px;
   border-radius: 6px;
   font-size: 10.5px;
@@ -3767,12 +3767,12 @@ button.cv-btn:active {
   background: var(--accent-b);
   color: var(--on-b);
 }
-.sv-ad-price {
+.sv-addon-price {
   flex-shrink: 0;
   text-align: right;
   font-size: 12.5px;
 }
-.sv-ad-sub {
+.sv-addon-sub {
   margin-top: 4px;
   font-size: 12.5px;
   line-height: 1.5;
@@ -5029,7 +5029,7 @@ button.cv-btn:active {
 
 /* An inset well that breathes. The pulse is switched off under prefers-reduced-motion by the
    global rule; base opacity stays visible. Placed after the page rules so it wins over a
-   layout class it shares an element with (e.g. `.ad-aside`). */
+   layout class it shares an element with (e.g. `.art-aside`). */
 .skeleton {
   position: relative;
   overflow: hidden;
@@ -5070,7 +5070,7 @@ button.cv-btn:active {
 }
 /* Keeps the aside's own sticky positioning (.skeleton's position:relative would turn its
    sticky top offset into a 100px shift). */
-.sk-ad-aside {
+.sk-art-aside {
   position: sticky;
   height: 320px;
 }
