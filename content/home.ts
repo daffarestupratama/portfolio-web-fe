@@ -129,8 +129,7 @@ export interface Article {
 }
 
 /** Featured articles float to the top of a list, everything else keeps its place.
- *  `sort` is stable (guaranteed since ES2019), so the incoming order — newest-first from
- *  the list query, or the editor's hand-picked relation order on the homepage — survives
+ *  `sort` is stable (guaranteed since ES2019), so the incoming newest-first order survives
  *  inside each group. Returns a new array; the input is untouched. */
 export function featuredFirst(articles: Article[]): Article[] {
   return [...articles].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured));
@@ -151,14 +150,10 @@ export async function getHomePage(): Promise<HomePage> {
   };
 }
 
-/** How many of the home-page `featuredProjects` relation the homepage grid renders.
- *  The relation itself is the source of truth for *which* projects and their order —
- *  this only caps the count. Raise it if the bento grid should show more. */
-export const HOME_FEATURED_PROJECTS_LIMIT = 4;
-
+/** Every project in the home-page `featuredProjects` relation, in its CMS order, uncapped. */
 export async function getFeaturedProjects(): Promise<Project[]> {
   const raw = await getHomePageRaw();
-  return raw.featuredProjects.map(mapProject).slice(0, HOME_FEATURED_PROJECTS_LIMIT);
+  return raw.featuredProjects.map(mapProject);
 }
 
 export async function getFeaturedTours(): Promise<TourPackage[]> {
@@ -166,9 +161,11 @@ export async function getFeaturedTours(): Promise<TourPackage[]> {
   return tours.map(mapTourPackage);
 }
 
+/** Every article in the home-page `featuredArticles` relation, in its CMS order, uncapped. The
+ *  editor's order is final here: unlike /articles, pinned articles are not floated up. */
 export async function getFeaturedArticles(): Promise<Article[]> {
   const raw = await getHomePageRaw();
-  return featuredFirst(raw.featuredArticles.map(mapArticle));
+  return raw.featuredArticles.map(mapArticle);
 }
 
 /** Homepage SEO component (falls back to site-setting.defaultSeo at the call site). */
