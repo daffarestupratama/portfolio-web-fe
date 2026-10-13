@@ -44,7 +44,8 @@ function formatDate(iso: string): string {
 }
 
 function mapGuestbookMessage(m: StrapiGuestbookMessage): GuestbookMessage {
-  const name = m.isAnonymous || !m.displayName ? "Anonymous" : m.displayName;
+  // An anonymous submission is stored with no name (see app/api/guestbook/route.ts).
+  const name = m.displayName?.trim() || "Anonymous";
   return {
     id: m.documentId,
     name,

@@ -8,20 +8,9 @@ import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFind } from "@/lib/strapi";
 import { PROJECT_SLUGS_QUERY, PROJECTS_LIST_QUERY, PROJECTS_SITEMAP_QUERY, projectDetailQuery } from "@/lib/queries";
 import { mapArticle, mapGallery, mapImage, mapProject } from "@/lib/mappers";
-import { strapiImageUrl } from "@/lib/image";
 import type { StrapiProject, StrapiProjectDetail } from "@/lib/types";
 import { mapSeo, toSitemapEntries, type Seo, type SitemapEntry, type StrapiSitemapRow } from "@/content/site";
 import type { Article, GalleryImage, MappedImage, Project } from "@/content/home";
-
-export interface NotebookResource {
-  id: string;
-  title: string;
-  kind: string;
-  description: string | null;
-  url: string | null;
-  embedUrl: string | null;
-  fileUrl: string | null;
-}
 
 export interface ProjectDetail extends Project {
   projectStatus: string;
@@ -30,7 +19,6 @@ export interface ProjectDetail extends Project {
   result: BlocksContent | null;
   coverImage: MappedImage | null;
   gallery: GalleryImage[];
-  notebookResources: NotebookResource[];
   relatedArticles: Article[];
   seo: Seo;
 }
@@ -38,18 +26,6 @@ export interface ProjectDetail extends Project {
 /** A Strapi `blocks` value is a non-empty array of nodes; empty/absent -> null. */
 function asBlocks(value: unknown): BlocksContent | null {
   return Array.isArray(value) && value.length > 0 ? (value as BlocksContent) : null;
-}
-
-function mapNotebookResource(n: StrapiProjectDetail["notebookResources"][number]): NotebookResource {
-  return {
-    id: String(n.id),
-    title: n.title,
-    kind: n.kind,
-    description: n.description || null,
-    url: n.url || null,
-    embedUrl: n.embedUrl || null,
-    fileUrl: n.file?.url ? strapiImageUrl(n.file.url) : null,
-  };
 }
 
 function mapProjectDetail(p: StrapiProjectDetail): ProjectDetail {
@@ -61,10 +37,6 @@ function mapProjectDetail(p: StrapiProjectDetail): ProjectDetail {
     result: asBlocks(p.result),
     coverImage: mapImage(p.coverImage, `${p.title} cover`),
     gallery: mapGallery(p.gallery),
-    notebookResources: (p.notebookResources ?? [])
-      .slice()
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-      .map(mapNotebookResource),
     relatedArticles: (p.relatedArticles ?? []).map(mapArticle),
     seo: mapSeo(p.seo),
   };

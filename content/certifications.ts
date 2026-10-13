@@ -11,7 +11,6 @@ import type { StrapiCertification } from "@/lib/types";
 
 export interface Certification {
   id: string;
-  slug: string;
   title: string;
   issuer: string;
   issuerLogo: MappedImage | null;
@@ -23,7 +22,6 @@ export interface Certification {
   credentialUrl: string | null;
   /** PDF (or image) URL, present only when the entry has one. */
   certificateUrl: string | null;
-  certificateMime: string | null;
   description: string | null;
   kind: string;
   kindLabel: string;
@@ -46,7 +44,6 @@ function clean(value: string | null | undefined): string | null {
 function mapCertification(c: StrapiCertification): Certification {
   return {
     id: c.documentId,
-    slug: c.slug,
     title: c.title,
     issuer: c.issuer,
     issuerLogo: c.issuerLogo?.url
@@ -62,7 +59,6 @@ function mapCertification(c: StrapiCertification): Certification {
     credentialId: clean(c.credentialId),
     credentialUrl: clean(c.credentialUrl),
     certificateUrl: c.certificateImage?.url ? strapiImageUrl(c.certificateImage.url) : null,
-    certificateMime: c.certificateImage?.mime ?? null,
     description: clean(c.description),
     kind: c.kind,
     kindLabel: titleCase(c.kind),

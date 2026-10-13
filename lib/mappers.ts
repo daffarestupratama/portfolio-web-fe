@@ -7,7 +7,6 @@
 
 import type {
   StrapiArticle,
-  StrapiContactLink,
   StrapiCta,
   StrapiExperience,
   StrapiGalleryImage,
@@ -20,12 +19,12 @@ import { strapiImageUrl } from "./image";
 import type {
   Article,
   ArticleLanguage,
-  ContactIcon,
-  ContactLink,
   Cta,
   Experience,
   ExperienceCategory,
   GalleryImage,
+  HeroLink,
+  HeroLinkType,
   MappedImage,
   Project,
   Technology,
@@ -90,39 +89,30 @@ export function mapImage(media: StrapiMedia | null | undefined, alt = ""): Mappe
   };
 }
 
-/** Map a repeatable gallery-image component (sorted by `order`, null images dropped). */
+/** Map a repeatable gallery-image component, in the CMS's own (drag-and-drop) order, null
+ *  images dropped. */
 export function mapGallery(items: StrapiGalleryImage[] | null | undefined): GalleryImage[] {
-  return (items ?? [])
-    .slice()
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .flatMap((item) => {
-      const img = mapImage(item.image, item.alt ?? "");
-      return img ? [{ ...img, alt: item.alt || img.alt, caption: item.caption }] : [];
-    });
+  return (items ?? []).flatMap((item) => {
+    const img = mapImage(item.image, item.alt ?? "");
+    return img ? [{ ...img, alt: item.alt || img.alt, caption: item.caption }] : [];
+  });
 }
 
 export function mapCta(cta: StrapiCta | null, fallback: Cta): Cta {
   return cta ? { label: cta.label, url: cta.url } : fallback;
 }
 
-const KNOWN_ICONS: ReadonlySet<string> = new Set(["linkedin", "github", "instagram", "email"]);
+const HERO_LINK_TYPES: ReadonlySet<string> = new Set(["linkedin", "github", "instagram"]);
 
-/** Strapi's `icon` field is free-form; drop anything outside our known 4 rather than
- *  let hero.tsx's unconditional `contactIcons[link.icon]` lookup crash on render. */
-export function mapContactLinks(links: StrapiContactLink[]): ContactLink[] {
-  return links
-    .filter((l) => KNOWN_ICONS.has(l.icon))
-    .map((l) => ({ icon: l.icon as ContactIcon, label: l.label, url: l.url }));
-}
-
-/** Hero social row, sourced from site-setting.contactLinks (home-page.contactLinks is empty in
- *  the CMS). Same known-icon filter as above, except site settings name the email link `mail`,
- *  which is accepted as `email`. Order and selection are the caller's concern. */
-export function mapHeroContactLinks(links: { icon: string; label: string; url: string }[]): ContactLink[] {
-  return links
-    .map((l) => ({ ...l, icon: l.icon === "mail" ? "email" : l.icon }))
-    .filter((l) => KNOWN_ICONS.has(l.icon))
-    .map((l) => ({ icon: l.icon as ContactIcon, label: l.label, url: l.url }));
+/** The hero's social row from site-setting.contactLinks, keyed on `linkType`: the first
+ *  LinkedIn, GitHub and Instagram rows, plus an email link built from the resolved site email
+ *  (so the hero and the contact card can never disagree). Order is the hero's concern. */
+export function mapHeroLinks(links: { linkType: string; label: string; url: string }[], email: string): HeroLink[] {
+  const profiles = links
+    .filter((l) => HERO_LINK_TYPES.has(l.linkType) && l.url)
+    .map((l) => ({ linkType: l.linkType as HeroLinkType, label: l.label, url: l.url }));
+  const emailLabel = links.find((l) => l.linkType === "email")?.label || "Email";
+  return [...profiles, { linkType: "email", label: emailLabel, url: `mailto:${email}` }];
 }
 
 function twoDigitYear(iso: string): string {
@@ -185,8 +175,7 @@ export function mapExperience(e: StrapiExperience): Experience {
 }
 
 /** Newest-first: current roles first, then latest end date, then latest start date.
- *  ISO date strings (YYYY-MM-DD) compare lexically = chronologically. Reused by the
- *  homepage section and the future /about + experience list pages. */
+ *  ISO date strings (YYYY-MM-DD) compare lexically = chronologically. */
 export function byNewestExperience(a: Experience, b: Experience): number {
   if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
   const aEnd = a.endDate ?? a.startDate;
@@ -197,7 +186,7 @@ export function byNewestExperience(a: Experience, b: Experience): number {
 }
 
 /** Bucket mapped experiences into the 3 tab categories, each sorted newest-first.
- *  Reused by the homepage (getFeaturedExperiences) and the /about page. */
+ *  Used by getExperiences (content/experiences.ts) for the homepage and /about. */
 export function bucketExperiences(experiences: Experience[]): Record<ExperienceCategory, Experience[]> {
   const bucket = (category: ExperienceCategory) =>
     experiences.filter((e) => e.category === category).sort(byNewestExperience);
@@ -237,11 +226,9 @@ export function mapProject(p: StrapiProject): Project {
     summary: p.summary,
     year: String(p.year),
     projectType: p.projectType,
-    techStack: toStringArray(p.techStack),
     technologies: mapTechnologies(p.technologies),
     coverImage: mapImage(p.coverImage, `${p.title} cover`),
     githubUrl: p.githubUrl || undefined,
-    dashboardUrl: p.dashboardUrl || undefined,
     liveDemoUrl: p.liveDemoUrl || undefined,
   };
 }
@@ -312,8 +299,7 @@ function estimateReadTime(body: unknown): string {
 
 const KNOWN_LANGUAGES: ReadonlySet<string> = new Set(["en", "id", "de"]);
 
-/** `language` currently 400s when queried on the live schema — this fallback is
- *  load-bearing today, not just defensive. */
+/** Entries created before the `language` field existed have it empty; they are English. */
 function mapLanguage(language: string | null | undefined): ArticleLanguage {
   return language && KNOWN_LANGUAGES.has(language) ? (language as ArticleLanguage) : "en";
 }

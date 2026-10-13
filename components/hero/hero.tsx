@@ -1,4 +1,4 @@
-import type { ContactIcon, ContactLink, HomePage } from "@/content/home";
+import type { HeroLink, HeroLinkType, HomePage } from "@/content/home";
 import { indonesiaMap } from "@/lib/geo/indonesia";
 import { CtaLink } from "@/components/ui/cta-link";
 import { HeroPanel } from "./hero-panel";
@@ -13,16 +13,16 @@ const contactIcons = {
 };
 
 /** 2a's social row: these four, in this order. */
-const SOCIAL_ORDER: ContactIcon[] = ["linkedin", "github", "instagram", "email"];
+const SOCIAL_ORDER: HeroLinkType[] = ["linkedin", "github", "instagram", "email"];
 
 interface HeroProps {
   home: HomePage;
-  /** From site-setting.contactLinks (see mapHeroContactLinks). */
-  links: ContactLink[];
+  /** From site-setting.contactLinks, keyed on linkType (see mapHeroLinks). */
+  links: HeroLink[];
 }
 
 export function Hero({ home, links }: HeroProps) {
-  const socials = SOCIAL_ORDER.flatMap((icon) => links.filter((l) => l.icon === icon).slice(0, 1));
+  const socials = SOCIAL_ORDER.flatMap((type) => links.filter((l) => l.linkType === type).slice(0, 1));
 
   return (
     <header className="hero">
@@ -49,16 +49,16 @@ export function Hero({ home, links }: HeroProps) {
             {socials.length > 0 && (
               <>
                 <span aria-hidden="true" className="hero-divider" />
-                <div className="hero-linkss">
+                <div className="hero-links">
                   {socials.map((link) => {
-                    const Icon = contactIcons[link.icon];
+                    const Icon = contactIcons[link.linkType];
                     const external = /^https?:\/\//.test(link.url);
                     return (
                       <a
-                        key={link.icon}
+                        key={link.linkType}
                         href={link.url}
                         aria-label={link.label}
-                        className="hero-links"
+                        className="hero-link"
                         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                       >
                         <Icon />

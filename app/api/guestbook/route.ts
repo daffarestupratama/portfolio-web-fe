@@ -8,7 +8,8 @@ const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? "https://cms.daffa.me"
 
 const MESSAGE_MIN = 3;
 const MESSAGE_MAX = 1000;
-const NAME_MAX = 80;
+// Strapi's `displayName` maxLength; the form enforces the same limit.
+const NAME_MAX = 50;
 
 // Simple per-IP sliding-window rate limit. In-memory = per server instance only,
 // which is acceptable here (a light anti-spam layer, not a security boundary).
@@ -60,6 +61,7 @@ export async function POST(req: Request) {
     return bad(`Message must be between ${MESSAGE_MIN} and ${MESSAGE_MAX} characters.`, 400);
   }
 
+  // Anonymity is stored as the absence of a name; the flag itself is not forwarded.
   const isAnonymous = body.isAnonymous === true;
   const rawName = typeof body.displayName === "string" ? body.displayName.trim() : "";
   if (rawName.length > NAME_MAX) {
@@ -86,14 +88,13 @@ export async function POST(req: Request) {
         data: {
           message,
           displayName,
-          isAnonymous,
           category,
           // Auto-publish: submissions are created visible and appear immediately.
           // (Verified live: token-created entries are published, so the public find
           // returns them right away. Honeypot + rate limit remain the spam guard.)
           // `moderationStatus` alone governs visibility — see GUESTBOOK_MESSAGES_QUERY.
+          // No submission timestamp: Strapi's own `createdAt` is what sorts and displays.
           moderationStatus: "visible",
-          submittedAt: new Date().toISOString(),
         },
       }),
       cache: "no-store",

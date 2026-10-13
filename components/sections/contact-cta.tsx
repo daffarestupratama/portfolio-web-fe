@@ -1,16 +1,14 @@
 import { MailIcon, WhatsappIcon } from "@/components/ui/icons";
 
-// Hardcoded fallbacks — used only when site-setting leaves the field empty.
-const FALLBACK_EMAIL = "contact@daffa.me";
-const FALLBACK_WHATSAPP_URL = "https://wa.me/6288233300541";
+// Copy fallbacks — used only when site-setting leaves the field empty.
 const DEFAULT_HEADING = "Let's work together";
 const DEFAULT_DESCRIPTION =
   "Have a project, a dataset, or a city you'd like to explore on foot? I'm happy to talk — reach out and I'll get back to you.";
 
 interface ContactCTAProps {
-  /** From site-setting via getSiteSettings() — CMS-editable. */
-  email?: string | null;
-  whatsappUrl?: string | null;
+  /** Resolved by getSiteSettings() from site-setting.contactLinks — never empty. */
+  email: string;
+  whatsappUrl: string;
   /** Optional overrides (e.g. /services passes service-page.ctaHeading / ctaText). */
   heading?: string | null;
   description?: string | null;
@@ -23,8 +21,6 @@ interface ContactCTAProps {
  * actions in an inset well.
  */
 export function ContactCTA({ email, whatsappUrl, heading, description, variant = "default" }: ContactCTAProps) {
-  const resolvedEmail = email || FALLBACK_EMAIL;
-  const resolvedWhatsapp = whatsappUrl || FALLBACK_WHATSAPP_URL;
   const resolvedHeading = heading || DEFAULT_HEADING;
   const resolvedDescription = description || DEFAULT_DESCRIPTION;
 
@@ -40,11 +36,11 @@ export function ContactCTA({ email, whatsappUrl, heading, description, variant =
               <p className="cta-text">{resolvedDescription}</p>
             </div>
             <div className="cta-well">
-              <a href={resolvedWhatsapp} target="_blank" rel="noopener noreferrer" className="nm-btn-accent cta-btn">
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="nm-btn-accent cta-btn">
                 <WhatsappIcon width={17} height={17} />
                 WhatsApp
               </a>
-              <a href={`mailto:${resolvedEmail}`} className="cta-btn cta-btn-email">
+              <a href={`mailto:${email}`} className="cta-btn cta-btn-email">
                 <MailIcon />
                 Email
               </a>

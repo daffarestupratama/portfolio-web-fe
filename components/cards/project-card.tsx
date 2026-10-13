@@ -83,17 +83,10 @@ export function ProjectCard({ project, index = 0, layout = "standalone" }: Proje
             <div>
               <div className="pc-tech-row">
                 <div className="pc-skills">
-                  {skills.length > 0
-                    ? skills.map((t) => (
-                        // Name only, as 2a's title tooltip shows (no level on cards).
-                        <TechTile key={t.id} item={{ name: t.name, logo: t.logo }} variant="card" href={href} />
-                      ))
-                    : // Legacy plain-text stack, for projects with no linked technologies yet.
-                      project.techStack.slice(0, MAX_SKILLS).map((name) => (
-                        <span key={name} className="pc-chip mono">
-                          {name}
-                        </span>
-                      ))}
+                  {skills.map((t) => (
+                    // Name only, as 2a's title tooltip shows (no level on cards).
+                    <TechTile key={t.id} item={{ name: t.name, logo: t.logo }} variant="card" href={href} />
+                  ))}
                 </div>
                 {layout !== "services" && (
                   <span aria-hidden="true" className="pc-details mono">

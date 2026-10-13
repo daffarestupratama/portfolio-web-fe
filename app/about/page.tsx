@@ -7,6 +7,7 @@ import { StrapiImage } from "@/components/ui/strapi-image";
 import { SkillsSection } from "@/components/about/skills-section";
 import { Experiences } from "@/components/sections/experiences";
 import { getFeaturedCertifications } from "@/content/certifications";
+import { getExperiences } from "@/content/experiences";
 import { ContactCTA } from "@/components/sections/contact-cta";
 
 export const revalidate = 86400;
@@ -25,10 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const [about, site, certifications] = await Promise.all([
+  const [about, site, certifications, experiences] = await Promise.all([
     getAboutPage(),
     getSiteSettings(),
     getFeaturedCertifications(),
+    getExperiences(),
   ]);
   const photo = about.profileImage;
 
@@ -77,7 +79,7 @@ export default async function AboutPage() {
         </div>
       </header>
 
-      <Experiences experiences={about.experiences} certifications={certifications} />
+      <Experiences experiences={experiences} certifications={certifications} />
 
       <SkillsSection groups={about.skillGroups} />
 

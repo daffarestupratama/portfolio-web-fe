@@ -17,6 +17,8 @@ const CATEGORY_OPTIONS = [
 
 const MESSAGE_MIN = 3;
 const MESSAGE_MAX = 1000;
+// Strapi's `displayName` maxLength; the route enforces the same limit.
+const NAME_MAX = 50;
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -34,6 +36,8 @@ export function GuestbookForm() {
   const router = useRouter();
   const trimmed = message.trim();
   const messageInvalid = trimmed.length < MESSAGE_MIN || trimmed.length > MESSAGE_MAX;
+  // `maxLength` stops typing at the limit; this also catches a pasted or scripted value.
+  const nameInvalid = !isAnonymous && displayName.trim().length > NAME_MAX;
 
   function resetFields() {
     setMessage("");
@@ -46,7 +50,7 @@ export function GuestbookForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (messageInvalid) {
+    if (messageInvalid || nameInvalid) {
       setShowValidation(true);
       return;
     }
@@ -126,11 +130,21 @@ export function GuestbookForm() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             disabled={isAnonymous}
-            maxLength={80}
+            maxLength={NAME_MAX}
+            aria-invalid={showValidation && nameInvalid}
+            aria-describedby={showValidation && nameInvalid ? `${ids}-name-err` : undefined}
             autoComplete="name"
             placeholder={isAnonymous ? "Anonymous" : "Your name"}
             className="gb-field"
           />
+          {/* Rendered only when invalid, so the valid form keeps its exact layout. */}
+          {showValidation && nameInvalid && (
+            <div id={`${ids}-name-err`} className="gb-help">
+              <span data-show className="gb-err-line">
+                Name must be {NAME_MAX} characters or fewer.
+              </span>
+            </div>
+          )}
         </div>
 
         <div>

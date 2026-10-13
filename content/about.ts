@@ -1,14 +1,14 @@
-/** About-page accessor: body blocks, skills grouped by category, and experiences
- *  bucketed for reuse of the homepage Experiences timeline. */
+/** About-page accessor: body blocks and skills grouped by category. The page's experiences
+ *  come from getExperiences (content/experiences.ts), shared with the homepage. */
 
 import { cache } from "react";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
 import { strapiFindOne } from "@/lib/strapi";
 import { ABOUT_PAGE_QUERY } from "@/lib/queries";
-import { bucketExperiences, mapExperience, mapImage, titleCase } from "@/lib/mappers";
+import { mapImage, titleCase } from "@/lib/mappers";
 import type { StrapiAboutPage, StrapiSkill } from "@/lib/types";
 import { mapSeo, type Seo } from "@/content/site";
-import type { Experience, ExperienceCategory, MappedImage } from "@/content/home";
+import type { MappedImage } from "@/content/home";
 
 export interface Skill {
   name: string;
@@ -30,7 +30,6 @@ export interface AboutPage {
   profileImage: MappedImage | null;
   body: BlocksContent | null;
   skillGroups: SkillGroup[];
-  experiences: Record<ExperienceCategory, Experience[]>;
   seo: Seo;
 }
 
@@ -62,7 +61,6 @@ export const getAboutPage = cache(async (): Promise<AboutPage> => {
     profileImage: mapImage(raw.profileImage, raw.title || "Profile photo"),
     body: asBlocks(raw.body),
     skillGroups: groupSkills(raw.skills ?? []),
-    experiences: bucketExperiences((raw.experiences ?? []).map(mapExperience)),
     seo: mapSeo(raw.seo),
   };
 });

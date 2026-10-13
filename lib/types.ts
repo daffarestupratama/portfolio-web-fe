@@ -34,7 +34,6 @@ export interface StrapiCta {
   id: number;
   label: string;
   url: string;
-  style: string;
   description?: string | null;
 }
 
@@ -42,7 +41,6 @@ export interface StrapiSeo {
   id: number;
   metaTitle: string | null;
   metaDescription: string | null;
-  canonicalUrl: string | null;
   noIndex: boolean | null;
   ogImage: StrapiMedia | null;
 }
@@ -52,9 +50,6 @@ export interface StrapiContactLink {
   label: string;
   url: string;
   linkType: string;
-  icon: string;
-  isPrimary: boolean;
-  sortOrder: number;
 }
 
 export interface StrapiPriceOption {
@@ -79,19 +74,7 @@ export interface StrapiGalleryImage {
   id: number;
   alt: string | null;
   caption: string | null;
-  order: number | null;
   image: StrapiMedia | null;
-}
-
-export interface StrapiNotebookResource {
-  id: number;
-  title: string;
-  kind: string;
-  url: string | null;
-  embedUrl: string | null;
-  description: string | null;
-  order: number | null;
-  file: StrapiMedia | null;
 }
 
 export interface StrapiExperience {
@@ -105,8 +88,6 @@ export interface StrapiExperience {
   endDate: string | null;
   isCurrent: boolean | null;
   description: string;
-  sortOrder: number | null;
-  isFeatured: boolean;
   gallery: StrapiGalleryImage[];
   logo?: StrapiMedia | null;
 }
@@ -118,15 +99,12 @@ export interface StrapiProject {
   slug: string;
   summary: string;
   coverImage: StrapiMedia | null;
-  /** Legacy plain-text stack. Retained as the fallback while entries migrate to `technologies`. */
-  techStack: unknown;
-  /** manyToMany → skill. Empty until an entry is migrated. */
+  /** manyToMany → skill. */
   technologies?: StrapiSkill[];
   projectType: string;
   year: number;
   githubUrl: string;
   liveDemoUrl: string;
-  dashboardUrl: string;
   // No `isFeatured`: the homepage uses the home-page `featuredProjects` relation as the
   // source of truth, and the Strapi field is being removed.
 }
@@ -138,7 +116,6 @@ export interface StrapiProjectDetail extends StrapiProject {
   result: unknown;
   projectStatus: string;
   gallery: StrapiGalleryImage[];
-  notebookResources: StrapiNotebookResource[];
   relatedArticles: StrapiArticle[];
   seo: StrapiSeo | null;
 }
@@ -201,7 +178,6 @@ export interface StrapiTourGuideLanding {
   whyChooseMe: unknown;
   heroImage: StrapiMedia | null;
   primaryCta: StrapiCta | null;
-  contactLinks: StrapiContactLink[];
   featuredTours: StrapiTourPackage[];
   seo: StrapiSeo | null;
 }
@@ -212,14 +188,13 @@ export interface StrapiCertification {
   id: number;
   documentId: string;
   title: string;
-  slug: string;
   issuer: string;
   issuerLogo: StrapiMedia | null;
   issueDate: string;
   credentialId: string | null;
   credentialUrl: string | null;
-  /** A PDF in practice (verified live), NOT an image — the list query reduces it to url+mime. */
-  certificateImage: { url: string; mime: string } | null;
+  /** A PDF in practice (verified live), NOT an image — the list query reduces it to its url. */
+  certificateImage: { url: string } | null;
   description: string | null;
   kind: string;
   skills: { name: string }[] | null;
@@ -234,7 +209,6 @@ export interface StrapiSkill {
   category: string;
   level: string;
   description: string | null;
-  isFeatured: boolean;
   order: number | null;
   /** Technology logo (images only). Absent for non-technology skills (e.g. languages). */
   logo?: StrapiMedia | null;
@@ -247,9 +221,7 @@ export interface StrapiAboutPage {
   subtitle: string | null;
   body: unknown;
   profileImage: StrapiMedia | null;
-  contactLinks: StrapiContactLink[];
   skills: StrapiSkill[];
-  experiences: StrapiExperience[];
   seo: StrapiSeo | null;
 }
 
@@ -261,8 +233,6 @@ export interface StrapiHomePage {
   subheadline: string;
   heroCtaPrimary: StrapiCta | null;
   heroCtaSecondary: StrapiCta | null;
-  contactLinks: StrapiContactLink[];
-  featuredExperiences: StrapiExperience[];
   featuredProjects: StrapiProject[];
   featuredArticles: StrapiArticle[];
   seo: StrapiSeo | null;
@@ -273,9 +243,10 @@ export interface StrapiSiteSetting {
   documentId: string;
   siteName: string | null;
   footerText: string | null;
-  copyrightText: string | null;
-  email: string | null;
-  whatsappUrl: string | null;
+  /** Transitional: superseded by the email / whatsapp rows of `contactLinks` and read only as a
+   *  fallback. Both are being removed from the schema, after which they arrive undefined. */
+  email?: string | null;
+  whatsappUrl?: string | null;
   contactLinks: StrapiContactLink[];
   defaultSeo: StrapiSeo | null;
   authorAvatar: StrapiMedia | null;
@@ -287,14 +258,12 @@ export interface StrapiServiceFeature {
   id: number;
   title: string;
   description: string;
-  icon: string | null;
 }
 
 export interface StrapiServiceProcess {
   id: number;
   title: string;
   description: string;
-  order: number | null;
 }
 
 export interface StrapiServiceFaq {
@@ -326,7 +295,6 @@ export interface StrapiServicePackage {
   id: number;
   documentId: string;
   name: string;
-  slug: string;
   tagline: string | null;
   kind: string;
   billing: string;
@@ -338,7 +306,6 @@ export interface StrapiServicePackage {
   revisions: string | null;
   suitableFor: string | null;
   isPopular: boolean | null;
-  isActive: boolean | null;
   order: number | null;
 }
 
@@ -365,7 +332,6 @@ export interface StrapiTerminalCommand {
   outputType: string | null;
   linkUrl: string | null;
   category: string | null;
-  isActive: boolean | null;
   order: number | null;
 }
 
@@ -374,12 +340,9 @@ export interface StrapiGuestbookMessage {
   documentId: string;
   message: string;
   displayName: string | null;
-  isAnonymous: boolean | null;
   isPinned: boolean | null;
   category: string | null;
-  submittedAt: string | null;
   reply: string | null;
-  repliedAt: string | null;
   moderationStatus: string;
   createdAt: string;
 }

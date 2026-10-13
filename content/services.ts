@@ -29,6 +29,7 @@ export interface ServiceFeature {
 }
 
 export interface ServiceProcessStep {
+  /** 1-based position in the CMS list, shown as the step number. */
   order: number;
   title: string;
   description: string;
@@ -165,14 +166,12 @@ export const getServicePage = cache(async (): Promise<ServicePage> => {
       title: fixMojibake(f.title),
       description: fixMojibake(f.description),
     })),
-    process: (raw.process ?? [])
-      .slice()
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-      .map((s, i) => ({
-        order: s.order ?? i + 1,
-        title: fixMojibake(s.title),
-        description: fixMojibake(s.description),
-      })),
+    // Numbered by position: the CMS's own (drag-and-drop) order is the step order.
+    process: (raw.process ?? []).map((s, i) => ({
+      order: i + 1,
+      title: fixMojibake(s.title),
+      description: fixMojibake(s.description),
+    })),
     faqs: (raw.faqs ?? []).map((q) => ({
       question: fixMojibake(q.question),
       answer: fixMojibake(q.answer),
@@ -188,16 +187,16 @@ export const getServicePage = cache(async (): Promise<ServicePage> => {
 });
 
 export const getServicePackages = cache(async (): Promise<ServicePackages> => {
+  // Every published package is offered; unpublishing one in the CMS withdraws it.
   const raw = await strapiFind<StrapiServicePackage>("service-packages", SERVICE_PACKAGES_QUERY);
-  const active = raw
-    .filter((p) => p.isActive !== false)
+  const all = raw
     .slice()
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map(mapPackage);
   return {
-    packages: active.filter((p) => p.kind === "package"),
-    bundles: active.filter((p) => p.kind === "bundle"),
-    maintenance: active.filter((p) => p.kind === "maintenance"),
+    packages: all.filter((p) => p.kind === "package"),
+    bundles: all.filter((p) => p.kind === "bundle"),
+    maintenance: all.filter((p) => p.kind === "maintenance"),
   };
 });
 

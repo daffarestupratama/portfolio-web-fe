@@ -4,7 +4,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import { getProjectSlugs } from "@/content/projects";
 import { getArticleSlugs } from "@/content/articles";
 import { getTourSlugs } from "@/content/tours";
-import { getTerminalCommands } from "@/content/mkdir";
+import { buildContactText, getTerminalCommands } from "@/content/mkdir";
 import { FEATURES } from "@/lib/features";
 import { Terminal } from "@/components/mkdir/terminal";
 
@@ -22,11 +22,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MkdirPage() {
-  const [projects, articles, tours, cmsCommands] = await Promise.all([
+  // site-setting is the same cached read generateMetadata makes, so it adds no request.
+  const [projects, articles, tours, cmsCommands, site] = await Promise.all([
     getProjectSlugs(),
     getArticleSlugs(),
     getTourSlugs(),
     getTerminalCommands(),
+    getSiteSettings(),
   ]);
   // Tours are hidden while FEATURES.tours is off — report 0 so neofetch/motd omit them.
   const counts = {
@@ -49,7 +51,7 @@ export default async function MkdirPage() {
         </p>
       </section>
 
-      <Terminal counts={counts} cmsCommands={cmsCommands} />
+      <Terminal counts={counts} cmsCommands={cmsCommands} contactText={buildContactText(site)} />
     </main>
   );
 }

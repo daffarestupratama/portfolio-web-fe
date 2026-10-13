@@ -1,10 +1,14 @@
 import { getSiteSettings } from "@/content/site";
 import { SITE_NAME } from "@/lib/seo";
 
+/** 2a's tagline, shown when site-setting.footerText is empty. */
+const FOOTER_TAGLINE = "Data · Business · Finance · Maps · Technology";
+
 /**
- * 2a's footer: an inset bar. The name comes from the same cached site-settings read the root
- * layout's metadata already makes, so this adds no request. The year is taken at render time,
- * which under ISR means the last build or revalidation.
+ * 2a's footer: an inset bar. The name and the tagline (site-setting.footerText) come from the
+ * same cached site-settings read the root layout's metadata already makes, so this adds no
+ * request. The year is taken at render time, which under ISR means the last build or
+ * revalidation.
  */
 export async function Footer() {
   const site = await getSiteSettings();
@@ -29,7 +33,7 @@ export async function Footer() {
         <span>
           © {year} {site.siteName || SITE_NAME}
         </span>
-        <span>Data · Business · Finance · Maps · Technology</span>
+        <span>{site.footerText || FOOTER_TAGLINE}</span>
       </div>
     </footer>
   );

@@ -8,22 +8,15 @@
 import { cache } from "react";
 import { strapiFind, strapiFindOne } from "@/lib/strapi";
 import { FEATURED_TOUR_PACKAGES_QUERY, HOME_PAGE_QUERY } from "@/lib/queries";
-import {
-  bucketExperiences,
-  mapArticle,
-  mapContactLinks,
-  mapCta,
-  mapExperience,
-  mapProject,
-  mapTourPackage,
-} from "@/lib/mappers";
+import { mapArticle, mapCta, mapProject, mapTourPackage } from "@/lib/mappers";
 import type { StrapiHomePage, StrapiTourPackage } from "@/lib/types";
 import { mapSeo, type Seo } from "@/content/site";
 
-export type ContactIcon = "linkedin" | "github" | "instagram" | "email";
+/** The four contact links in the hero's social row (site-setting.contactLinks `linkType`s). */
+export type HeroLinkType = "linkedin" | "github" | "instagram" | "email";
 
-export interface ContactLink {
-  icon: ContactIcon;
+export interface HeroLink {
+  linkType: HeroLinkType;
   label: string;
   url: string;
 }
@@ -39,7 +32,6 @@ export interface HomePage {
   subheadline: string;
   heroCtaPrimary: Cta;
   heroCtaSecondary: Cta;
-  contactLinks: ContactLink[];
 }
 
 /** A resolved image (absolute URL + intrinsic size) for next/image. */
@@ -101,12 +93,9 @@ export interface Project {
   summary: string;
   year: string;
   projectType: ProjectType;
-  /** Legacy plain-text stack — the fallback when `technologies` is empty. */
-  techStack: string[];
   technologies: Technology[];
   coverImage: MappedImage | null;
   githubUrl?: string;
-  dashboardUrl?: string;
   liveDemoUrl?: string;
 }
 
@@ -147,8 +136,8 @@ export function featuredFirst(articles: Article[]): Article[] {
   return [...articles].sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured));
 }
 
-/** All four home-page-derived accessors read the same endpoint — cache() collapses
- *  them to a single network round trip per render. */
+/** All home-page-derived accessors read the same endpoint — cache() collapses them to a
+ *  single network round trip per render. */
 const getHomePageRaw = cache(() => strapiFindOne<StrapiHomePage>("home-page", HOME_PAGE_QUERY));
 
 export async function getHomePage(): Promise<HomePage> {
@@ -159,13 +148,7 @@ export async function getHomePage(): Promise<HomePage> {
     subheadline: raw.subheadline,
     heroCtaPrimary: mapCta(raw.heroCtaPrimary, { label: "Resume", url: "#" }),
     heroCtaSecondary: mapCta(raw.heroCtaSecondary, { label: "About me", url: "/about" }),
-    contactLinks: mapContactLinks(raw.contactLinks),
   };
-}
-
-export async function getFeaturedExperiences(): Promise<Record<ExperienceCategory, Experience[]>> {
-  const raw = await getHomePageRaw();
-  return bucketExperiences(raw.featuredExperiences.map(mapExperience));
 }
 
 /** How many of the home-page `featuredProjects` relation the homepage grid renders.

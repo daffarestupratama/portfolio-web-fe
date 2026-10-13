@@ -30,12 +30,17 @@ const SAFE_MINIMUM: PathSpec[] = [["/"], ["/sitemap.xml"]];
  */
 type PathSpec = [path: string] | [path: string, type: "layout" | "page"];
 
-/** Content type → the routes its content appears on. Keys are Strapi model names. */
+/**
+ * Content type → every route that reads it. Keys are Strapi model names. Checked against the
+ * readers in content/* and the pages that call them; a relation counts too (an article shown
+ * as "related writing" on a project page puts /projects on article's list).
+ */
 const ROUTES: Record<string, PathSpec[]> = {
-  // Detail slug is appended at request time when the payload carries one.
-  article: [["/articles", "layout"], ["/"], ["/sitemap.xml"]],
-  project: [["/projects", "layout"], ["/"], ["/services"], ["/sitemap.xml"]],
-  "tour-package": [["/tours", "layout"], ["/"], ["/sitemap.xml"]],
+  // Detail slug is appended at request time when the payload carries one. /mkdir shows the
+  // project, article and (when tours are on) tour counts.
+  article: [["/articles", "layout"], ["/projects", "layout"], ["/"], ["/mkdir"], ["/sitemap.xml"]],
+  project: [["/projects", "layout"], ["/articles", "layout"], ["/"], ["/services"], ["/mkdir"], ["/sitemap.xml"]],
+  "tour-package": [["/tours", "layout"], ["/"], ["/mkdir"], ["/sitemap.xml"]],
 
   "tour-guide-landing-page": [["/tours"]],
   "home-page": [["/"], ["/sitemap.xml"]],
@@ -45,18 +50,21 @@ const ROUTES: Record<string, PathSpec[]> = {
   "service-package": [["/services"]],
   "service-addon": [["/services"]],
 
-  // Populated as `technologies` on projects (home, list, detail, services) and as
-  // `skills` on about-page — see the populate map in lib/queries.ts.
-  skill: [["/about"], ["/projects", "layout"], ["/services"], ["/"]],
-  // `featuredExperiences` on home-page, `experiences` on about-page.
+  // Populated as `technologies` on projects (home, list, detail, services), as `skills` on
+  // about-page, and as skill names on the certification cards.
+  skill: [["/about"], ["/projects", "layout"], ["/services"], ["/"], ["/certifications"]],
+  // Read directly from the collection by the homepage and /about (content/experiences.ts).
   experience: [["/"], ["/about"]],
+  // The list page, plus the featured ones in the Experiences tab on the homepage and /about.
+  certification: [["/certifications"], ["/"], ["/about"]],
 
   "terminal-command": [["/mkdir"]],
   "guestbook-message": [["/guestbook"]],
 
-  // Feeds metadata and the footer on EVERY route, so this is the one legitimate use of the
-  // site-wide layout tag. It expires every page, meaning the next visitor to each one pays
-  // a full render — deploy-sized, fine occasionally, not for routine edits.
+  // Feeds metadata, the footer and every contact surface (hero, contact card, /services, the
+  // terminal's contact.txt) on EVERY route, so this is the one legitimate use of the site-wide
+  // layout tag. It expires every page, meaning the next visitor to each one pays a full
+  // render — deploy-sized, fine occasionally, not for routine edits.
   "site-setting": [["/", "layout"]],
 };
 
@@ -74,6 +82,7 @@ const ALIASES: Record<string, string> = {
   "tour-packages": "tour-package",
   skills: "skill",
   experiences: "experience",
+  certifications: "certification",
   "service-packages": "service-package",
   "service-addons": "service-addon",
   "terminal-commands": "terminal-command",

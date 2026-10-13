@@ -1,5 +1,19 @@
-import type { NotebookResource } from "@/content/projects";
 import { titleCase } from "@/lib/mappers";
+
+/**
+ * Not rendered anywhere at the moment: project.notebookResources is no longer read, and this
+ * component is kept for the project resources field that will replace it in the CMS. The prop
+ * type lives here so the file stays self-contained until it is wired up again.
+ */
+export interface NotebookResource {
+  id: string;
+  title: string;
+  kind: string;
+  description: string | null;
+  url: string | null;
+  embedUrl: string | null;
+  fileUrl: string | null;
+}
 
 interface NotebookResourcesProps {
   resources: NotebookResource[];

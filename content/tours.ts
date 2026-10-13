@@ -19,12 +19,10 @@ import type {
 import { mapSeo, toSitemapEntries, type Seo, type SitemapEntry, type StrapiSitemapRow } from "@/content/site";
 import type { GalleryImage, MappedImage, TourPackage } from "@/content/home";
 
-export interface ContactLinkOut {
+/** A tour's booking link. The first is styled as the primary button by position. */
+export interface BookingLink {
   label: string;
   url: string;
-  icon: string;
-  linkType: string;
-  isPrimary: boolean;
 }
 
 export interface TourLanding {
@@ -34,7 +32,6 @@ export interface TourLanding {
   whyChooseMe: string[];
   heroImage: MappedImage | null;
   primaryCta: { label: string; url: string; description: string | null } | null;
-  contactLinks: ContactLinkOut[];
   featuredSlugs: string[];
   seo: Seo;
 }
@@ -70,7 +67,7 @@ export interface TourDetail {
   excluded: string[];
   route: RouteStop[];
   priceOptions: PriceOption[];
-  bookingContact: ContactLinkOut[];
+  bookingContact: BookingLink[];
   gallery: GalleryImage[];
   seo: Seo;
 }
@@ -79,8 +76,8 @@ function asBlocks(value: unknown): BlocksContent | null {
   return Array.isArray(value) && value.length > 0 ? (value as BlocksContent) : null;
 }
 
-function mapContactLinkOut(c: StrapiContactLink): ContactLinkOut {
-  return { label: c.label, url: c.url, icon: c.icon, linkType: c.linkType, isPrimary: c.isPrimary };
+function mapBookingLink(c: StrapiContactLink): BookingLink {
+  return { label: c.label, url: c.url };
 }
 
 function mapPriceOption(o: StrapiPriceOption): PriceOption {
@@ -108,7 +105,6 @@ export const getTourLanding = cache(async (): Promise<TourLanding> => {
     primaryCta: raw.primaryCta
       ? { label: raw.primaryCta.label, url: raw.primaryCta.url, description: raw.primaryCta.description ?? null }
       : null,
-    contactLinks: (raw.contactLinks ?? []).map(mapContactLinkOut),
     featuredSlugs: (raw.featuredTours ?? []).map((t) => t.slug).filter(Boolean),
     seo: mapSeo(raw.seo),
   };
@@ -143,7 +139,7 @@ export async function getTourBySlug(slug: string): Promise<TourDetail | null> {
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       .map(mapRouteStop),
     priceOptions: (t.priceOption ?? []).map(mapPriceOption),
-    bookingContact: (t.bookingContact ?? []).map(mapContactLinkOut),
+    bookingContact: (t.bookingContact ?? []).map(mapBookingLink),
     gallery: mapGallery(t.gallery),
     seo: mapSeo(t.seo),
   };

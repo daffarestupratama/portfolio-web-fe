@@ -9,14 +9,15 @@ import { ContactCTA } from "@/components/sections/contact-cta";
 import { HomeJsonLd } from "@/components/seo/json-ld";
 import {
   getFeaturedArticles,
-  getFeaturedExperiences,
   getFeaturedProjects,
   getFeaturedTours,
   getHomePage,
   getHomePageSeo,
 } from "@/content/home";
+import { getExperiences } from "@/content/experiences";
 import { getSiteSettings } from "@/content/site";
-import { mapHeroContactLinks } from "@/lib/mappers";
+import { mapHeroLinks } from "@/lib/mappers";
+import { PROFILE_LINK_TYPES } from "@/lib/contact";
 import { buildPageMetadata } from "@/lib/seo";
 import { FEATURES } from "@/lib/features";
 
@@ -30,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const [home, experiences, projects, tours, articles, site, certifications] = await Promise.all([
     getHomePage(),
-    getFeaturedExperiences(),
+    getExperiences(),
     getFeaturedProjects(),
     FEATURES.tours ? getFeaturedTours() : Promise.resolve([]),
     getFeaturedArticles(),
@@ -38,13 +39,15 @@ export default async function Home() {
     getFeaturedCertifications(),
   ]);
 
-  const sameAs = site.contactLinks.map((l) => l.url).filter((url) => /^https?:\/\//.test(url));
+  // Profiles only: a mailto: or wa.me link is a way to reach the person, not who they are.
+  const sameAs = site.contactLinks
+    .filter((l) => PROFILE_LINK_TYPES.has(l.linkType) && /^https?:\/\//.test(l.url))
+    .map((l) => l.url);
 
   return (
     <>
       <HomeJsonLd fullName={home.fullName} siteName={site.siteName || home.fullName} sameAs={sameAs} />
-      {/* Socials come from site-setting.contactLinks: home-page.contactLinks is empty. */}
-      <Hero home={home} links={mapHeroContactLinks(site.contactLinks)} />
+      <Hero home={home} links={mapHeroLinks(site.contactLinks, site.email)} />
       <Experiences experiences={experiences} certifications={certifications} />
       <Projects projects={projects} />
       {FEATURES.tours && <Tours tours={tours} />}

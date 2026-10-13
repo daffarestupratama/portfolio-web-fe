@@ -23,29 +23,8 @@ function normalizePath(path: string): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
-// The site's own hostnames — current domain plus the former `daffa.me` (still the
-// CMS/media host). CMS `canonicalUrl` values pointing at any of these are stale
-// self-references, not deliberate cross-domain canonicals, so they're ignored in
-// favour of the route-derived canonical. Only a genuinely external host is honoured.
-const OWN_HOSTS = new Set([
-  "daffarestupratama.com",
-  "www.daffarestupratama.com",
-  "daffa.me",
-  "www.daffa.me",
-]);
-
-/** Self-referencing canonical from the route, unless the CMS sets a canonicalUrl on
- *  a genuinely external host (a deliberate cross-domain canonical). Same-site values
- *  — including stale old-domain ones — are ignored so canonicals always track the
- *  real route (and never drift, e.g. a "/tour-guide" or "/service" typo). */
-export function resolveCanonical(cmsCanonical: string | null | undefined, path: string): string {
-  if (cmsCanonical) {
-    try {
-      if (!OWN_HOSTS.has(new URL(cmsCanonical).hostname)) return cmsCanonical;
-    } catch {
-      // malformed CMS value — fall through to the route-derived canonical
-    }
-  }
+/** The page's own canonical, derived from its route. */
+function canonicalFor(path: string): string {
   return `${SITE_URL}${normalizePath(path)}`;
 }
 
@@ -80,8 +59,8 @@ interface PageMetaInput {
 }
 
 /** The one metadata builder every page calls. Resolves the full fallback chain
- *  (entry.seo → entry's own field → site default → hardcoded), a route-derived
- *  self-canonical, and complete Open Graph + Twitter tags. */
+ *  (entry.seo → entry's own field → site default → hardcoded), the route-derived
+ *  canonical, and complete Open Graph + Twitter tags. */
 export function buildPageMetadata(input: PageMetaInput): Metadata {
   const { path, seo, defaultSeo, absoluteTitle, ogType = "website", article } = input;
 
@@ -90,7 +69,7 @@ export function buildPageMetadata(input: PageMetaInput): Metadata {
     seo?.metaDescription || input.description || defaultSeo.metaDescription || FALLBACK_DESCRIPTION;
   const ogImage = seo?.ogImage || input.image || defaultSeo.ogImage || null;
   const noIndex = seo?.noIndex ?? false;
-  const canonical = resolveCanonical(seo?.canonicalUrl, path);
+  const canonical = canonicalFor(path);
 
   const ogImages = ogImage
     ? [

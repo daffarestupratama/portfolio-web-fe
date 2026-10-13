@@ -17,13 +17,8 @@ import { ServicesJsonLd } from "@/components/seo/services-json-ld";
 
 export const revalidate = 3600;
 
-const FALLBACK_WHATSAPP_URL = "https://wa.me/6288233300541";
-const FALLBACK_EMAIL = "contact@daffa.me";
-
 export async function generateMetadata(): Promise<Metadata> {
   const [page, site] = await Promise.all([getServicePage(), getSiteSettings()]);
-  // Canonical self-derives from the "/services" route. The CMS entry's canonicalUrl
-  // is a same-origin "…/service" (singular) typo, which resolveCanonical ignores.
   return buildPageMetadata({
     path: "/services",
     seo: page.seo,
@@ -52,8 +47,8 @@ export default async function ServicesPage() {
     getSiteSettings(),
   ]);
 
-  const whatsappUrl = site.whatsappUrl || FALLBACK_WHATSAPP_URL;
-  const email = site.email || FALLBACK_EMAIL;
+  // Both resolved in getSiteSettings (contactLinks rows, then the shared fallback).
+  const { whatsappUrl, email } = site;
   const heroWa = waLink(whatsappUrl, "Halo Daffa, saya ingin konsultasi soal pembuatan website.");
   const allPackages = [...packages.packages, ...packages.bundles, ...packages.maintenance];
 

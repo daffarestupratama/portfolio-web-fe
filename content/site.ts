@@ -1,13 +1,13 @@
 /**
- * Global site-setting accessor (nav/footer/contact/default SEO). Fetched once
- * per render via React cache(). This step consumes it for SEO metadata and the
- * contact CTA; nav/footer will migrate onto it in a later step.
+ * Global site-setting accessor: default SEO, the footer, the article byline, and every contact
+ * surface. Fetched once per render via React cache().
  */
 
 import { cache } from "react";
 import { strapiFindOne } from "@/lib/strapi";
 import { strapiImageUrl } from "@/lib/image";
 import { mapImage } from "@/lib/mappers";
+import { CONTACT_FALLBACK, stripMailto, withHttps } from "@/lib/contact";
 import { SITE_SETTING_QUERY } from "@/lib/queries";
 import type { MappedImage } from "@/content/home";
 import type { StrapiContactLink, StrapiSeo, StrapiSiteSetting } from "@/lib/types";
@@ -44,23 +44,26 @@ export function toSitemapEntries(rows: StrapiSitemapRow[]): SitemapEntry[] {
 export interface Seo {
   metaTitle: string | null;
   metaDescription: string | null;
-  canonicalUrl: string | null;
   noIndex: boolean;
   ogImage: OgImage | null;
 }
 
 export interface SiteContactLink {
+  /** site-setting.contactLinks `linkType` enum: email, whatsapp, linkedin, github, … */
+  linkType: string;
   label: string;
   url: string;
-  icon: string;
 }
 
 export interface SiteSettings {
   siteName: string | null;
+  /** The footer tagline. Null when blank, so the footer falls back to its own copy. */
   footerText: string | null;
-  copyrightText: string | null;
-  email: string | null;
-  whatsappUrl: string | null;
+  /** Resolved address, never empty: the `email` row, then the old field, then the fallback. */
+  email: string;
+  /** Resolved wa.me URL, never empty: the `whatsapp` row, then the old field, then the fallback. */
+  whatsappUrl: string;
+  /** The single source of contact links, in CMS order. */
   contactLinks: SiteContactLink[];
   defaultSeo: Seo;
   /** Byline photo for the article author. Null → the monogram fallback is used. */
@@ -74,7 +77,6 @@ export function mapSeo(seo: StrapiSeo | null): Seo {
   return {
     metaTitle: seo?.metaTitle ?? null,
     metaDescription: seo?.metaDescription ?? null,
-    canonicalUrl: seo?.canonicalUrl ?? null,
     noIndex: seo?.noIndex ?? false,
     ogImage: og?.url
       ? { url: strapiImageUrl(og.url), width: og.width, height: og.height, alt: og.alternativeText }
@@ -83,18 +85,24 @@ export function mapSeo(seo: StrapiSeo | null): Seo {
 }
 
 function mapContactLinks(links: StrapiContactLink[]): SiteContactLink[] {
-  return links.map((l) => ({ label: l.label, url: l.url, icon: l.icon }));
+  return links
+    .filter((l) => l.linkType && l.url?.trim())
+    .map((l) => ({ linkType: l.linkType, label: l.label, url: l.url.trim() }));
 }
 
 export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   const raw = await strapiFindOne<StrapiSiteSetting>("site-setting", SITE_SETTING_QUERY);
+  const contactLinks = mapContactLinks(raw.contactLinks ?? []);
+  const row = (linkType: string) => contactLinks.find((l) => l.linkType === linkType)?.url;
+  // The rows win; `raw.email` / `raw.whatsappUrl` are read only while those fields still exist.
+  const emailRow = row("email");
+  const whatsappRow = row("whatsapp");
   return {
     siteName: raw.siteName,
-    footerText: raw.footerText,
-    copyrightText: raw.copyrightText,
-    email: raw.email,
-    whatsappUrl: raw.whatsappUrl,
-    contactLinks: mapContactLinks(raw.contactLinks ?? []),
+    footerText: raw.footerText?.trim() || null,
+    email: (emailRow && stripMailto(emailRow)) || raw.email?.trim() || CONTACT_FALLBACK.email,
+    whatsappUrl: (whatsappRow && withHttps(whatsappRow)) || raw.whatsappUrl?.trim() || CONTACT_FALLBACK.whatsappUrl,
+    contactLinks,
     defaultSeo: mapSeo(raw.defaultSeo),
     authorAvatar: mapImage(raw.authorAvatar, "Author"),
     contactCta: {

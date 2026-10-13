@@ -26,11 +26,18 @@ function Line({ line }: { line: TermLine }) {
   );
 }
 
-export function Terminal({ counts, cmsCommands }: { counts: ContentCounts; cmsCommands: CmsCommandData[] }) {
+interface TerminalProps {
+  counts: ContentCounts;
+  cmsCommands: CmsCommandData[];
+  /** `about/contact.txt`, built from site-setting.contactLinks (content/mkdir.ts). */
+  contactText: string;
+}
+
+export function Terminal({ counts, cmsCommands, contactText }: TerminalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cmsCmds = useMemo(() => buildCmsCommands(cmsCommands), [cmsCommands]);
-  const t = useTerminal({ counts, inputRef, scrollRef, cmsCommands: cmsCmds });
+  const t = useTerminal({ counts, inputRef, scrollRef, cmsCommands: cmsCmds, contactText });
 
   // Portfolio 2a's window: a raised frame with traffic lights and a centred title over an
   // inset terminal screen; the shortcut chips sit below it. The engine is unchanged.

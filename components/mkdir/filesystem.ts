@@ -1,11 +1,27 @@
 import type { DirEntry, FileSystem, FsDir, FsFile, FsNode } from "./terminal-types";
-import { HOME } from "./config";
+import { DOMAIN, HOME } from "./config";
+import { CONTACT_FALLBACK } from "@/lib/contact";
 
 const file = (content: string): FsFile => ({ type: "file", content: content.trimStart() });
 const dir = (children: Record<string, FsNode>): FsDir => ({ type: "dir", children });
 
+/** `about/contact.txt`: one `key : value` line per row, keys padded into a column. The page
+ *  builds the rows from site-setting.contactLinks (see buildContactText in content/mkdir.ts). */
+export function formatContactText(rows: { key: string; value: string }[]): string {
+  const width = Math.max(...rows.map((r) => r.key.length)) + 1;
+  return rows.map((r) => `${r.key.padEnd(width)}: ${r.value}`).join("\n") + "\n";
+}
+
+/** Used when the page passes no contact text. */
+const DEFAULT_CONTACT_TEXT = formatContactText([
+  { key: "email", value: CONTACT_FALLBACK.email },
+  { key: "linkedin", value: "linkedin.com/in/daffarestupratama" },
+  { key: "github", value: "github.com/daffarestupratama" },
+  { key: "site", value: DOMAIN },
+]);
+
 // Home tree (~). Hidden entries are those whose name starts with "." (shown by `ls -a`).
-const HOME_TREE: Record<string, FsNode> = {
+const homeTree = (contactText: string): Record<string, FsNode> => ({
   "README.md": file(`
 Welcome to dirOS — the terminal corner of daffarestupratama.com.
 Poke around with \`ls\`, \`cd\`, and \`cat\`. Type \`help\` for the full list,
@@ -29,12 +45,7 @@ Everyday tools:
 B.Sc. Information Systems — Universitas Indonesia.
 Focus: data science, information systems, and business process.
 `),
-    "contact.txt": file(`
-email    : contact@daffa.me
-linkedin : linkedin.com/in/daffarestupratama
-github   : github.com/daffarestupratama
-site     : daffarestupratama.com
-`),
+    "contact.txt": file(contactText),
   }),
   projects: dir({
     "README.txt": file(`
@@ -63,9 +74,7 @@ Try \`fortune\`, \`cowsay hello\`, or \`sudo make me a sandwich\`.
 `),
   }),
   ".motd": file("Type `help` to get started.\n"),
-};
-
-const ROOT: FsDir = dir({ home: dir({ visitor: dir(HOME_TREE) }) });
+});
 
 /** Normalize a path into absolute segments, resolving "." and "..". */
 function normalize(path: string): string {
@@ -78,11 +87,13 @@ function normalize(path: string): string {
   return "/" + out.join("/");
 }
 
-export function createFileSystem(home = HOME): FileSystem {
+export function createFileSystem(home = HOME, contactText = DEFAULT_CONTACT_TEXT): FileSystem {
+  const root: FsDir = dir({ home: dir({ visitor: dir(homeTree(contactText)) }) });
+
   function node(path: string): FsNode | null {
     const abs = normalize(path);
-    if (abs === "/") return ROOT;
-    let cur: FsNode = ROOT;
+    if (abs === "/") return root;
+    let cur: FsNode = root;
     for (const seg of abs.split("/").filter(Boolean)) {
       if (cur.type !== "dir" || !(seg in cur.children)) return null;
       cur = cur.children[seg]!;

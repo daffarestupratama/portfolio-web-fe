@@ -11,7 +11,6 @@ import { StrapiImage } from "@/components/ui/strapi-image";
 import { Contour } from "@/components/ui/contour";
 import { TechTile } from "@/components/ui/tech-tile";
 import { Gallery } from "@/components/ui/gallery";
-import { NotebookResources } from "@/components/projects/notebook-resources";
 import { RelatedCard } from "@/components/cards/related-card";
 import { projectTypeMeta } from "@/components/cards/project-type-meta";
 import { ArrowRightIcon } from "@/components/ui/icons";
@@ -47,17 +46,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const links = [
     project.githubUrl && { label: "GitHub", url: project.githubUrl },
     project.liveDemoUrl && { label: "Live demo", url: project.liveDemoUrl },
-    project.dashboardUrl && { label: "Dashboard", url: project.dashboardUrl },
   ].filter(Boolean) as { label: string; url: string }[];
 
-  // 2a: logo tiles for technologies that have a logo, mono pills for the rest; the legacy
-  // techStack strings stand in when an entry has no linked technologies yet.
+  // 2a: logo tiles for technologies that have a logo, mono pills for the rest. A project with
+  // no linked technologies has no Technologies block at all, label included.
   const logoTech = project.technologies.filter((t) => t.logo);
-  const textTech =
-    project.technologies.length > 0
-      ? project.technologies.filter((t) => !t.logo).map((t) => t.name)
-      : project.techStack;
-  const hasTech = logoTech.length > 0 || textTech.length > 0;
+  const textTech = project.technologies.filter((t) => !t.logo).map((t) => t.name);
+  const hasTech = project.technologies.length > 0;
   const galleryCount = `${project.gallery.length} ${project.gallery.length === 1 ? "image" : "images"}`;
 
   return (
@@ -160,13 +155,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               <div className="pj-result">
                 <StrapiBlocks content={project.result} variant="project" />
               </div>
-            </section>
-          )}
-
-          {project.notebookResources.length > 0 && (
-            <section>
-              <h2 className="pj-h2 pj-h2-lg">Notebooks &amp; outputs</h2>
-              <NotebookResources resources={project.notebookResources} />
             </section>
           )}
 

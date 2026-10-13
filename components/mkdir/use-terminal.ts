@@ -42,15 +42,17 @@ interface UseTerminalArgs {
   counts: ContentCounts;
   /** CMS commands (already built into runnable Commands); merged after built-ins. */
   cmsCommands: Command[];
+  /** `about/contact.txt`, built on the server from site-setting.contactLinks. */
+  contactText: string;
   // DOM refs are owned by the component and passed in — a hook must not *return*
   // refs (reading them off the returned object counts as ref-access during render).
   inputRef: RefObject<HTMLInputElement | null>;
   scrollRef: RefObject<HTMLDivElement | null>;
 }
 
-export function useTerminal({ counts, cmsCommands, inputRef, scrollRef }: UseTerminalArgs) {
+export function useTerminal({ counts, cmsCommands, contactText, inputRef, scrollRef }: UseTerminalArgs) {
   const router = useRouter();
-  const fs = useMemo(() => createFileSystem(HOME), []);
+  const fs = useMemo(() => createFileSystem(HOME, contactText), [contactText]);
   const registry = useMemo(() => buildRegistry(builtinCommands, cmsCommands), [cmsCommands]);
   const env = useMemo<TermEnv>(
     () => ({ user: USER, host: HOST, launchedAt: SITE_LAUNCHED_AT, counts, stack: STACK }),

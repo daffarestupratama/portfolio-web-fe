@@ -664,11 +664,11 @@ button.cv-btn:active {
   border-radius: 4px;
   box-shadow: var(--in-sm);
 }
-.hero-linkss {
+.hero-links {
   display: flex;
   gap: 12px;
 }
-.hero-links {
+.hero-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -680,11 +680,11 @@ button.cv-btn:active {
   color: var(--ink-dim);
   transition: transform .45s var(--spring), color .2s;
 }
-.hero-links:hover {
+.hero-link:hover {
   transform: translateY(-3px);
   color: var(--accent-ink);
 }
-.hero-links:active {
+.hero-link:active {
   transform: scale(.92);
   box-shadow: var(--in-sm);
 }

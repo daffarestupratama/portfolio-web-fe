@@ -9,14 +9,16 @@
 export const HOME_PAGE_QUERY =
   "populate[heroCtaPrimary]=*" +
   "&populate[heroCtaSecondary]=*" +
-  "&populate[contactLinks]=*" +
-  "&populate[featuredExperiences][populate][gallery][populate][image]=true" +
-  "&populate[featuredExperiences][populate][logo]=true" +
   "&populate[featuredProjects][populate][coverImage]=true" +
   "&populate[featuredProjects][populate][technologies][populate][logo]=true" +
   "&populate[featuredArticles][populate][coverImage]=true" +
   "&populate[seo][populate][ogImage]=true";
-// featuredSkills deliberately omitted — no skills UI on the ported homepage design.
+
+/** Every published experience, for the homepage and /about. Unpublishing one hides it. */
+export const EXPERIENCES_QUERY =
+  "populate[logo]=true" +
+  "&populate[gallery][populate][image]=true" +
+  "&pagination[pageSize]=100";
 
 export const FEATURED_TOUR_PACKAGES_QUERY =
   "filters[isFeatured][$eq]=true" +
@@ -25,7 +27,7 @@ export const FEATURED_TOUR_PACKAGES_QUERY =
   "&populate[priceOption]=*";
 
 /**
- * Certifications list. `certificateImage` is deliberately reduced to url + mime: the file is a
+ * Certifications list. `certificateImage` is deliberately reduced to its url: the file is a
  * ~155KB PDF, and a URL string in the payload downloads nothing until the viewer mounts it —
  * so the list stays light (measured +1.5KB across 30 entries) without needing a second
  * round trip when someone opens one. Sorting is done in the mapper, not here, because it is
@@ -38,7 +40,6 @@ export const CERTIFICATIONS_QUERY =
   "&populate[issuerLogo][fields][3]=alternativeText" +
   "&populate[skills][fields][0]=name" +
   "&populate[certificateImage][fields][0]=url" +
-  "&populate[certificateImage][fields][1]=mime" +
   "&pagination[pageSize]=100";
 
 export const SITE_SETTING_QUERY =
@@ -61,7 +62,6 @@ export function projectDetailQuery(slug: string): string {
     "&populate[coverImage]=true" +
     "&populate[technologies][populate][logo]=true" +
     "&populate[gallery][populate][image]=true" +
-    "&populate[notebookResources][populate][file]=true" +
     "&populate[relatedArticles][populate][coverImage]=true" +
     "&populate[seo][populate][ogImage]=true"
   );
@@ -81,7 +81,6 @@ export function articleDetailQuery(slug: string): string {
 export const TOUR_LANDING_QUERY =
   "populate[heroImage]=true" +
   "&populate[primaryCta]=*" +
-  "&populate[contactLinks]=*" +
   "&populate[featuredTours][populate][coverImage]=true" +
   "&populate[seo][populate][ogImage]=true";
 
@@ -102,23 +101,14 @@ export function tourDetailQuery(slug: string): string {
 
 export const ABOUT_PAGE_QUERY =
   "populate[profileImage]=true" +
-  "&populate[contactLinks]=*" +
   "&populate[skills][populate][logo]=true" +
-  "&populate[experiences][populate][gallery][populate][image]=true" +
-  "&populate[experiences][populate][logo]=true" +
   "&populate[seo][populate][ogImage]=true";
 
-/** Visible, approved guestbook messages: pinned first, then newest.
- *  createdAt is the reliable tiebreaker since admin-added rows can have submittedAt=null. */
 /**
- * `moderationStatus` is the single source of truth for visibility — the old companion
- * `isVisible` filter was redundant (the two agreed on every row) and doubled the ways to
- * get it wrong.
+ * Visible guestbook messages: pinned first, then newest.
  *
- * Sorted on `createdAt`, NOT `submittedAt`: the latter is null on older rows, and Postgres
- * orders nulls FIRST on a DESC sort, so those floated above genuinely newer messages while
- * the `createdAt` tiebreaker only ever applied within an equal `submittedAt`. `createdAt`
- * is always populated and within a second of `submittedAt` wherever both exist.
+ * `moderationStatus` is the single source of truth for visibility. Sorted on `createdAt`, which
+ * Strapi stamps on every row, rather than a hand-written submission time that older rows lack.
  */
 export const GUESTBOOK_MESSAGES_QUERY =
   "filters[moderationStatus][$eq]=visible" +
@@ -134,6 +124,7 @@ export const SERVICE_PAGE_QUERY =
   "&populate[process]=true" +
   "&populate[faqs]=true" +
   "&populate[featuredProjects][populate][coverImage]=true" +
+  "&populate[featuredProjects][populate][technologies][populate][logo]=true" +
   "&populate[seo][populate][ogImage]=true";
 
 export const SERVICE_PACKAGES_QUERY = "pagination[pageSize]=100&sort[0]=order:asc";
@@ -144,9 +135,8 @@ export const PROJECT_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const ARTICLE_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 export const TOUR_SLUGS_QUERY = "fields[0]=slug&pagination[pageSize]=100";
 
-/** Active, published terminal commands for /mkdir (phase 2 CMS commands). */
-export const TERMINAL_COMMANDS_QUERY =
-  "filters[isActive][$eq]=true&sort[0]=order:asc&pagination[pageSize]=100";
+/** Published terminal commands for /mkdir (phase 2 CMS commands). Unpublishing one hides it. */
+export const TERMINAL_COMMANDS_QUERY = "sort[0]=order:asc&pagination[pageSize]=100";
 
 /** Sitemap listings: slug + updatedAt (for lastModified) + seo.noIndex (to exclude). */
 const SITEMAP_FIELDS = "fields[0]=slug&fields[1]=updatedAt&populate[seo][fields][0]=noIndex&pagination[pageSize]=100";
