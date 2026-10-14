@@ -1295,6 +1295,35 @@ button.cv-btn:active {
   line-height: 1.6;
   color: var(--ink-dim);
 }
+
+/* Plain-text CMS fields with paragraphs or a list (ui/plain-text.tsx). The field's own class
+   keeps its font, size and colour; these only space the blocks, in em so they scale with it:
+   2a's project-prose paragraph gap (12px at 16px) and the article body's bullet list (8px dot,
+   12px marker gap, 8px item gap at 16.5px). The dot is centred on the item's first line. */
+.pt {
+  display: flex;
+  flex-direction: column;
+  gap: .75em;
+}
+.pt-ul {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  padding-left: 4px;
+}
+.pt-li {
+  display: flex;
+  gap: .75em;
+}
+.pt-ul > .pt-li::before {
+  content: "";
+  flex-shrink: 0;
+  width: .5em;
+  height: .5em;
+  margin-top: calc(.5lh - .25em);
+  border-radius: 50%;
+  background: var(--accent-b);
+}
 .cc-skills {
   margin-top: 12px;
   display: flex;

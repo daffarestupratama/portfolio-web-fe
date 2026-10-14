@@ -1,4 +1,6 @@
 import { SITE_URL } from "@/lib/seo";
+import { toSingleLine } from "@/lib/plain-text";
+import { serializeJsonLd } from "@/components/seo/json-ld";
 import type { ServiceFaq, ServicePackage } from "@/content/services";
 
 interface ServicesJsonLdProps {
@@ -17,7 +19,7 @@ export function ServicesJsonLd({ packages, faqs, providerName }: ServicesJsonLdP
       name: p.name,
       price: String(p.price),
       priceCurrency: p.currency,
-      ...(p.tagline ? { description: p.tagline } : {}),
+      ...(p.tagline ? { description: toSingleLine(p.tagline) } : {}),
     }));
 
   const graph: Record<string, unknown>[] = [
@@ -41,7 +43,7 @@ export function ServicesJsonLd({ packages, faqs, providerName }: ServicesJsonLdP
       mainEntity: faqs.map((f) => ({
         "@type": "Question",
         name: f.question,
-        acceptedAnswer: { "@type": "Answer", text: f.answer },
+        acceptedAnswer: { "@type": "Answer", text: toSingleLine(f.answer) },
       })),
     });
   }
@@ -49,8 +51,8 @@ export function ServicesJsonLd({ packages, faqs, providerName }: ServicesJsonLdP
   return (
     <script
       type="application/ld+json"
-      // Structured data is static, server-rendered JSON — safe to inline.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@graph": graph }) }}
+      // Escaped by serializeJsonLd, so CMS text can never break out of the script.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd({ "@context": "https://schema.org", "@graph": graph }) }}
     />
   );
 }

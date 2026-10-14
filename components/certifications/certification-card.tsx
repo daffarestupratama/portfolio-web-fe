@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { Certification } from "@/content/certifications";
 import { CertificateViewer } from "@/components/certifications/certificate-viewer";
 import { shouldIgnoreCardClick } from "@/components/ui/card-toggle";
+import { PlainText } from "@/components/ui/plain-text";
 import { deriveInitials } from "@/lib/mappers";
 
 /**
@@ -90,7 +91,7 @@ export function CertificationCard({
 
       {open && (
         <div id={bodyId} className="cc-body">
-          {c.description && <p className="cc-desc">{c.description}</p>}
+          {c.description && <PlainText text={c.description} className="cc-desc" />}
 
           {c.skills.length > 0 && (
             <ul className="cc-skills">

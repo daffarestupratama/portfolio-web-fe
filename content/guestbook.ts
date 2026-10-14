@@ -4,6 +4,7 @@
 import { strapiFind } from "@/lib/strapi";
 import { GUESTBOOK_MESSAGES_QUERY } from "@/lib/queries";
 import { titleCase } from "@/lib/mappers";
+import { collapseBlankLines } from "@/lib/plain-text";
 import type { StrapiGuestbookMessage } from "@/lib/types";
 
 /** The `category` enum values (must match Strapi exactly, in select order). */
@@ -49,14 +50,16 @@ function mapGuestbookMessage(m: StrapiGuestbookMessage): GuestbookMessage {
   return {
     id: m.documentId,
     name,
-    message: m.message,
+    // Visitor text keeps its line breaks (white-space: pre-line), with at most one blank line
+    // in a row so a message cannot be padded out with empty lines.
+    message: collapseBlankLines(m.message),
     category: m.category ?? "other",
     categoryLabel: categoryLabel(m.category ?? "other"),
     // Same field the list is sorted on (see GUESTBOOK_MESSAGES_QUERY), so the displayed
     // date and the ordering can never disagree.
     date: formatDate(m.createdAt),
     isPinned: Boolean(m.isPinned),
-    reply: m.reply || null,
+    reply: m.reply ? collapseBlankLines(m.reply) : null,
   };
 }
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ServiceFaq } from "@/content/services";
+import { PlainText } from "@/components/ui/plain-text";
 
 export function FaqAccordion({ faqs }: { faqs: ServiceFaq[] }) {
   // 2a opens the first question on arrival.
@@ -47,7 +48,7 @@ export function FaqAccordion({ faqs }: { faqs: ServiceFaq[] }) {
               className="sv-faq-panel"
             >
               <div>
-                <p className="sv-faq-a">{faq.answer}</p>
+                <PlainText text={faq.answer} className="sv-faq-a" />
               </div>
             </div>
           </div>

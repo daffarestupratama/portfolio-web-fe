@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { Experience } from "@/content/home";
 import { shouldIgnoreCardClick } from "@/components/ui/card-toggle";
 import { Gallery } from "@/components/ui/gallery";
+import { PlainText } from "@/components/ui/plain-text";
 
 interface ExperienceTimelineItemProps {
   experience: Experience;
@@ -71,7 +72,7 @@ export function ExperienceTimelineItem({ experience }: ExperienceTimelineItemPro
         {open && (
           <div id={bodyId} className="xp-body">
             {experience.location && <div className="xp-loc mono">{experience.location}</div>}
-            <p className="xp-desc">{experience.description}</p>
+            <PlainText text={experience.description} className="xp-desc" />
             <Gallery images={experience.gallery} variant="grid" />
           </div>
         )}

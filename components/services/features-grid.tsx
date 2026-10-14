@@ -1,4 +1,5 @@
 import type { ServiceFeature } from "@/content/services";
+import { PlainText } from "@/components/ui/plain-text";
 
 /** Portfolio 2a's feature cards, numbered 01, 02… in an inset well. */
 export function FeaturesGrid({ features }: { features: ServiceFeature[] }) {
@@ -10,7 +11,7 @@ export function FeaturesGrid({ features }: { features: ServiceFeature[] }) {
             {String(i + 1).padStart(2, "0")}
           </span>
           <h3 className="sv-ft-title">{f.title}</h3>
-          <p className="sv-ft-desc">{f.description}</p>
+          <PlainText text={f.description} className="sv-ft-desc" mode="breaks" />
         </div>
       ))}
     </div>

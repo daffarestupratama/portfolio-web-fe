@@ -1,12 +1,29 @@
 import { JOB_TITLE, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { toSingleLine } from "@/lib/plain-text";
+
+/**
+ * JSON for an inline `<script type="application/ld+json">`. Plain JSON.stringify is not enough:
+ * CMS text containing `</script>` would close the script early and the rest would be parsed as
+ * page HTML (and could open a real script). `<`, `>` and `&` become \u escapes, which JSON
+ * parsers read back as the same characters, so the structured data itself is unchanged; U+2028/9
+ * are escaped for old JS parsers.
+ */
+export function serializeJsonLd(data: object): string {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
 
 /** Inline a schema.org graph/node as a server-rendered JSON-LD script. */
 function JsonLdScript({ data }: { data: object }) {
   return (
     <script
       type="application/ld+json"
-      // Structured data is static, server-rendered JSON — safe to inline.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      // Escaped by serializeJsonLd, so CMS text can never break out of the script.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
     />
   );
 }
@@ -62,7 +79,7 @@ export function ArticleJsonLd({
         "@context": "https://schema.org",
         "@type": "BlogPosting",
         headline,
-        description,
+        description: toSingleLine(description),
         ...(imageUrl ? { image: imageUrl } : {}),
         datePublished,
         dateModified,
@@ -149,8 +166,8 @@ export function HomeJsonLd({ fullName, siteName, sameAs }: HomeJsonLdProps) {
   return (
     <script
       type="application/ld+json"
-      // Structured data is static, server-rendered JSON — safe to inline.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+      // Escaped by serializeJsonLd, so CMS text can never break out of the script.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(graph) }}
     />
   );
 }

@@ -1,4 +1,5 @@
 import type { ServiceProcessStep } from "@/content/services";
+import { PlainText } from "@/components/ui/plain-text";
 
 /** Portfolio 2a's process steps: a grid of raised cards, each with an accent-b number disc. */
 export function ProcessList({ steps }: { steps: ServiceProcessStep[] }) {
@@ -11,7 +12,7 @@ export function ProcessList({ steps }: { steps: ServiceProcessStep[] }) {
           </span>
           <div>
             <h3 className="sv-pr-title">{s.title}</h3>
-            <p className="sv-pr-desc">{s.description}</p>
+            <PlainText text={s.description} className="sv-pr-desc" mode="breaks" />
           </div>
         </li>
       ))}

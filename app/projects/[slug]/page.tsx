@@ -11,6 +11,7 @@ import { StrapiImage } from "@/components/ui/strapi-image";
 import { Contour } from "@/components/ui/contour";
 import { TechTile } from "@/components/ui/tech-tile";
 import { Gallery } from "@/components/ui/gallery";
+import { PlainText } from "@/components/ui/plain-text";
 import { RelatedCard } from "@/components/cards/related-card";
 import { projectTypeMeta } from "@/components/cards/project-type-meta";
 import { ArrowRightIcon } from "@/components/ui/icons";
@@ -138,7 +139,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           {project.problem && (
             <section>
               <h2 className="pj-h2">Problem</h2>
-              <p className="pj-text">{project.problem}</p>
+              <PlainText text={project.problem} className="pj-text" />
             </section>
           )}
 

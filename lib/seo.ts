@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { MappedImage } from "@/content/home";
 import type { OgImage, Seo } from "@/content/site";
+import { toSingleLine } from "@/lib/plain-text";
 
 /** Canonical site origin — the single source of truth for every self-referencing
  *  URL (canonicals, OG urls, JSON-LD @id, sitemap, robots). */
@@ -64,9 +65,11 @@ interface PageMetaInput {
 export function buildPageMetadata(input: PageMetaInput): Metadata {
   const { path, seo, defaultSeo, absoluteTitle, ogType = "website", article } = input;
 
-  const title = seo?.metaTitle || input.title || defaultSeo.metaTitle || FALLBACK_TITLE;
-  const description =
-    seo?.metaDescription || input.description || defaultSeo.metaDescription || FALLBACK_DESCRIPTION;
+  // CMS text fields (summaries, excerpts, subtitles) may carry line breaks; metadata is one line.
+  const title = toSingleLine(seo?.metaTitle || input.title || defaultSeo.metaTitle || FALLBACK_TITLE);
+  const description = toSingleLine(
+    seo?.metaDescription || input.description || defaultSeo.metaDescription || FALLBACK_DESCRIPTION,
+  );
   const ogImage = seo?.ogImage || input.image || defaultSeo.ogImage || null;
   const noIndex = seo?.noIndex ?? false;
   const canonical = canonicalFor(path);
