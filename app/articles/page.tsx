@@ -4,6 +4,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { ArticlesBrowser } from "@/components/articles/articles-browser";
 import { PageHeader } from "@/components/ui/page-header";
+import { PageTop } from "@/components/layout/page-top";
 
 export const revalidate = 3600;
 
@@ -24,15 +25,18 @@ export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
   return (
-    <main>
-      <PageHeader title="Articles" subtitle="Notes on data, technology, business, and the ideas I explore along the way." />
-      <div className="pg-body">
-        {articles.length === 0 ? (
-          <p className="pg-empty">No articles published yet.</p>
-        ) : (
-          <ArticlesBrowser articles={articles} />
-        )}
-      </div>
-    </main>
+    <>
+      <PageTop />
+      <main>
+        <PageHeader title="Articles" subtitle="Notes on data, technology, business, and the ideas I explore along the way." />
+        <div className="pg-body">
+          {articles.length === 0 ? (
+            <p className="pg-empty">No articles published yet.</p>
+          ) : (
+            <ArticlesBrowser articles={articles} />
+          )}
+        </div>
+      </main>
+    </>
   );
 }

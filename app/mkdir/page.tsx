@@ -7,6 +7,7 @@ import { getTourSlugs } from "@/content/tours";
 import { buildContactText, getTerminalCommands } from "@/content/mkdir";
 import { FEATURES } from "@/lib/features";
 import { Terminal } from "@/components/mkdir/terminal";
+import { PageTop } from "@/components/layout/page-top";
 
 export const revalidate = 3600;
 
@@ -38,20 +39,23 @@ export default async function MkdirPage() {
   };
 
   return (
-    <main className="relative z-[3] term-page">
-      {/* Crawlable description — the terminal is client-rendered, so this gives search
-          engines and screen readers real content describing the page. */}
-      <section className="sr-only">
-        <h1>mkdir — an interactive terminal</h1>
-        <p>
-          mkdir is a playful terminal on Daffa Ilham Restupratama&apos;s portfolio. It emulates a small Linux-style
-          shell called dirOS, with built-in commands such as help, ls, cd, cat, tree, neofetch, fortune, and cowsay,
-          plus a fake filesystem you can explore. Type <code>help</code> to list every command, or <code>exit</code>{" "}
-          to return to the homepage.
-        </p>
-      </section>
+    <>
+      <PageTop />
+      <main className="relative z-[3] term-page">
+        {/* Crawlable description — the terminal is client-rendered, so this gives search
+            engines and screen readers real content describing the page. */}
+        <section className="sr-only">
+          <h1>mkdir — an interactive terminal</h1>
+          <p>
+            mkdir is a playful terminal on Daffa Ilham Restupratama&apos;s portfolio. It emulates a small Linux-style
+            shell called dirOS, with built-in commands such as help, ls, cd, cat, tree, neofetch, fortune, and cowsay,
+            plus a fake filesystem you can explore. Type <code>help</code> to list every command, or <code>exit</code>{" "}
+            to return to the homepage.
+          </p>
+        </section>
 
-      <Terminal counts={counts} cmsCommands={cmsCommands} contactText={buildContactText(site)} />
-    </main>
+        <Terminal counts={counts} cmsCommands={cmsCommands} contactText={buildContactText(site)} />
+      </main>
+    </>
   );
 }

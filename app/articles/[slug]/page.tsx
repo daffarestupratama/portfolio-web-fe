@@ -16,6 +16,7 @@ import { Contour } from "@/components/ui/contour";
 import { RelatedCard } from "@/components/cards/related-card";
 import { projectTypeMeta } from "@/components/cards/project-type-meta";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { PageTop } from "@/components/layout/page-top";
 
 export const revalidate = 3600;
 
@@ -119,137 +120,140 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   ) : null;
 
   return (
-    // 2a widens the page only when there is a sidebar or related content, and pads the left
-    // edge (50px) only when the fixed TOC rail renders below 1024px.
-    <main className="art" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
-      <BreadcrumbJsonLd
-        items={[
-          { name: "Home", path: "" },
-          { name: "Articles", path: "/articles" },
-          { name: article.title, path: `/articles/${slug}` },
-        ]}
-      />
-      <ArticleJsonLd
-        headline={article.title}
-        description={article.excerpt}
-        imageUrl={article.coverImage?.url ?? null}
-        datePublished={article.publishedTime}
-        dateModified={article.modifiedTime}
-        authorName={SITE_NAME}
-        path={`/articles/${slug}`}
-      />
+    <>
+      <PageTop />
+      {/* 2a widens the page only when there is a sidebar or related content, and pads the left
+          edge (50px) only when the fixed TOC rail renders below 1024px. */}
+      <main className="art" data-wide={hasToc || hasRelated || undefined} data-rail={hasToc || undefined}>
+        <BreadcrumbJsonLd
+          items={[
+            { name: "Home", path: "" },
+            { name: "Articles", path: "/articles" },
+            { name: article.title, path: `/articles/${slug}` },
+          ]}
+        />
+        <ArticleJsonLd
+          headline={article.title}
+          description={article.excerpt}
+          imageUrl={article.coverImage?.url ?? null}
+          datePublished={article.publishedTime}
+          dateModified={article.modifiedTime}
+          authorName={SITE_NAME}
+          path={`/articles/${slug}`}
+        />
 
-      {/* Narrow viewports: the TOC sidebar is replaced by the fixed rail on the left edge. */}
-      <TocRail entries={toc} />
+        {/* Narrow viewports: the TOC sidebar is replaced by the fixed rail on the left edge. */}
+        <TocRail entries={toc} />
 
-      <div className="art-grid" data-aside={hasSidebar || undefined}>
-        {/* The aside is sticky at --sticky-top and scrolls internally (scrollbar hidden,
-            as in the latest 2a) when the TOC is taller than the viewport. `self-start` and `sticky`
-            live on the same element, or sticky has nothing to stick within. With a TOC it is
-            hidden below 1024px, where the rail takes over; carrying the related content it
-            stays at every width and sits after the body when stacked. */}
-        {hasSidebar && (
-          <aside className="art-aside" data-kind={hasToc ? "toc" : "related"} data-sb="toc">
-            {hasToc ? <ArticleToc entries={toc} /> : relatedBlocks}
-          </aside>
-        )}
+        <div className="art-grid" data-aside={hasSidebar || undefined}>
+          {/* The aside is sticky at --sticky-top and scrolls internally (scrollbar hidden,
+              as in the latest 2a) when the TOC is taller than the viewport. `self-start` and `sticky`
+              live on the same element, or sticky has nothing to stick within. With a TOC it is
+              hidden below 1024px, where the rail takes over; carrying the related content it
+              stays at every width and sits after the body when stacked. */}
+          {hasSidebar && (
+            <aside className="art-aside" data-kind={hasToc ? "toc" : "related"} data-sb="toc">
+              {hasToc ? <ArticleToc entries={toc} /> : relatedBlocks}
+            </aside>
+          )}
 
-        <div className="art-content">
-          <Link href="/articles" className="nm-back mono">
-            <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
-            All articles
-          </Link>
+          <div className="art-content">
+            <Link href="/articles" className="nm-back mono">
+              <ArrowRightIcon width={13} height={13} style={{ transform: "rotate(180deg)" }} />
+              All articles
+            </Link>
 
-          {/* 2a's header: title, cover well, standfirst, byline, closed off by a rule. */}
-          <header className="art-head">
-            <h1 className="art-title">{article.title}</h1>
-            <div className="art-cover-well">
-              <div className="art-cover">
-                {article.coverImage ? (
-                  <StrapiImage
-                    src={article.coverImage.url}
-                    alt={article.coverImage.alt || `${article.title} cover`}
-                    fill
-                    sizes="(max-width: 860px) 100vw, 820px"
-                    style={{ objectFit: "cover" }}
-                    priority
-                    fallback={<Contour seed={article.slug} dark={false} className="art-contour" />}
-                  />
-                ) : (
-                  <Contour seed={article.slug} dark={false} className="art-contour" />
-                )}
+            {/* 2a's header: title, cover well, standfirst, byline, closed off by a rule. */}
+            <header className="art-head">
+              <h1 className="art-title">{article.title}</h1>
+              <div className="art-cover-well">
+                <div className="art-cover">
+                  {article.coverImage ? (
+                    <StrapiImage
+                      src={article.coverImage.url}
+                      alt={article.coverImage.alt || `${article.title} cover`}
+                      fill
+                      sizes="(max-width: 860px) 100vw, 820px"
+                      style={{ objectFit: "cover" }}
+                      priority
+                      fallback={<Contour seed={article.slug} dark={false} className="art-contour" />}
+                    />
+                  ) : (
+                    <Contour seed={article.slug} dark={false} className="art-contour" />
+                  )}
+                </div>
               </div>
-            </div>
 
-            {article.excerpt && <p className="art-excerpt">{article.excerpt}</p>}
+              {article.excerpt && <p className="art-excerpt">{article.excerpt}</p>}
 
-            <div className="art-byline">
-              <span className="art-author">
-                {/* The real photo from site-setting.authorAvatar — free, because
-                    generateMetadata above already loads site-setting and React cache()
-                    dedupes the two calls into one request. The monogram stays as the
-                    fallback: StrapiImage swaps to it on load error as well as when the
-                    field is empty. aria-hidden because the author's name sits beside it. */}
-                <span aria-hidden="true" className="art-avatar">
-                  <span className="art-avatar-in">
-                    {site.authorAvatar ? (
-                      <StrapiImage
-                        src={site.authorAvatar.url}
-                        alt=""
-                        // Declared at the rendered size so next/image cannot warn about a
-                        // modified dimension, and the box is reserved (no layout shift).
-                        width={26}
-                        height={26}
-                        style={{ borderRadius: 999, objectFit: "cover", width: "100%", height: "100%" }}
-                        fallback={<AuthorMonogram />}
-                      />
-                    ) : (
-                      <AuthorMonogram />
-                    )}
+              <div className="art-byline">
+                <span className="art-author">
+                  {/* The real photo from site-setting.authorAvatar — free, because
+                      generateMetadata above already loads site-setting and React cache()
+                      dedupes the two calls into one request. The monogram stays as the
+                      fallback: StrapiImage swaps to it on load error as well as when the
+                      field is empty. aria-hidden because the author's name sits beside it. */}
+                  <span aria-hidden="true" className="art-avatar">
+                    <span className="art-avatar-in">
+                      {site.authorAvatar ? (
+                        <StrapiImage
+                          src={site.authorAvatar.url}
+                          alt=""
+                          // Declared at the rendered size so next/image cannot warn about a
+                          // modified dimension, and the box is reserved (no layout shift).
+                          width={26}
+                          height={26}
+                          style={{ borderRadius: 999, objectFit: "cover", width: "100%", height: "100%" }}
+                          fallback={<AuthorMonogram />}
+                        />
+                      ) : (
+                        <AuthorMonogram />
+                      )}
+                    </span>
                   </span>
+                  {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
+                      the visible byline and the structured data cannot drift apart. */}
+                  <Link href="/about" className="art-name">
+                    {SITE_NAME}
+                  </Link>
                 </span>
-                {/* SITE_NAME is the same constant ArticleJsonLd receives as authorName, so
-                    the visible byline and the structured data cannot drift apart. */}
-                <Link href="/about" className="art-name">
-                  {SITE_NAME}
-                </Link>
-              </span>
-              <span aria-hidden="true" className="art-sep">
-                ·
-              </span>
-              <span className="art-date mono">
-                {article.publishedDate} · {article.readTime}
-              </span>
-              <span className="art-pills">
-                <span className="art-cat">{article.category}</span>
-                <span className="art-lang mono">{article.language.toUpperCase()}</span>
-              </span>
-            </div>
-          </header>
-
-          {article.body && (
-            <article id={ARTICLE_BODY_ID} className="art-body">
-              <StrapiBlocks content={bodyWithIds} variant="article" />
-            </article>
-          )}
-
-          {article.tags.length > 0 && (
-            <div className="art-tags">
-              {article.tags.map((tag) => (
-                <span key={tag} className="art-tag mono">
-                  #{tag}
+                <span aria-hidden="true" className="art-sep">
+                  ·
                 </span>
-              ))}
-            </div>
-          )}
+                <span className="art-date mono">
+                  {article.publishedDate} · {article.readTime}
+                </span>
+                <span className="art-pills">
+                  <span className="art-cat">{article.category}</span>
+                  <span className="art-lang mono">{article.language.toUpperCase()}</span>
+                </span>
+              </div>
+            </header>
+
+            {article.body && (
+              <article id={ARTICLE_BODY_ID} className="art-body">
+                <StrapiBlocks content={bodyWithIds} variant="article" />
+              </article>
+            )}
+
+            {article.tags.length > 0 && (
+              <div className="art-tags">
+                {article.tags.map((tag) => (
+                  <span key={tag} className="art-tag mono">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* After the body: the point at which someone has finished reading. Suppressed when
-          the sidebar carries it. */}
-      {!relatedInSidebar && relatedBlocks && <div className="art-below">{relatedBlocks}</div>}
+        {/* After the body: the point at which someone has finished reading. Suppressed when
+            the sidebar carries it. */}
+        {!relatedInSidebar && relatedBlocks && <div className="art-below">{relatedBlocks}</div>}
 
-      <BackToTop />
-    </main>
+        <BackToTop />
+      </main>
+    </>
   );
 }

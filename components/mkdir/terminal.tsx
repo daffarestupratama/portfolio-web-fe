@@ -115,7 +115,7 @@ export function Terminal({ counts, cmsCommands, contactText }: TerminalProps) {
               onKeyDown={(e) => {
                 if (e.key === "Escape") t.exitApp();
               }}
-              ref={(el) => el?.focus()}
+              ref={(el) => el?.focus({ preventScroll: true })}
             >
               {t.activeApp.render(t.exitApp)}
               <button type="button" className="term-exit mono" onClick={t.exitApp}>

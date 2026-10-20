@@ -67,6 +67,9 @@ textarea::placeholder {
      uses against that bar: sticky asides and the guestbook form at 100, the #contact
      anchor at 90. Article headings use HEADING_SCROLL_OFFSET (components/blocks/toc.ts). */
   --nav-stuck-h: 60px;
+  /* The nav's in-flow height before it sticks: .nv-wrap's 14px top padding + the 60px bar.
+     Every page starts this far down the document (see .page-top). */
+  --nav-flow-h: calc(14px + var(--nav-stuck-h));
   --sticky-top: 100px;
   --anchor-contact: 90px;
 }
@@ -295,6 +298,15 @@ select {
    14px top padding, so its in-flow height is constant; the bar box is always full width; the
    two looks are fixed-geometry layers that crossfade; and the bar's vertical move and the
    content's narrow-width inset are transforms. */
+/* The true top of the document for the router's scroll-to-top check (layout/page-top.tsx).
+   It is each page's first element, so it lays out right under the nav; shifting it up by the
+   nav's in-flow height puts it at y = 0 without affecting layout (relative offset, no height). */
+.page-top {
+  position: relative;
+  top: calc(-1 * var(--nav-flow-h));
+  height: 0;
+}
+
 .nv-wrap {
   --nv-wp: clamp(10px,2.5vw,20px);
   position: sticky;

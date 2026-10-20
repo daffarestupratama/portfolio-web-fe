@@ -4,6 +4,7 @@ import { getSiteSettings } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo";
 import { ProjectsFilter } from "@/components/projects/projects-filter";
 import { PageHeader } from "@/components/ui/page-header";
+import { PageTop } from "@/components/layout/page-top";
 
 export const revalidate = 3600;
 
@@ -24,18 +25,21 @@ export default async function ProjectsPage() {
   const projects = await getAllProjects();
 
   return (
-    <main>
-      <PageHeader
-        title="Projects"
-        subtitle="Selected data, machine-learning, and mapping work — each with the problem it tackled, the approach, and the result."
-      />
-      {projects.length === 0 ? (
-        <div className="pg-body">
-          <p className="pg-empty">No projects published yet.</p>
-        </div>
-      ) : (
-        <ProjectsFilter projects={projects} />
-      )}
-    </main>
+    <>
+      <PageTop />
+      <main>
+        <PageHeader
+          title="Projects"
+          subtitle="Selected data, machine-learning, and mapping work — each with the problem it tackled, the approach, and the result."
+        />
+        {projects.length === 0 ? (
+          <div className="pg-body">
+            <p className="pg-empty">No projects published yet.</p>
+          </div>
+        ) : (
+          <ProjectsFilter projects={projects} />
+        )}
+      </main>
+    </>
   );
 }

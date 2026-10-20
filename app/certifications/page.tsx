@@ -5,6 +5,7 @@ import { buildPageMetadata } from "@/lib/seo";
 import { BreadcrumbJsonLd, CertificationsJsonLd } from "@/components/seo/json-ld";
 import { CertificationsList } from "@/components/certifications/certifications-list";
 import { PageHeader } from "@/components/ui/page-header";
+import { PageTop } from "@/components/layout/page-top";
 
 // Matches /projects and /articles. NOT 60 — a short window here would reopen the
 // Cloudflare 1102 CPU problem the current values exist to prevent.
@@ -27,24 +28,27 @@ export default async function CertificationsPage() {
   const certifications = await getAllCertifications();
 
   return (
-    <main className="relative z-[3]">
-      <BreadcrumbJsonLd
-        items={[
-          { name: "Home", path: "" },
-          { name: "Certifications", path: "/certifications" },
-        ]}
-      />
-      {certifications.length > 0 && <CertificationsJsonLd items={certifications} />}
+    <>
+      <PageTop />
+      <main className="relative z-[3]">
+        <BreadcrumbJsonLd
+          items={[
+            { name: "Home", path: "" },
+            { name: "Certifications", path: "/certifications" },
+          ]}
+        />
+        {certifications.length > 0 && <CertificationsJsonLd items={certifications} />}
 
-      <PageHeader title="Certifications" subtitle={CERTIFICATIONS_DESCRIPTION} narrow />
+        <PageHeader title="Certifications" subtitle={CERTIFICATIONS_DESCRIPTION} narrow />
 
-      <section className="ct">
-        {certifications.length === 0 ? (
-          <p className="ct-none">No certifications published yet.</p>
-        ) : (
-          <CertificationsList certifications={certifications} />
-        )}
-      </section>
-    </main>
+        <section className="ct">
+          {certifications.length === 0 ? (
+            <p className="ct-none">No certifications published yet.</p>
+          ) : (
+            <CertificationsList certifications={certifications} />
+          )}
+        </section>
+      </main>
+    </>
   );
 }

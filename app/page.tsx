@@ -20,6 +20,7 @@ import { mapHeroLinks } from "@/lib/mappers";
 import { PROFILE_LINK_TYPES } from "@/lib/contact";
 import { buildPageMetadata } from "@/lib/seo";
 import { FEATURES } from "@/lib/features";
+import { PageTop } from "@/components/layout/page-top";
 
 export const revalidate = 3600;
 
@@ -46,6 +47,7 @@ export default async function Home() {
 
   return (
     <>
+      <PageTop />
       <HomeJsonLd fullName={home.fullName} siteName={site.siteName || home.fullName} sameAs={sameAs} />
       <Hero home={home} links={mapHeroLinks(site.contactLinks, site.email)} />
       <Experiences experiences={experiences} certifications={certifications} />

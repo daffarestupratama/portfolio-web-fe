@@ -79,7 +79,7 @@ export function useTerminal({ counts, cmsCommands, contactText, inputRef, scroll
   const bootTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bootDoneRef = useRef(false);
 
-  const focusInput = useCallback(() => inputRef.current?.focus(), [inputRef]);
+  const focusInput = useCallback(() => inputRef.current?.focus({ preventScroll: true }), [inputRef]);
 
   // Read the caret position from the real input (source of truth). Also mirror the
   // input's horizontal scroll so the block stays aligned past the field width.
@@ -124,7 +124,7 @@ export function useTerminal({ counts, cmsCommands, contactText, inputRef, scroll
     } catch {
       /* private mode — ignore */
     }
-    requestAnimationFrame(() => inputRef.current?.focus());
+    requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
   }, [bootLines.length, inputRef]);
 
   // Boot: animate line-by-line on first visit; instant for returning/reduced-motion.
@@ -358,7 +358,7 @@ export function useTerminal({ counts, cmsCommands, contactText, inputRef, scroll
 
   const exitApp = useCallback(() => {
     setActiveApp(null);
-    requestAnimationFrame(() => inputRef.current?.focus());
+    requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
   }, [inputRef]);
 
   return {
