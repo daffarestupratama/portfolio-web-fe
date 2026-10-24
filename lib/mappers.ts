@@ -119,10 +119,11 @@ function twoDigitYear(iso: string): string {
   return `'${iso.slice(2, 4)}`;
 }
 
-/** `'24–'25` / `'23–now` / `'22` (same start/end year collapses to one). */
-export function formatDateRange(startDate: string, endDate: string | null, isCurrent: boolean | null): string {
-  if (isCurrent) return `${twoDigitYear(startDate)}–now`;
-  if (!endDate) return twoDigitYear(startDate);
+/** `'24–'25` / `'23–now` / `'22` (same start/end year collapses to one). An experience is
+ *  ongoing exactly when it has no end date; the CMS `isCurrent` flag is not read, so the two
+ *  can never disagree (an end date always wins). */
+export function formatDateRange(startDate: string, endDate: string | null): string {
+  if (!endDate) return `${twoDigitYear(startDate)}–now`;
   return startDate.slice(2, 4) === endDate.slice(2, 4)
     ? twoDigitYear(startDate)
     : `${twoDigitYear(startDate)}–${twoDigitYear(endDate)}`;
@@ -163,24 +164,23 @@ export function mapExperience(e: StrapiExperience): Experience {
     organization: e.organization,
     initials: deriveInitials(e.organization),
     role: e.title,
-    dateRange: formatDateRange(e.startDate, e.endDate, e.isCurrent),
+    dateRange: formatDateRange(e.startDate, e.endDate),
     description: e.description,
     location: e.location?.trim() || null,
     startDate: e.startDate,
-    endDate: e.endDate,
-    isCurrent: e.isCurrent ?? false,
+    endDate: e.endDate || null,
     gallery: mapGallery(e.gallery),
     logo: mapImage(e.logo, e.organization),
   };
 }
 
-/** Newest-first: current roles first, then latest end date, then latest start date.
- *  ISO date strings (YYYY-MM-DD) compare lexically = chronologically. */
+/** Newest-first: ongoing roles (no end date) first, then latest end date, then latest start
+ *  date. ISO date strings (YYYY-MM-DD) compare lexically = chronologically. */
 export function byNewestExperience(a: Experience, b: Experience): number {
-  if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
-  const aEnd = a.endDate ?? a.startDate;
-  const bEnd = b.endDate ?? b.startDate;
-  if (aEnd !== bEnd) return aEnd < bEnd ? 1 : -1;
+  const aOngoing = a.endDate === null;
+  const bOngoing = b.endDate === null;
+  if (aOngoing !== bOngoing) return aOngoing ? -1 : 1;
+  if (!aOngoing && a.endDate !== b.endDate) return a.endDate! < b.endDate! ? 1 : -1;
   if (a.startDate !== b.startDate) return a.startDate < b.startDate ? 1 : -1;
   return 0;
 }

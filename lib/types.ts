@@ -86,7 +86,6 @@ export interface StrapiExperience {
   experienceType: string;
   startDate: string;
   endDate: string | null;
-  isCurrent: boolean | null;
   description: string;
   gallery: StrapiGalleryImage[];
   logo?: StrapiMedia | null;

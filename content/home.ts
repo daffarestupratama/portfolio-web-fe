@@ -59,10 +59,10 @@ export interface Experience {
   description: string;
   /** Free-text place ("Depok, Indonesia"); shown in the expanded card. Null when blank. */
   location: string | null;
-  /** Raw dates carried through for newest-first sorting (see byNewestExperience). */
+  /** Raw dates carried through for newest-first sorting (see byNewestExperience). A null
+   *  `endDate` means the experience is ongoing. */
   startDate: string;
   endDate: string | null;
-  isCurrent: boolean;
   gallery: GalleryImage[];
   /** Uploaded org logo when present; the item falls back to the initials box when null. */
   logo: MappedImage | null;
