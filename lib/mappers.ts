@@ -147,12 +147,14 @@ export function deriveInitials(organization: string): string {
 }
 
 const EXPERIENCE_CATEGORY_MAP: Record<string, ExperienceCategory> = {
+  work: "work",
+  freelance: "work",
   education: "education",
   organization: "organization",
 };
 
-/** Every experienceType outside education/organization (work, freelance, volunteer,
- *  project, certification, other, …) falls into the "others" bucket. */
+/** Every experienceType outside the map (volunteer, project, other, and the legacy
+ *  `certification` value) falls into the "others" bucket. */
 export function mapExperienceCategory(experienceType: string): ExperienceCategory {
   return EXPERIENCE_CATEGORY_MAP[experienceType] ?? "others";
 }
@@ -185,12 +187,17 @@ export function byNewestExperience(a: Experience, b: Experience): number {
   return 0;
 }
 
-/** Bucket mapped experiences into the 3 tab categories, each sorted newest-first.
+/** Bucket mapped experiences into the 4 experience tab categories, each sorted newest-first.
  *  Used by getExperiences (content/experiences.ts) for the homepage and /about. */
 export function bucketExperiences(experiences: Experience[]): Record<ExperienceCategory, Experience[]> {
   const bucket = (category: ExperienceCategory) =>
     experiences.filter((e) => e.category === category).sort(byNewestExperience);
-  return { education: bucket("education"), organization: bucket("organization"), others: bucket("others") };
+  return {
+    work: bucket("work"),
+    education: bucket("education"),
+    organization: bucket("organization"),
+    others: bucket("others"),
+  };
 }
 
 export function toStringArray(value: unknown): string[] {

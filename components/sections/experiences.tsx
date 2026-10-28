@@ -7,6 +7,7 @@ import type { Certification } from "@/content/certifications";
 import { ExperienceTimelineItem } from "@/components/cards/experience-timeline-item";
 import { CertificationCard } from "@/components/certifications/certification-card";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { NavIcon } from "@/components/layout/nav-icon";
 
 /** Certifications aren't Experience entries in Strapi; they borrow this section's space
  *  rather than adding another one to the page. */
@@ -19,15 +20,83 @@ interface ExperiencesProps {
   certifications?: Certification[];
 }
 
-/** Order is declared here and nowhere else — Certifications sits third, before Others. */
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "education", label: "Education" },
-  { key: "organization", label: "Organization" },
-  { key: CERTIFICATIONS_TAB, label: "Certifications" },
-  { key: "others", label: "Others" },
+/** Single-path 24×24 tab glyphs, drawn for NavIcon (the navbar's stroke, caps and size). */
+const XP_TAB_ICONS = {
+  work: "M4 7.5h16a1.5 1.5 0 0 1 1.5 1.5v9.5A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5V9A1.5 1.5 0 0 1 4 7.5zM8.5 7.5v-2A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5v2",
+  education: "M2.5 9.5L12 5l9.5 4.5L12 14zM6.5 11.6V16c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4M21.5 9.5v5",
+  leadership: "M15.5 20v-1.5a3.5 3.5 0 0 0-3.5-3.5H6a3.5 3.5 0 0 0-3.5 3.5V20M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21.5 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8",
+  certifications: "M12 15a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8.6 13.8L7.5 21l4.5-2.5 4.5 2.5-1.1-7.2",
+  others: "M12 3L2.5 8 12 13l9.5-5zM2.5 12.5L12 17.5l9.5-5M2.5 17L12 22l9.5-5",
+} as const;
+
+/**
+ * Order is declared here and nowhere else. `label` is what the tab shows (and its tooltip);
+ * `name` is the accessible name, which always contains the label.
+ */
+const TABS: { key: TabKey; label: string; name: string; icon: string }[] = [
+  { key: "work", label: "Work", name: "Work", icon: XP_TAB_ICONS.work },
+  { key: "education", label: "Education", name: "Education", icon: XP_TAB_ICONS.education },
+  { key: "organization", label: "Leadership", name: "Leadership/Organization", icon: XP_TAB_ICONS.leadership },
+  { key: CERTIFICATIONS_TAB, label: "Certifications", name: "Certifications", icon: XP_TAB_ICONS.certifications },
+  { key: "others", label: "Others", name: "Others", icon: XP_TAB_ICONS.others },
 ];
 
 const TOP_N = 3;
+
+/**
+ * The tab row's three stages, like the navbar's (nav-links.ts NAV_STAGES): icon + label when it
+ * fits, label only while the labels still fit without the icon, and icon only below that (the
+ * label then shows as a tooltip). The breakpoints depend on how many tabs are offered, which the
+ * server already knows, so they are solved here once for every count and emitted as media
+ * queries keyed on `data-n`: the first render is the right stage, with no hydration flash.
+ *
+ * Widths are measured in the tab font (Inter 600, 14px): the widest label, "Certifications", is
+ * 89.2px. Every stage keeps equal `1fr` columns and only changes the track's width, so the thumb
+ * (one column wide) lines up with the active tab in all of them.
+ */
+const LABEL_MAX = 90;
+/** Icon + label tab: icon 17, gap 7, and 2a's 16px side padding. */
+const TAB_W = LABEL_MAX + 17 + 7 + 2 * 16;
+/** Label-only tab at its narrowest: 6px each side (today's 360px row keeps about 7.5px). */
+const LABEL_MIN = LABEL_MAX + 2 * 6;
+/** 2a's label tabs from 640px, and the compact icon-only tabs there. */
+const TAB_W_LABEL = 136;
+const TAB_W_ICON = 64;
+/** Desktop browsers count a classic scrollbar in the media-query width but not in layout. */
+const SCROLLBAR = 17;
+
+/** Width the tab track can use at viewport width `vw`: the 820px column inside the section's
+ *  clamp(16px, 4vw, 40px) side padding, less the wrap's 2px each side. */
+function trackRoom(vw: number): number {
+  const content = vw - (vw >= 640 ? SCROLLBAR : 0);
+  return Math.min(820, content - 2 * Math.min(40, Math.max(16, 0.04 * vw))) - 4;
+}
+
+function smallestWidth(fits: (vw: number) => boolean): number {
+  let vw = 240;
+  while (!fits(vw)) vw++;
+  return vw;
+}
+
+/** The stage breakpoints for `n` tabs: label only from `label`, icon + label from `iconLabel`. */
+function xpTabStages(n: number): { label: number; iconLabel: number } {
+  return {
+    label: smallestWidth((vw) => (trackRoom(vw) - 12) / n >= LABEL_MIN),
+    iconLabel: smallestWidth((vw) => trackRoom(vw) >= n * TAB_W + 12),
+  };
+}
+
+const XP_STAGE_CSS = [1, 2, 3, 4, 5]
+  .map((n) => {
+    const { label, iconLabel } = xpTabStages(n);
+    const t = `.xp-tabs[data-n="${n}"]`;
+    return (
+      `@media (min-width:${label}px){${t} .xp-txt{display:inline}${t} .xp-ico{display:none}${t} .xp-tab{--xp-tip:none}}` +
+      `@media (min-width:${Math.max(label, 640)}px){${t}{width:min(100%,${n * TAB_W_LABEL + 12}px)}}` +
+      `@media (min-width:${iconLabel}px){${t}{width:${n * TAB_W + 12}px}${t} .xp-ico{display:block}}`
+    );
+  })
+  .join("\n");
 
 /**
  * Portfolio 2a's Experiences: an inset tab track with a raised thumb that springs between
@@ -53,11 +122,6 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
   const showingCertifications = tab === CERTIFICATIONS_TAB;
   const items = showingCertifications ? [] : experiences[tab as ExperienceCategory];
   const visible = showAll ? items : items.slice(0, TOP_N);
-
-  // Below 640px (latest 2a) the track fills the width instead of scrolling: one row, or two
-  // columns once there are more than three tabs. The thumb moves by column and row there.
-  const narrowCols = tabs.length > 3 ? 2 : tabs.length;
-  const narrowRows = Math.ceil(tabs.length / narrowCols);
 
   const selectTab = (key: TabKey) => {
     setSelected(key);
@@ -85,21 +149,13 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
         <h2 className="xp-title">Experiences</h2>
 
         <div className="xp-tabs-wrap">
+          <style dangerouslySetInnerHTML={{ __html: XP_STAGE_CSS }} />
           <div
             role="tablist"
             aria-label="Experience category"
             className="xp-tabs"
-            data-rows={narrowRows > 1 || undefined}
-            style={
-              {
-                "--xp-tabs": tabs.length,
-                "--xp-i": index,
-                "--xp-cols": narrowCols,
-                "--xp-rows": narrowRows,
-                "--xp-col": index % narrowCols,
-                "--xp-row": Math.floor(index / narrowCols),
-              } as CSSProperties
-            }
+            data-n={tabs.length}
+            style={{ "--xp-tabs": tabs.length, "--xp-i": index } as CSSProperties}
             onKeyDown={onTabKey}
           >
             <span aria-hidden="true" className="xp-thumb" />
@@ -112,6 +168,7 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
                 type="button"
                 role="tab"
                 id={`xp-tab-${t.key}`}
+                aria-label={t.name}
                 aria-selected={tab === t.key}
                 aria-controls="xp-panel"
                 tabIndex={tab === t.key ? 0 : -1}
@@ -119,7 +176,11 @@ export function Experiences({ experiences, certifications = [] }: ExperiencesPro
                 onClick={() => selectTab(t.key)}
                 className="xp-tab"
               >
-                {t.label}
+                <NavIcon d={t.icon} size={17} className="xp-ico" />
+                <span className="xp-txt">{t.label}</span>
+                <span role="tooltip" className="xp-tip">
+                  {t.label}
+                </span>
               </button>
             ))}
           </div>

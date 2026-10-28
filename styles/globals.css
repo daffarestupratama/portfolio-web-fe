@@ -420,7 +420,9 @@ select {
 .nv-txt {
   white-space: nowrap;
 }
-.nv-tip {
+/* Also the Experiences tabs' tooltip (.xp-tip), so the two look identical. */
+.nv-tip,
+.xp-tip {
   display: none;
   position: absolute;
   top: calc(100% + 12px);
@@ -992,21 +994,31 @@ button.cv-btn:active {
   justify-content: center;
   padding: 4px 2px 12px;
 }
+/* The tab row's three stages (experiences.tsx): icon + label, label only, icon only. The
+   base rules here are icon only; experiences.tsx emits the per-tab-count media queries that
+   switch to the other two. Every stage keeps equal 1fr columns and only the track's width
+   changes, so the thumb (one column wide) always sits exactly on the active tab. */
 .xp-tabs {
-  --xp-tab-w: 136px;
   position: relative;
   display: grid;
-  grid-template-columns: repeat(var(--xp-tabs), var(--xp-tab-w));
+  grid-template-columns: repeat(var(--xp-tabs), minmax(0,1fr));
+  width: 100%;
   padding: 6px;
   border-radius: 999px;
   background: var(--bg);
   box-shadow: var(--in);
 }
+/* Icon only from 640px: a compact row of 64px tabs instead of the full width. */
+@media (min-width: 640px) {
+  .xp-tabs {
+    width: calc(var(--xp-tabs) * 64px + 12px);
+  }
+}
 .xp-thumb {
   position: absolute;
   top: 6px;
   left: 6px;
-  width: var(--xp-tab-w);
+  width: calc((100% - 12px) / var(--xp-tabs));
   height: calc(100% - 12px);
   border-radius: 999px;
   background: var(--bg);
@@ -1014,28 +1026,15 @@ button.cv-btn:active {
   transform: translateX(calc(var(--xp-i) * 100%));
   transition: transform .55s var(--spring);
 }
-/* Latest 2a: below 640px the track fills the width and never scrolls. One row of equal tabs,
-   or a 2-column grid once there are more than three (the thumb then moves by column and row). */
-@media (max-width: 639px) {
-  .xp-tabs {
-    width: 100%;
-    grid-template-columns: repeat(var(--xp-cols), minmax(0,1fr));
-  }
-  .xp-tabs[data-rows] {
-    border-radius: 24px;
-  }
-  .xp-thumb {
-    width: calc((100% - 12px) / var(--xp-cols));
-    height: calc((100% - 12px) / var(--xp-rows));
-    transform: translate(calc(var(--xp-col) * 100%), calc(var(--xp-row) * 100%));
-  }
-  .xp-tabs[data-rows] .xp-thumb {
-    border-radius: 18px;
-  }
-}
 .xp-tab {
+  --xp-tip: block;
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   padding: 10px 0;
   border: none;
   background: transparent;
@@ -1047,6 +1046,28 @@ button.cv-btn:active {
 }
 .xp-tab[data-active] {
   color: var(--accent-ink);
+}
+.xp-ico {
+  flex-shrink: 0;
+}
+.xp-txt {
+  display: none;
+  white-space: nowrap;
+}
+/* The label as a tooltip, only in the icon-only stage (where --xp-tip stays block), like the
+   navbar's icon-only items. The end tabs align it to their outer edge so it never leaves the
+   screen on a phone. */
+.xp-tab:is(:hover, :focus-visible) .xp-tip {
+  display: var(--xp-tip, none);
+}
+.xp-tab:nth-child(2) .xp-tip {
+  left: 0;
+  transform: none;
+}
+.xp-tab:last-child .xp-tip {
+  left: auto;
+  right: 0;
+  transform: none;
 }
 .xp-timeline {
   position: relative;

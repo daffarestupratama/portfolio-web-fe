@@ -46,7 +46,9 @@ export interface GalleryImage extends MappedImage {
   caption: string | null;
 }
 
-export type ExperienceCategory = "education" | "organization" | "others";
+/** The Experiences tabs' buckets (see mapExperienceCategory). "organization" is shown as
+ *  "Leadership". */
+export type ExperienceCategory = "work" | "education" | "organization" | "others";
 
 export interface Experience {
   id: string;
