@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "@/content/home";
 import { ProjectCard } from "@/components/cards/project-card";
-import { projectTypeMeta } from "@/components/cards/project-type-meta";
+import { byProjectTypeOrder, projectTypeMeta } from "@/components/cards/project-type-meta";
 
 interface ProjectsFilterProps {
   projects: Project[];
@@ -13,7 +13,10 @@ const ALL = "__all__";
 const BATCH = 6;
 
 export function ProjectsFilter({ projects }: ProjectsFilterProps) {
-  const types = useMemo(() => Array.from(new Set(projects.map((p) => p.projectType))), [projects]);
+  const types = useMemo(
+    () => Array.from(new Set(projects.map((p) => p.projectType))).sort(byProjectTypeOrder),
+    [projects],
+  );
   const [active, setActive] = useState<string>(ALL);
   const [count, setCount] = useState(BATCH);
   const sentinelRef = useRef<HTMLDivElement>(null);

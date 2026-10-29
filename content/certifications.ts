@@ -41,6 +41,16 @@ function clean(value: string | null | undefined): string | null {
   return t ? t : null;
 }
 
+/** Every `certification.kind` enum value, including ones the CMS may not offer yet. */
+const CERTIFICATION_KIND_LABELS: Record<string, string> = {
+  course: "Course",
+  workshop: "Workshop",
+  event: "Event",
+  bootcamp: "Bootcamp",
+  organization: "Organization",
+  professional: "Professional certification",
+};
+
 function mapCertification(c: StrapiCertification): Certification {
   return {
     id: c.documentId,
@@ -61,7 +71,7 @@ function mapCertification(c: StrapiCertification): Certification {
     certificateUrl: c.certificateImage?.url ? strapiImageUrl(c.certificateImage.url) : null,
     description: clean(c.description),
     kind: c.kind,
-    kindLabel: titleCase(c.kind),
+    kindLabel: CERTIFICATION_KIND_LABELS[c.kind] ?? titleCase(c.kind),
     skills: (c.skills ?? []).map((s) => s.name).filter(Boolean),
     isFeatured: Boolean(c.isFeatured),
     order: c.order,

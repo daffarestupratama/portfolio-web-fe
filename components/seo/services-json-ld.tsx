@@ -10,15 +10,36 @@ interface ServicesJsonLdProps {
   providerName: string;
 }
 
+/** UN/CEFACT unit codes for recurring billing (schema.org's recommended `unitCode` values). */
+const BILLING_UNIT: Record<string, string> = { monthly: "MON", yearly: "ANN" };
+
+/**
+ * The Offer's price properties. A fixed one-off price sits on the Offer itself; a "starts from"
+ * price is a PriceSpecification `minPrice`, and recurring billing is a UnitPriceSpecification per
+ * month or year, so neither is published as a fixed one-off price.
+ */
+function offerPrice(p: ServicePackage & { price: number }): Record<string, unknown> {
+  const unitCode = BILLING_UNIT[p.billing];
+  const startsFrom = p.priceQualifier === "starts_from";
+  if (!unitCode && !startsFrom) return { price: String(p.price), priceCurrency: p.currency };
+  return {
+    priceSpecification: {
+      "@type": unitCode ? "UnitPriceSpecification" : "PriceSpecification",
+      [startsFrom ? "minPrice" : "price"]: p.price,
+      priceCurrency: p.currency,
+      ...(unitCode ? { referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode } } : {}),
+    },
+  };
+}
+
 /** Service + OfferCatalog (packages as Offers) + FAQPage structured data for /services. */
 export function ServicesJsonLd({ packages, faqs, providerName }: ServicesJsonLdProps) {
   const offers = packages
-    .filter((p) => p.price != null)
+    .filter((p): p is ServicePackage & { price: number } => p.price != null)
     .map((p) => ({
       "@type": "Offer",
       name: p.name,
-      price: String(p.price),
-      priceCurrency: p.currency,
+      ...offerPrice(p),
       ...(p.tagline ? { description: toSingleLine(p.tagline) } : {}),
     }));
 

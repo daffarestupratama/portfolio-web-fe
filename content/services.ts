@@ -63,6 +63,8 @@ export interface ServicePackage {
   tagline: string | null;
   kind: string;
   billing: string;
+  /** "starts_from" when `price` is a minimum; anything else is a fixed price. */
+  priceQualifier: string;
   /** Formatted display price, with a "mulai " prefix when priceQualifier is starts_from. */
   priceLabel: string;
   /** "/bulan" | "/tahun" | "" — appended after the price for recurring billing. */
@@ -125,6 +127,7 @@ function mapPackage(p: StrapiServicePackage): ServicePackage {
     tagline: fix(p.tagline),
     kind: p.kind,
     billing: p.billing,
+    priceQualifier: p.priceQualifier,
     priceLabel: priceLabel(p),
     billingSuffix: billingSuffix(p.billing),
     includes: toStringArray(p.includes).map(fixMojibake),

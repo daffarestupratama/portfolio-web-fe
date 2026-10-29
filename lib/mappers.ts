@@ -217,12 +217,14 @@ export function mapTechnology(s: StrapiSkill): Technology {
   };
 }
 
-/** Sort by `order` (nulls last — many skills have none) then name, so the tile row is
- *  deterministic across renders. */
+/** Skill order: by `order` (nulls last — many skills have none) then name, so lists are
+ *  deterministic across renders. Shared by technology rows and the /about skill groups. */
+export function bySkillOrder(a: { order: number | null; name: string }, b: { order: number | null; name: string }): number {
+  return (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) || a.name.localeCompare(b.name);
+}
+
 export function mapTechnologies(list: StrapiSkill[] | null | undefined): Technology[] {
-  return (list ?? [])
-    .map(mapTechnology)
-    .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) || a.name.localeCompare(b.name));
+  return (list ?? []).map(mapTechnology).sort(bySkillOrder);
 }
 
 export function mapProject(p: StrapiProject): Project {
@@ -315,13 +317,26 @@ function formatPublishedDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
+/** Every `article.category` enum value, including ones the CMS may not offer yet. */
+const ARTICLE_CATEGORY_LABELS: Record<string, string> = {
+  personal: "Personal",
+  data: "Data",
+  technology: "Technology",
+  travel: "Travel",
+  tutorial: "Tutorial",
+  essay: "Essay",
+  campus: "Campus",
+  business: "Business",
+  other: "Other",
+};
+
 export function mapArticle(a: StrapiArticle): Article {
   return {
     id: a.documentId,
     slug: a.slug,
     title: a.title,
     excerpt: a.excerpt,
-    category: titleCase(a.category),
+    category: ARTICLE_CATEGORY_LABELS[a.category] ?? titleCase(a.category),
     language: mapLanguage(a.language),
     publishedDate: formatPublishedDate(a.publishedDate),
     readTime: estimateReadTime(a.body),

@@ -15,7 +15,6 @@ export const GUESTBOOK_CATEGORIES = [
   "personal",
   "tour",
   "website",
-  "critics",
   "other",
 ] as const;
 

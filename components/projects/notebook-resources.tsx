@@ -21,6 +21,21 @@ interface NotebookResourcesProps {
 
 const EMBED_KINDS = new Set(["interactive_chart", "dashboard", "html_export", "map"]);
 
+/** Every `project-resource.kind` enum value, including ones the CMS may not offer yet. */
+const RESOURCE_KIND_LABELS: Record<string, string> = {
+  jupyter_notebook: "Jupyter notebook",
+  r_notebook: "R notebook",
+  html_export: "HTML export",
+  interactive_chart: "Interactive chart",
+  static_chart: "Static chart",
+  dashboard: "Dashboard",
+  dataset: "Dataset",
+  map: "Map",
+  document: "Document",
+  video: "Video",
+  other: "Other",
+};
+
 /** Renders a single notebook/output resource by kind: embed (iframe), link, or
  *  file download — degrading to a title + description card when nothing is filled in.
  *  Card styling is 2a's (kind chip, title, description, action at the foot). */
@@ -33,7 +48,7 @@ function ResourceItem({ resource }: { resource: NotebookResource }) {
 
   return (
     <div className="nb">
-      <span className="nb-kind mono">{titleCase(resource.kind)}</span>
+      <span className="nb-kind mono">{RESOURCE_KIND_LABELS[resource.kind] ?? titleCase(resource.kind)}</span>
       <h3 className="nb-title">{resource.title}</h3>
       {resource.description && <p className="nb-desc">{resource.description}</p>}
 

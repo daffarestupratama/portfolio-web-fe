@@ -1482,7 +1482,7 @@ button.cv-btn:active {
     aspect-ratio: auto;
     grid-column: span 2;
   }
-  .bento[data-layout="home"] .pc[data-rows="2"] {
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc[data-rows="2"] {
     grid-row: span 2;
   }
 }
@@ -1705,11 +1705,11 @@ button.cv-btn:active {
 /* "Big" tiles keep both rows and allow six summary lines. Which tiles are big follows 2a:
    the two-row tiles in a multi-column grid, and every home/services tile at 560–899px. */
 @media (min-width: 900px) {
-  .bento[data-layout="home"] .pc[data-rows="2"]:is(:hover, :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc[data-rows="2"]:is(:hover, :has(.pc-link:focus-visible)) :is(.pc-meta, .pc-tech) {
     grid-template-rows: 1fr;
     opacity: 1;
   }
-  .bento[data-layout="home"] .pc[data-rows="2"] .pc-sum p {
+  .bento:is([data-layout="home"], [data-layout="services"]) .pc[data-rows="2"] .pc-sum p {
     -webkit-line-clamp: 6;
   }
 }

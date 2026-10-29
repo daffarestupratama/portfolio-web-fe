@@ -54,7 +54,9 @@ export const SITE_SETTING_QUERY =
 export const PROJECTS_LIST_QUERY =
   "populate[coverImage]=true" +
   "&populate[technologies][populate][logo]=true" +
-  "&sort[0]=year:desc&pagination[pageSize]=100";
+  // Newest year first, then title A–Z; slug (unique) settles identical titles, so the order
+  // never falls back to database order.
+  "&sort[0]=year:desc&sort[1]=title:asc&sort[2]=slug:asc&pagination[pageSize]=100";
 
 export function projectDetailQuery(slug: string): string {
   return (

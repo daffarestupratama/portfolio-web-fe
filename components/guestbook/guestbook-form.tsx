@@ -11,7 +11,6 @@ const CATEGORY_OPTIONS = [
   { value: "career", label: "Career" },
   { value: "personal", label: "Personal" },
   { value: "website", label: "Website" },
-  { value: "critics", label: "Critics" },
   { value: "other", label: "Other" },
 ];
 
