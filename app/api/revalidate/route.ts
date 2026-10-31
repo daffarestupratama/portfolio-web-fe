@@ -37,13 +37,16 @@ type PathSpec = [path: string] | [path: string, type: "layout" | "page"];
  */
 const ROUTES: Record<string, PathSpec[]> = {
   // Detail slug is appended at request time when the payload carries one. /mkdir shows the
-  // project, article and (when tours are on) tour counts.
+  // project, article and (when tours are on) tour counts. The project layout tag also covers
+  // the /projects list, which the projects-page order is applied to.
   article: [["/articles", "layout"], ["/projects", "layout"], ["/"], ["/mkdir"], ["/sitemap.xml"]],
   project: [["/projects", "layout"], ["/articles", "layout"], ["/"], ["/services"], ["/mkdir"], ["/sitemap.xml"]],
   "tour-package": [["/tours", "layout"], ["/"], ["/mkdir"], ["/sitemap.xml"]],
 
   "tour-guide-landing-page": [["/tours"]],
   "home-page": [["/"], ["/sitemap.xml"]],
+  // Order, header copy and seo of the /projects list. No other route reads it.
+  "projects-page": [["/projects"]],
   "about-page": [["/about"], ["/sitemap.xml"]],
 
   "service-page": [["/services"]],
@@ -79,6 +82,7 @@ const DETAIL_SEGMENT: Record<string, string> = {
 const ALIASES: Record<string, string> = {
   articles: "article",
   projects: "project",
+  "projects-pages": "projects-page",
   "tour-packages": "tour-package",
   skills: "skill",
   experiences: "experience",

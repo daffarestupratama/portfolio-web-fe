@@ -58,6 +58,19 @@ export const PROJECTS_LIST_QUERY =
   // never falls back to database order.
   "&sort[0]=year:desc&sort[1]=title:asc&sort[2]=slug:asc&pagination[pageSize]=100";
 
+/**
+ * The /projects single type: header copy, seo, and the related projects' documentIds in
+ * relation order (that order is the curated list order). The ogImage keeps only what mapSeo reads.
+ */
+export const PROJECTS_PAGE_QUERY =
+  "fields[0]=title" +
+  "&fields[1]=subtitle" +
+  "&populate[projects][fields][0]=documentId" +
+  "&populate[seo][populate][ogImage][fields][0]=url" +
+  "&populate[seo][populate][ogImage][fields][1]=width" +
+  "&populate[seo][populate][ogImage][fields][2]=height" +
+  "&populate[seo][populate][ogImage][fields][3]=alternativeText";
+
 export function projectDetailQuery(slug: string): string {
   return (
     `filters[slug][$eq]=${encodeURIComponent(slug)}` +

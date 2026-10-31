@@ -13,11 +13,22 @@ const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? "https://cms.daffa.me"
  * stale data from the fetch cache. With no fetch cache entry, every render fetches fresh
  * data, and renders only happen on the route's ISR schedule.
  */
+/** A non-2xx Strapi response. `status` lets callers treat a missing entry differently from an outage. */
+export class StrapiHttpError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "StrapiHttpError";
+  }
+}
+
 async function strapiFetch<T>(path: string, query: string | undefined): Promise<T> {
   const url = `${STRAPI_URL}/api${path}${query ? `?${query}` : ""}`;
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`Strapi request failed: ${res.status} ${res.statusText} — ${url}`);
+    throw new StrapiHttpError(`Strapi request failed: ${res.status} ${res.statusText} — ${url}`, res.status);
   }
   return res.json() as Promise<T>;
 }
@@ -26,6 +37,20 @@ async function strapiFetch<T>(path: string, query: string | undefined): Promise<
 export async function strapiFindOne<T>(uid: string, query?: string): Promise<T> {
   const json = await strapiFetch<StrapiSingleResponse<T>>(`/${uid}`, query);
   return json.data;
+}
+
+/**
+ * Like `strapiFindOne`, but a single type that is missing, unpublished (404) or not public
+ * (403) resolves to null so the page can fall back to its own copy. Any other failure still
+ * throws, so an outage keeps the last good render instead of caching a degraded one.
+ */
+export async function strapiFindOneOptional<T>(uid: string, query?: string): Promise<T | null> {
+  try {
+    return (await strapiFindOne<T>(uid, query)) ?? null;
+  } catch (err) {
+    if (err instanceof StrapiHttpError && (err.status === 404 || err.status === 403)) return null;
+    throw err;
+  }
 }
 
 /** Fetch a collection-type listing (e.g. `tour-packages`). */
