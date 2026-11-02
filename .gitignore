@@ -46,7 +46,8 @@ next-env.d.ts
 dist/
 
 # claude
-.claude/
+.claude/*
+!.claude/settings.json
 
 # claude design handoff (reference only, re-downloadable from Claude Design)
 design-export/redesign-v2/
