@@ -59,9 +59,8 @@ const LABEL_MAX = 90;
 const TAB_W = LABEL_MAX + 17 + 7 + 2 * 16;
 /** Label-only tab at its narrowest: 6px each side (today's 360px row keeps about 7.5px). */
 const LABEL_MIN = LABEL_MAX + 2 * 6;
-/** 2a's label tabs from 640px, and the compact icon-only tabs there. */
+/** 2a's label tabs from 640px. */
 const TAB_W_LABEL = 136;
-const TAB_W_ICON = 64;
 /** Desktop browsers count a classic scrollbar in the media-query width but not in layout. */
 const SCROLLBAR = 17;
 

@@ -213,6 +213,15 @@ export interface StrapiSkill {
   logo?: StrapiMedia | null;
 }
 
+export interface StrapiProjectsPage {
+  id: number;
+  documentId: string;
+  title: string | null;
+  subtitle: string | null;
+  projects: { documentId: string }[] | null;
+  seo: StrapiSeo | null;
+}
+
 export interface StrapiAboutPage {
   id: number;
   documentId: string;
